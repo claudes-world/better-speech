@@ -3,8 +3,6 @@ from __future__ import annotations
 import re
 from urllib.parse import urlparse
 
-DEFAULT_SPEECH_SEGMENT_CHARS = 4000
-
 
 def humanize_url(url: str) -> str:
     """Describe a URL without making a listener hear protocol and path noise."""

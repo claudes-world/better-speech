@@ -7,11 +7,10 @@ This module does no synthesis and never records a lesson as heard.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 
 from .boundaries import paragraph_boundaries
 from .curriculum import canonical_phrase, js_trim
@@ -125,13 +124,6 @@ class SpeechPlan:
     status: str
     reason: str | None = None
     schema_version: int = 1
-
-    def digest(self) -> str:
-        return hashlib.sha256(
-            json.dumps(
-                asdict(self), ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
-            ).encode()
-        ).hexdigest()
 
 
 def _tts(text: str, display: str, voice: RenderVoice, **fields) -> SpeechStep:

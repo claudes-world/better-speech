@@ -1,4 +1,8 @@
-# Cold review of the week-one implementation
+# Historical implementation self-review
+
+This is the self-review snapshot preceding commit `f104349`, retained as history.
+It is superseded by the subsequent cold-review fixes in Git history; its counts
+and status statements are not a current branch report.
 
 Reviewed against the stage-one brief and the approved stage-two refinements in
 the conversation. `stage2-directive.md` was not found in the checkout or the
@@ -64,71 +68,3 @@ declined as gold-plating or explicitly deferred scope.
 - Ruff lint and formatting checks pass.
 - Distribution build and a clean core-only wheel installation are checked; the
   historical reference modules/assets are excluded from the runtime wheel.
-
-## Files changed in this pass
-
-The following inventory compares this pass with its starting snapshot. Since the
-implementation was uncommitted throughout, Git still shows these as new relative
-to the repository's initial `LICENSE` commit. See [the complete tree inventory](files-changed.md)
-for every proposed file.
-
-### Modified
-
-- `README.md`
-- `docs/files-changed.md`
-- `docs/provenance.md`
-- `docs/worldos-adapter.md`
-- `src/better_speech/assembly.py`
-- `src/better_speech/cache.py`
-- `src/better_speech/compiler.py`
-- `src/better_speech/config.py`
-- `src/better_speech/curriculum.py`
-- `src/better_speech/executor.py`
-- `src/better_speech/exposure.py`
-- `src/better_speech/ledger.py`
-- `src/better_speech/planner.py`
-- `src/better_speech/providers/elevenlabs.py`
-- `src/better_speech/providers/google.py`
-- `src/better_speech/rendering.py`
-- `src/better_speech/rewriter.py`
-- `src/better_speech/transcript.py`
-- `src/better_speech/voices.py`
-- `tests/reference/identity.py`
-- `tests/reference/planner.py`
-- `tests/reference/polyglot.py`
-- `tests/test_cache_io.py`
-- `tests/test_cli_learning.py`
-- `tests/test_polyglot_curriculum.py`
-- `tests/test_polyglot_exposure.py`
-- `tests/test_polyglot_pacing.py`
-- `tests/test_polyglot_rewriter.py`
-- `tests/test_polyglot_segments.py`
-- `tests/test_polyglot_selection.py`
-- `tests/test_providers.py`
-- `tests/test_speech_cache.py`
-- `tests/test_speech_executor.py`
-- `tests/test_speech_executor_audio.py`
-
-### Added (including reference moves)
-
-- `docs/review-pass.md`
-- `tests/reference/curriculum.py`
-- `tests/reference/data/polyglot/curriculum-pr1010-provenance.json`
-- `tests/reference/data/polyglot/curriculum-pr1010.json`
-- `tests/reference/data/polyglot/curriculum-v1.json`
-- `tests/reference/executor.py`
-- `tests/reference/exposure.py`
-- `tests/reference/legacy_pacing.py`
-- `tests/reference/rewriter.py`
-- `tests/reference/segments.py`
-- `tests/reference/selection.py`
-- `tests/test_review_regressions.py`
-
-### Removed from the runtime tree (retained as test references)
-
-- `src/better_speech/data/polyglot/curriculum-pr1010-provenance.json`
-- `src/better_speech/data/polyglot/curriculum-pr1010.json`
-- `src/better_speech/data/polyglot/curriculum-v1.json`
-- `src/better_speech/legacy_pacing.py`
-- `src/better_speech/segments.py`
-- `src/better_speech/selection.py`
