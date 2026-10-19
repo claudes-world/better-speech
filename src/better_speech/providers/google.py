@@ -26,11 +26,13 @@ class GoogleProvider:
             "wav": texttospeech.AudioEncoding.LINEAR16,
         }[clip.output_format]
         if self.client is None:
+            remaining(deadline)
             self.client = (
                 texttospeech.TextToSpeechClient.from_service_account_file(self.credentials_file)
                 if self.credentials_file
                 else texttospeech.TextToSpeechClient()
             )
+            remaining(deadline)
         settings = json.loads(clip.settings_json)
         response = self.client.synthesize_speech(
             input=texttospeech.SynthesisInput(text=clip.text),

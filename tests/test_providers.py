@@ -1,3 +1,7 @@
+import json
+import socket
+import threading
+import time
 from dataclasses import replace
 from types import SimpleNamespace
 
@@ -33,14 +37,13 @@ def test_google_uses_plain_text_and_one_bounded_attempt():
 
 
 def test_elevenlabs_uses_configured_native_voice_and_no_retry():
-    pytest.importorskip("httpx")
+    httpx = pytest.importorskip("httpx")
+    requests = []
 
-    class Client:
-        def post(self, url, **kwargs):
-            self.url, self.request = url, kwargs
-            return SimpleNamespace(raise_for_status=lambda: None, content=b"audio")
+    def respond(request):
+        requests.append(request)
+        return httpx.Response(200, content=b"audio")
 
-    client = Client()
     native = replace(
         clip("elevenlabs", "vi"),
         text="Cảm ơn.",
@@ -49,15 +52,89 @@ def test_elevenlabs_uses_configured_native_voice_and_no_retry():
         rate=0.9,
         output_format="mp3_44100_128",
     )
-    assert ElevenLabsProvider("test-credential", client=client).synthesize(native, timeout=2) == b"audio"
-    assert client.url.endswith("/configured-id")
-    assert client.request["json"] == {
+    with httpx.Client(transport=httpx.MockTransport(respond)) as client:
+        assert ElevenLabsProvider("test-credential", client=client).synthesize(native, timeout=2) == b"audio"
+    assert len(requests) == 1
+    request = requests[0]
+    assert request.method == "POST" and request.url.path.endswith("/configured-id")
+    assert json.loads(request.content) == {
         "text": "Cảm ơn.",
         "model_id": "eleven_turbo_v2_5",
         "voice_settings": {"speed": 0.9},
     }
-    assert client.request["params"] == {"output_format": "mp3_44100_128"}
-    assert 0 < client.request["timeout"] <= 2
+    assert dict(request.url.params) == {"output_format": "mp3_44100_128"}
+    assert 0 < request.extensions["timeout"]["read"] <= 2
+
+
+def test_elevenlabs_dribbling_body_stops_at_operation_deadline():
+    """Use the real HTTPX/httpcore read path without binding a TCP port."""
+    httpx = pytest.importorskip("httpx")
+    from httpcore._backends.sync import SyncStream
+
+    left, right = socket.socketpair()
+
+    class PlainStream(SyncStream):
+        def start_tls(self, ssl_context, server_hostname=None, timeout=None):
+            return self
+
+    class Backend:
+        def connect_tcp(self, *args, **kwargs):
+            return PlainStream(left)
+
+    sent = []
+
+    def server():
+        try:
+            right.settimeout(2)
+            right.recv(65536)
+            right.sendall(b"HTTP/1.1 200 OK\r\nContent-Length: 10\r\nConnection: close\r\n\r\n")
+            for _ in range(10):
+                time.sleep(0.04)
+                right.sendall(b"x")
+                sent.append(True)
+        except (BrokenPipeError, ConnectionResetError):
+            pass  # The provider must close the stream before the body completes.
+        finally:
+            right.close()
+
+    worker = threading.Thread(target=server)
+    transport = httpx.HTTPTransport()
+    transport._pool._network_backend = Backend()
+    worker.start()
+    try:
+        with httpx.Client(transport=transport) as client:
+            started = time.monotonic()
+            with pytest.raises(TimeoutError):
+                ElevenLabsProvider("test-credential", client=client).synthesize(
+                    clip("elevenlabs", "vi"), timeout=0.1
+                )
+            elapsed = time.monotonic() - started
+            assert elapsed < 0.2  # A buffered read takes >0.4 seconds.
+            assert left.fileno() == -1
+    finally:
+        left.close()
+        worker.join(2)
+    assert not worker.is_alive() and len(sent) < 10
+
+
+def test_google_initialization_consumes_rpc_budget(monkeypatch):
+    texttospeech = pytest.importorskip("google.cloud.texttospeech")
+    client = SimpleNamespace()
+    observed = []
+
+    def synthesize(**kwargs):
+        observed.append(kwargs["timeout"])
+        return SimpleNamespace(audio_content=b"audio")
+
+    client.synthesize_speech = synthesize
+
+    def initialize():
+        time.sleep(0.04)
+        return client
+
+    monkeypatch.setattr(texttospeech, "TextToSpeechClient", initialize)
+    assert GoogleProvider().synthesize(clip(), timeout=0.2) == b"audio"
+    assert len(observed) == 1 and 0 < observed[0] < 0.18
 
 
 def test_missing_credential_never_makes_paid_attempt():

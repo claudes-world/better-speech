@@ -30,18 +30,25 @@ class ElevenLabsProvider:
         }
 
         def call(client):
-            response = client.post(
+            remaining(deadline)
+            with client.stream(
+                "POST",
                 "https://api.elevenlabs.io/v1/text-to-speech/" + quote(clip.voice, safe=""),
                 params={"output_format": clip.output_format},
                 json=body,
                 headers={"xi-api-key": self.api_key},
                 timeout=remaining(deadline),
-            )
-            response.raise_for_status()
-            remaining(deadline)
-            return response.content
+            ) as response:
+                response.raise_for_status()
+                chunks = []
+                for chunk in response.iter_bytes():
+                    remaining(deadline)
+                    chunks.append(chunk)
+                remaining(deadline)
+                return b"".join(chunks)
 
         if self.client is not None:
             return call(self.client)
+        remaining(deadline)
         with httpx.Client() as client:
             return call(client)
