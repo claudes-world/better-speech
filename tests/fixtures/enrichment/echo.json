@@ -1,0 +1,92 @@
+{
+  "classification": "v1-original",
+  "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+  "source_file": "polyglot-speak.test.ts",
+  "source_sha256": "92a98036688b267133a3080d3fe24294079678974051c89925c7b7ea43662b0b",
+  "source_test_names": [
+    "repeat_second_voice picks the echo from a DIFFERENT accent region",
+    "repeat_second_voice off: the echo reuses the primary voice",
+    "no second voice resolved when repeat is off (rotation stays one call)"
+  ],
+  "extraction": "Original buildSpeechPlan evaluated with the six RNG constants from the named original test; no synthesis/model call.",
+  "cases": [
+    {
+      "rng": 0,
+      "primary": {
+        "provider": "elevenlabs",
+        "voice": "CE5BJM57m1rtrAFVXfCq",
+        "region": "central"
+      },
+      "echo": {
+        "provider": "elevenlabs",
+        "voice": "2G3KT0n4xucedtpsBlU2",
+        "region": "southern"
+      }
+    },
+    {
+      "rng": 0.2,
+      "primary": {
+        "provider": "elevenlabs",
+        "voice": "uN2lv5lSgnxa1hcYRElP",
+        "region": "central"
+      },
+      "echo": {
+        "provider": "google",
+        "voice": "vi-VN-Chirp3-HD-Puck",
+        "region": "northern"
+      }
+    },
+    {
+      "rng": 0.4,
+      "primary": {
+        "provider": "elevenlabs",
+        "voice": "2G3KT0n4xucedtpsBlU2",
+        "region": "southern"
+      },
+      "echo": {
+        "provider": "elevenlabs",
+        "voice": "9FhIljxdGFirnCpAoUES",
+        "region": "central"
+      }
+    },
+    {
+      "rng": 0.6,
+      "primary": {
+        "provider": "google",
+        "voice": "vi-VN-Chirp3-HD-Puck",
+        "region": "northern"
+      },
+      "echo": {
+        "provider": "elevenlabs",
+        "voice": "9FhIljxdGFirnCpAoUES",
+        "region": "central"
+      }
+    },
+    {
+      "rng": 0.8,
+      "primary": {
+        "provider": "google",
+        "voice": "vi-VN-Chirp3-HD-Aoede",
+        "region": "northern"
+      },
+      "echo": {
+        "provider": "elevenlabs",
+        "voice": "2G3KT0n4xucedtpsBlU2",
+        "region": "southern"
+      }
+    },
+    {
+      "rng": 0.99,
+      "primary": {
+        "provider": "google",
+        "voice": "vi-VN-Chirp3-HD-Leda",
+        "region": "northern"
+      },
+      "echo": {
+        "provider": "elevenlabs",
+        "voice": "2G3KT0n4xucedtpsBlU2",
+        "region": "southern"
+      }
+    }
+  ]
+}

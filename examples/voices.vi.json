@@ -1,0 +1,35 @@
+{
+  "_note": "L2 lead-voice selection for speak-mixed-render.ts. exclude = never selected (lead or echo); weights = relative lead-selection probability, default 1; regions = accent region. Liam 10376 (2026-09-17 04:37 ET): weights for all 11 ElevenLabs VI voices; Google Chirp3-HD excluded (10305).",
+  "exclude": [
+    "vi-VN-Chirp3-HD-Puck",
+    "vi-VN-Chirp3-HD-Enceladus",
+    "vi-VN-Chirp3-HD-Aoede",
+    "vi-VN-Chirp3-HD-Leda"
+  ],
+  "weights": {
+    "ZvBK3ITp9pAzXbi1yZZH": 1,
+    "uN2lv5lSgnxa1hcYRElP": 2,
+    "CE5BJM57m1rtrAFVXfCq": 4,
+    "L5c6tGA8OiORYKxez5Zu": 4,
+    "9FhIljxdGFirnCpAoUES": 1,
+    "a3AkyqGG4v8Pg7SWQ0Y3": 4,
+    "IZKDEBDVLx4BnFc8W03D": 2,
+    "zRKf3RQpAJq11rSezsxD": 1,
+    "iCOyvtdHUPOHaQYt93QQ": 3,
+    "2G3KT0n4xucedtpsBlU2": 1,
+    "x4KAhuXs2G8TfK9Zr7Q4": 3
+  },
+  "regions": {
+    "ZvBK3ITp9pAzXbi1yZZH": "central",
+    "uN2lv5lSgnxa1hcYRElP": "central",
+    "CE5BJM57m1rtrAFVXfCq": "central",
+    "L5c6tGA8OiORYKxez5Zu": "central",
+    "9FhIljxdGFirnCpAoUES": "central",
+    "a3AkyqGG4v8Pg7SWQ0Y3": "central",
+    "IZKDEBDVLx4BnFc8W03D": "central",
+    "zRKf3RQpAJq11rSezsxD": "central",
+    "iCOyvtdHUPOHaQYt93QQ": "central",
+    "2G3KT0n4xucedtpsBlU2": "southern",
+    "x4KAhuXs2G8TfK9Zr7Q4": "southern"
+  }
+}

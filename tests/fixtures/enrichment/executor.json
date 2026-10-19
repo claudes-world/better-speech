@@ -1,0 +1,25 @@
+{
+  "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+  "source_file": "polyglot-speak.ts",
+  "source_sha256": "8c6e4b7e88c51df4c92238fd8c09bdfc487b922af3f11889767fa6f88c5a1186",
+  "source_test_file": "polyglot-speak.test.ts",
+  "source_test_sha256": "92a98036688b267133a3080d3fe24294079678974051c89925c7b7ea43662b0b",
+  "classification": "source-derived-regression-with-labelled-owner-deltas",
+  "source_test_names": ["all provider calls are in flight before any resolves, and output order follows step order", "a failing step rejects the whole plan with the provider error and still cleans up"],
+  "expectation_delta": "Bounded injected concurrency and custody-aware outcomes replace V1 unbounded direct providers. Only definitive terminal failure permits whole-source fallback; retryable/uncertain is held. Native-rate retry requires adapter-certified parameter rejection rather than all HTTP 4xx. No live ffmpeg/provider acceptance claimed.",
+  "concurrent": {"started_indices":[0,2,3],"assembly":["0","silence","2","3"]},
+  "failures": [
+    {"disposition":"terminal","status":"monolingual","fallback_calls":1},
+    {"disposition":"retryable","status":"held","fallback_calls":0},
+    {"disposition":"uncertain","status":"held","fallback_calls":0}
+  ],
+  "rate_rejection_trace": [["call",0.8],["call",null],["atempo",0.8]],
+  "ffmpeg_commands": [
+    ["ffmpeg","-f","lavfi","-i","anullsrc=r=48000:cl=mono","-t","0.05","/scratch/job/part-1.wav","-y","-loglevel","error"],
+    ["ffmpeg","-i","/input/a","-ar","48000","-ac","1","/scratch/job/part-0.wav","-y","-loglevel","error"],
+    ["ffmpeg","-i","/input/b","-ar","48000","-ac","1","/scratch/job/part-2.wav","-y","-loglevel","error"],
+    ["ffmpeg","-f","concat","-safe","0","-i","/scratch/job/list.txt","/scratch/job/joined.wav","-y","-loglevel","error"],
+    ["ffmpeg","-i","/scratch/job/joined.wav","-filter:a","loudnorm=I=-11:LRA=11:TP=-1.5,volume=3dB,alimiter=limit=0.95","-c:a","libopus","/output/final.ogg","-y","-loglevel","error"]
+  ],
+  "manifest": "file '/scratch/job/part-0.wav'\nfile '/scratch/job/part-1.wav'\nfile '/scratch/job/part-2.wav'\nfile '/scratch/job/part-1.wav'\n"
+}

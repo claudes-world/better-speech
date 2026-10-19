@@ -1,0 +1,17 @@
+{
+  "classification": "owner-extension",
+  "authority": "PLAN-codex-voice-pipeline-20260916.md Amendment A2 settings, budget and LOCKED INPUTS",
+  "expectation_delta": "No implicit v2 enablement. Unset budget uses remaining shared deadline, explicit legacy budgets cannot extend it. Legacy l1InPool is preserved as requested provenance but inactive under locked ElevenLabs pool.",
+  "cases": [
+    {"name":"absent-off", "lane":{}, "remaining_budget_ms":170000, "expected":{"enabled":false,"rewriteBudgetMs":170000,"l1InPool":false}},
+    {"name":"explicit-enabled", "lane":{"enabled":true}, "remaining_budget_ms":90000, "expected":{"enabled":true,"rewriteBudgetMs":90000}},
+    {"name":"lane-off", "lane":{"enabled":false}, "per_call":{"enabled":true}, "expected":{"enabled":false}},
+    {"name":"operator-off", "lane":{"enabled":true}, "imported_overrides":{"POLYGLOT_ENABLED":"off"}, "expected":{"enabled":false}},
+    {"name":"tight-deadline", "lane":{"enabled":true,"rewriteBudgetMs":9000}, "remaining_budget_ms":123, "expected":{"rewriteBudgetMs":123}},
+    {"name":"explicit-budget", "lane":{"enabled":true,"rewriteBudgetMs":1000}, "remaining_budget_ms":90000, "expected":{"rewriteBudgetMs":1000}},
+    {"name":"locked-pool", "lane":{"enabled":true,"l1InPool":true}, "expected":{"l1InPool":false,"requestedL1InPool":true}},
+    {"name":"false-role", "lane":{"enabled":true,"tailL1Lead":true}, "per_call":{"tail_l1_lead":false}, "expected":{"tailL1Lead":false}},
+    {"name":"invalid-role-inherits", "lane":{"midL1Lead":true}, "per_call":{"mid_l1_lead":null}, "expected":{"midL1Lead":true}},
+    {"name":"expired-budget", "lane":{"enabled":true,"rewriteBudgetMs":1000}, "remaining_budget_ms":0, "expected":{"rewriteBudgetMs":0}}
+  ]
+}

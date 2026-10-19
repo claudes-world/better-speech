@@ -1,0 +1,83 @@
+{
+  "classification": "v1-original",
+  "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+  "source_file": "polyglot-rewriter.test.ts",
+  "source_sha256": "5dea3c5720ea2ccbf2995d9a3857628e2fb7d365fd0ac0bb21225201e9ac3a07",
+  "source_test_names": [
+    "plan is assembled into a SegmentDoc with inventory strings verbatim",
+    "echo yields two segments with verbatim inventory l2 and ONE extracted phrase",
+    "parsePlan rejects non-object items and empty plans",
+    "unknown phraseId drops just that sprinkle"
+  ],
+  "inventory": [
+    {
+      "id": "ba-manh",
+      "l2": "ba mảnh",
+      "l1": "three pieces",
+      "units": [
+        "ba",
+        "mảnh"
+      ]
+    },
+    {
+      "id": "cung-luc",
+      "l2": "cùng lúc",
+      "l1": "same time",
+      "literal": "same... moment"
+    }
+  ],
+  "plan": {
+    "plan": [
+      {
+        "phraseId": "ba-manh",
+        "echo": true
+      },
+      {
+        "rest": "It finished."
+      },
+      {
+        "phraseId": "cung-luc",
+        "mode": "close"
+      }
+    ]
+  },
+  "expected": {
+    "segments": [
+      {
+        "l2": [
+          "ba",
+          "mảnh"
+        ],
+        "l1": "three pieces"
+      },
+      {
+        "l2": [
+          "ba",
+          "mảnh"
+        ],
+        "l1": "three pieces"
+      },
+      {
+        "rest": "It finished."
+      },
+      {
+        "l2": "cùng lúc",
+        "l1": "same time",
+        "literal": "same... moment",
+        "mode": "close"
+      }
+    ]
+  },
+  "invalid": [
+    {
+      "plan": []
+    },
+    {
+      "plan": [
+        "x"
+      ]
+    },
+    [],
+    "not json"
+  ]
+}

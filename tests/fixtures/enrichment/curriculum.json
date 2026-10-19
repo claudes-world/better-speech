@@ -1,0 +1,26 @@
+{
+  "classification": "v1-original",
+  "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+  "source_file": "polyglot-hook.test.ts",
+  "source_sha256": "f6cc20592e3957f76ecf034479065fefd2f0a0168febbb8c70b37f9de8f7b940",
+  "source_test_names": [
+    "bundled Tier-1 set by default, with unique ids and the Liam-adopted stock sentences",
+    "POLYGLOT_CURRICULUM overrides; an unreadable/invalid file falls back to bundled"
+  ],
+  "asset_sha256": "faebf815c56cb8051a1c330f1404b6600a00a3bfcc223eff9ddde8edcd8f22f1",
+  "inventory_count": 54,
+  "phrase_id": "ngon-qua",
+  "phrase": "Ngon quá!",
+  "override": {
+    "focusPhrases": [
+      {
+        "id": "x",
+        "l2": "Dạ.",
+        "l1": "Yes."
+      }
+    ]
+  },
+  "expected_override_ids": [
+    "x"
+  ]
+}

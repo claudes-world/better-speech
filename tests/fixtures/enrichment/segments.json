@@ -1,0 +1,61 @@
+{
+  "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+  "source_file": "marketplace/plugins/comms/polyglot-segments.test.ts",
+  "classification": "legacy-parity",
+  "source_sha256": "a41084fd812510acf6a6e63a4360eba1fbac9c7a160d7231c81cc8522fed286c",
+  "expectation_delta": "JSON parse diagnostic wording is interpreter-specific; assert error presence, as original tests do. The legacy rest contract is not permission for model-authored source replacement.",
+  "good": {"segments": [
+    {"l2": "Chào bạn", "l1": "Hi friend", "rest": "The deploy finished cleanly."},
+    {"mode": "close", "l1": "Have a good evening", "l2": ["Chúc bạn", "một buổi tối", "vui vẻ"], "literal": "Wish you... one evening... happy."}
+  ]},
+  "good_phrases": [{"l2": "Chào bạn", "l1": "Hi friend"}, {"l2": "Chúc bạn một buổi tối vui vẻ", "l1": "Have a good evening"}],
+  "validation": [
+    {"name": "a rest-only segment (untranslated remainder)", "input": {"segments": [{"rest": "Just English."}]}, "output": {"segments": [{"rest": "Just English."}]}},
+    {"name": "unknown fields, so a chatty model is not rejected for extra keys", "input": {"segments": [{"l2": "Xong rồi", "l1": "All done", "note": "ignore me"}]}, "output": {"segments": [{"l2": "Xong rồi", "l1": "All done"}]}},
+    {"name": "unparseable JSON", "input": "{\"segments\": [", "ok": false},
+    {"name": "a non-object root", "input": 42, "ok": false},
+    {"name": "null", "input": null, "ok": false},
+    {"name": "a missing segments array", "input": {"foo": 1}, "ok": false},
+    {"name": "segments as an object", "input": {"segments": {}}, "ok": false},
+    {"name": "an empty segments array", "input": {"segments": []}, "ok": false},
+    {"name": "a non-object segment", "input": {"segments": ["nope"]}, "ok": false},
+    {"name": "an empty segment", "input": {"segments": [{}]}, "ok": false},
+    {"name": "a bad mode value", "input": {"segments": [{"rest": "x", "mode": "middle"}]}, "ok": false},
+    {"name": "l2 of the wrong type", "input": {"segments": [{"l2": 12, "l1": "x"}]}, "ok": false},
+    {"name": "an empty l2 string", "input": {"segments": [{"l2": "   ", "l1": "x"}]}, "ok": false},
+    {"name": "an empty l2 array", "input": {"segments": [{"l2": [], "l1": "x"}]}, "ok": false},
+    {"name": "a blank unit inside l2", "input": {"segments": [{"l2": ["ok", ""], "l1": "x"}]}, "ok": false},
+    {"name": "literal without l2", "input": {"segments": [{"rest": "x", "literal": "y"}]}, "ok": false},
+    {"name": "l2 without an l1 gloss — the failure that actively harms the learner", "input": {"segments": [{"l2": "Chào bạn"}]}, "ok": false, "error_contains": "without an l1 gloss"},
+    {"name": "reports every error, not just the first, so one pass fixes a prompt", "input": {"segments": [{"l2": "a"}, {"mode": "sideways", "rest": "b"}]}, "ok": false, "minimum_errors": 2},
+    {"name": "a valid annotation survives validation and is exposed as units", "input": {"segments": [{"l2": "cà phê sữa", "l1": "coffee", "l2Tiered": "cà phê⟨1⟩sữa"}]}, "output": {"segments": [{"l2": "cà phê sữa", "l1": "coffee", "l2Tiered": "cà phê⟨1⟩sữa"}]}},
+    {"name": "an array annotation mirrors an array l2", "input": {"segments": [{"l2": ["Cho mình", "cà phê sữa"], "l1": "coffee", "l2Tiered": ["Cho⟨0⟩mình", "cà phê⟨1⟩sữa"]}]}, "output": {"segments": [{"l2": ["Cho mình", "cà phê sữa"], "l1": "coffee", "l2Tiered": ["Cho⟨0⟩mình", "cà phê⟨1⟩sữa"]}]}},
+    {"name": "a strip-invariant violation DROPS the field but keeps the message", "input": {"segments": [{"l2": "cà phê sữa", "l1": "coffee", "l2Tiered": "cà phê⟨1⟩đá"}]}, "output": {"segments": [{"l2": "cà phê sữa", "l1": "coffee"}]}},
+    {"name": "a shape mismatch against l2 drops the field, never fails the doc/string-array", "input": {"segments": [{"l2": "cà phê sữa", "l1": "coffee", "l2Tiered": ["cà phê⟨1⟩sữa"]}]}, "output": {"segments": [{"l2": "cà phê sữa", "l1": "coffee"}]}},
+    {"name": "a shape mismatch against l2 drops the field, never fails the doc/array-string", "input": {"segments": [{"l2": ["a", "b"], "l1": "coffee", "l2Tiered": "a⟨1⟩b"}]}, "output": {"segments": [{"l2": ["a", "b"], "l1": "coffee"}]}},
+    {"name": "a shape mismatch against l2 drops the field, never fails the doc/array-length", "input": {"segments": [{"l2": ["a", "b"], "l1": "coffee", "l2Tiered": ["a"]}]}, "output": {"segments": [{"l2": ["a", "b"], "l1": "coffee"}]}},
+    {"name": "a shape mismatch against l2 drops the field, never fails the doc/non-string", "input": {"segments": [{"l2": "a b", "l1": "coffee", "l2Tiered": 42}]}, "output": {"segments": [{"l2": "a b", "l1": "coffee"}]}},
+    {"name": "an annotation without an l2 to annotate is dropped", "input": {"segments": [{"rest": "hello", "l2Tiered": "a⟨1⟩b"}]}, "output": {"segments": [{"rest": "hello"}]}},
+    {"name": "sentinels in l1/rest/literal are stripped — they belong only in l2Tiered", "input": {"segments": [{"l2": "xin chào", "l1": "hi⟨1⟩there", "literal": "greet⟨2⟩you", "rest": "and⟨3⟩more"}]}, "output": {"segments": [{"l2": "xin chào", "l1": "hi there", "literal": "greet you", "rest": "and more"}]}},
+    {"name": "sentinels smuggled directly in l2 are stripped, not just l1/rest/literal (R1 fix)", "input": {"segments": [{"l2": "cà⟨1⟩phê", "l1": "coffee"}]}, "output": {"segments": [{"l2": "cà phê", "l1": "coffee"}]}},
+    {"name": "an l2 unit that is ONLY sentinel chars strips to empty and is rejected, not silently spoken blank (codex follow-on)/string", "input": {"segments": [{"l2": "⟨1⟩", "l1": "coffee"}]}, "ok": false},
+    {"name": "an l2 unit that is ONLY sentinel chars strips to empty and is rejected, not silently spoken blank (codex follow-on)/array", "input": {"segments": [{"l2": ["cà phê", "⟨1⟩"], "l1": "coffee"}]}, "ok": false},
+    {"name": "sentinels smuggled in an l2 array unit are stripped per-unit (R1 fix)", "input": {"segments": [{"l2": ["cho⟨0⟩mình", "cà phê"], "l1": "give me coffee"}]}, "output": {"segments": [{"l2": ["cho mình", "cà phê"], "l1": "give me coffee"}]}}
+  ],
+  "helpers": {
+    "units": [{"input": {"l2": "a"}, "output": ["a"]}, {"input": {"l2": ["a", "b"]}, "output": ["a", "b"]}, {"input": {"rest": "none"}, "output": []}],
+    "text": [{"input": {"l2": ["Chúc bạn", "vui vẻ"]}, "joiner": " ", "output": "Chúc bạn vui vẻ"}, {"input": {"l2": ["a", "b"]}, "joiner": " · ", "output": "a · b"}],
+    "dedupe": {"segments": [{"l2": "Xong rồi", "l1": "All done"}, {"rest": "middle"}, {"l2": "Xong rồi", "l1": "All done"}], "output": [{"l2": "Xong rồi", "l1": "All done"}]}
+  },
+  "source_derived_regressions": [
+    {"name": "JS trim rejects FEFF-only phrase", "input": {"segments": [{"l2": "\ufeff", "l1": "x"}]}, "ok": false},
+    {"name": "JS trim retains U0085 unlike Python strip", "input": {"segments": [{"l2": "\u0085", "l1": "x"}]}, "output": {"segments": [{"l2": "\u0085", "l1": "x"}]}},
+    {"name": "annotation strip uses JS whitespace", "input": {"segments": [{"l2": "a\u0085 b", "l1": "x", "l2Tiered": "a\u0085⟨1⟩b"}]}, "output": {"segments": [{"l2": "a\u0085 b", "l1": "x", "l2Tiered": "a\u0085⟨1⟩b"}]}},
+    {"name": "sentinel strip trims FEFF", "input": {"segments": [{"l2": "\ufeffa⟨1⟩b\ufeff", "l1": "x"}]}, "output": {"segments": [{"l2": "a b", "l1": "x"}]}},
+    {"name": "JSON.parse rejects NaN even in ignored field", "input": "{\"segments\":[{\"rest\":\"x\",\"junk\":NaN}]}", "ok": false},
+    {"name": "JSON.parse rejects Infinity even in ignored field", "input": "{\"segments\":[{\"rest\":\"x\",\"junk\":Infinity}]}", "ok": false},
+    {"name": "JSON.parse rejects negative Infinity", "input": "{\"segments\":[{\"rest\":\"x\",\"junk\":-Infinity}]}", "ok": false}
+  ],
+  "bounds": {"segments": 41, "units": 13},
+  "extension": {"classification": "A2-regression", "name": "NFC and NFD phrases dedupe but case remains distinct", "input": {"segments": [{"l2": "cà phê", "l1": "coffee"}, {"l2": "cà phê", "l1": "coffee"}, {"l2": "Cà phê", "l1": "Coffee"}]}, "output": [{"l2": "cà phê", "l1": "coffee"}, {"l2": "Cà phê", "l1": "Coffee"}]}
+}

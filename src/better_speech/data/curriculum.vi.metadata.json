@@ -1,0 +1,446 @@
+{
+  "di-thoi": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Đi thôi!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "an-thoi": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Ăn thôi!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "ngu-thoi": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Ngủ thôi!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "ngon-qua": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Ngon quá!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "vui-qua": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Vui quá!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "met-qua": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Mệt quá!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "nong-qua": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Nóng quá!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "dep-qua": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Đẹp quá!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "thich-qua": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Thích quá!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "khong-sao-dau": {
+    "lesson_type": "connector",
+    "units": [
+      "Không sao đâu!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "duoc-roi": {
+    "lesson_type": "connector",
+    "units": [
+      "Được rồi."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "xong-roi": {
+    "lesson_type": "connector",
+    "units": [
+      "Xong rồi!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "hieu-roi": {
+    "lesson_type": "connector",
+    "units": [
+      "Hiểu rồi!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "dung-roi": {
+    "lesson_type": "connector",
+    "units": [
+      "Đúng rồi!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "co-len": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Cố lên!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "tu-tu": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Từ từ!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "dung-lo": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Đừng lo!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "cho-chut-nhe": {
+    "lesson_type": "connector",
+    "units": [
+      "Chờ chút nhé!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "troi-oi": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Trời ơi!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "cho-minh-ca-phe": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Cho mình",
+      "một",
+      "cà phê sữa đá",
+      "nha"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "cai-nay-bao-nhieu": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Cái này",
+      "bao nhiêu",
+      "tiền"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "mac-qua-bot-di": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Mắc quá",
+      "Bớt chút đi"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "goi-la-gi": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Cái này",
+      "tiếng Việt",
+      "gọi là gì"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "em-oi": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Em ơi!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "chi-oi": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Chị ơi!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "anh-oi": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Anh ơi!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "cam-on-nha": {
+    "lesson_type": "connector",
+    "units": [
+      "Cảm ơn nha!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "khong-co-gi": {
+    "lesson_type": "connector",
+    "units": [
+      "Không có gì."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "xin-loi": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Xin lỗi!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "da": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Dạ."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "khong": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Không."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "co": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Có."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "duoc": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Được!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "chua": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Chưa."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "them-mot": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Thêm một!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "mot-chut-thoi": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Một chút thôi."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "khong-hieu": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Mình",
+      "không hiểu"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "noi-cham-thoi": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Nói chậm thôi."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "noi-lai-di": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Nói lại đi."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "tieng-viet-mot-chut": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Mình nói",
+      "tiếng Việt",
+      "một chút thôi"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "nuoc": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Nước."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "tinh-tien": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Tính tiền!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "mang-ve": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Mang về."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "khong-cay": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Không cay."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "khong-duong": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Không đường."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "mam-mam": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Măm măm!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "o-dau": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Nhà vệ sinh",
+      "ở đâu"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "dung-o-day": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Dừng ở đây."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "toi-roi": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Tới rồi!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "hom-nay": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Hôm nay."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "ngay-mai": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Ngày mai."
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "doi-qua": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Đói quá!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "giup-minh-voi": {
+    "lesson_type": "learning_sentence",
+    "units": [
+      "Giúp mình với!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  },
+  "hen-gap-lai": {
+    "lesson_type": "connector",
+    "units": [
+      "Hẹn gặp lại!"
+    ],
+    "vocabulary": [],
+    "structure_pauses": []
+  }
+}

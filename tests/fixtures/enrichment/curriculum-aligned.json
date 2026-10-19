@@ -1,0 +1,12 @@
+{
+  "classification": "recovered-authoritative-v1-data",
+  "source_commit": "5c4205c440f5a836373d8fc8160aa4c861427c58",
+  "asset_sha256": "e9a3f428ece83f20f65024ffdaa2c839cd37a19b5f7c5632257745f08652a28c",
+  "inventory_count": 54,
+  "coffee_id": "cho-minh-ca-phe",
+  "coffee_pairs": [["Cho","give"],["mình","me"],["một","one"],["cà phê","coffee"],["sữa","milk"],["đá","ice"],["nha","[softener]"]],
+  "coffee_unit_glosses": ["give — me","one","coffee — milk — ice","[softener]"],
+  "hometown_time_example_id": "hom-nay",
+  "hometown_time_example_pairs": [["Hôm","day"],["nay","this"]],
+  "expectation_delta": "No translation changes. Supplement attaches original PR1010 aligned pairs by stable ID/exact source match; old baseline asset stays unchanged. Does not infer active lesson classes or connector eligibility."
+}
