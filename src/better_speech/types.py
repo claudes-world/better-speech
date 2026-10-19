@@ -126,6 +126,16 @@ class Plan:
     selection_time: str = ""
     executed: bool = False
     schema_version: int = 1
+    executed_digest: str | None = None
+
+    def __post_init__(self):
+        object.__setattr__(
+            self,
+            "executed_digest",
+            digest([[asdict(clip) for clip in self.clips], [asdict(lesson) for lesson in self.lessons]])
+            if self.executed
+            else None,
+        )
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -156,6 +166,7 @@ class Rendering:
     markdown: str
     diagnostics: tuple[Diagnostic, ...]
     cache_hits: int = 0
+    audio_sha256: str | None = None
 
     @property
     def status(self) -> str:

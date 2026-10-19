@@ -61,7 +61,7 @@ truncated. Numbered lessons come only from the executed plan.
 names to objects implementing `synthesize(clip, *, timeout) -> bytes`. The host
 wraps these objects to enforce its budget and record every paid attempt. Cache
 hits never call a provider. The result contains a caller-owned temporary Ogg/Opus
-path, SHA-256 artifact identity, executed plan, diagnostic records, Markdown and
+path, rendition artifact identity, audio SHA-256 checksum, executed plan, diagnostic records, Markdown and
 structured title/lesson/transcript/links sections. The **Vietnamese lesson** block
 is collapsible. Move/copy the returned file to durable storage and remove its
 temporary directory after use. The CLI handles this when writing `--out`.
@@ -126,8 +126,12 @@ checksum envelope, temporary file and `os.replace`. Cache bypass can purchase an
 identical clip more than once; host budget wrappers remain authoritative.
 
 `Plan.identity` hashes `(learner_id, curriculum_snapshot_digest, source_text,
-profile_digest)`. Key rendition custody on it so learners or curriculum changes
-never share a lesson rendering; identical clips still share the clip cache.
+profile_digest)` for input grouping. When `executed=True`, `Plan.executed_digest`
+hashes its ordered clips and lessons. Key rendition custody on
+`Rendering.artifact_identity`, the digest of `(Plan.identity, Plan.executed_digest)`,
+alongside the persisted executed plan. Ledger changes, contextual placements and
+English fallback can change the execution of the same input group. Identical clips
+still share the clip cache; `Rendering.audio_sha256` is the audio file checksum.
 Persist the **executed** manifest: a requested bilingual plan can render English.
 See the exact [WorldOS integration contract](docs/worldos-adapter.md) and
 [source provenance](docs/provenance.md).

@@ -18,7 +18,7 @@ from .cache import ClipCache
 from .config import cache_dir
 from .executor import AudioPart
 from .transcript import present
-from .types import Diagnostic, Rendering, Section
+from .types import Diagnostic, Rendering, Section, digest
 
 
 def render(plan, providers, cache=None, *, deadline: float | None = None) -> Rendering:
@@ -69,7 +69,11 @@ def render(plan, providers, cache=None, *, deadline: float | None = None) -> Ren
         nonlocal hits, artifact_dir
         remaining(budget)
         # Present before purchasing clips: a corrupt optional manifest is not audible authority.
-        actual = replace(requested, executed=True)
+        actual = replace(
+            requested,
+            clips=tuple(replace(c, text=unicodedata.normalize("NFC", c.text)) for c in requested.clips),
+            executed=True,
+        )
         sections, markdown = present(actual)
         remaining(budget)
         if artifact_dir is None:
@@ -79,9 +83,8 @@ def render(plan, providers, cache=None, *, deadline: float | None = None) -> Ren
         with tempfile.TemporaryDirectory(prefix="better-speech-clips-") as owned:
             scratch = Path(owned)
             parts = []
-            for index, original in enumerate(requested.clips):
+            for index, clip in enumerate(actual.clips):
                 remaining(budget)
-                clip = replace(original, text=unicodedata.normalize("NFC", original.text))
                 if (clip.language, clip.provider) not in {("en", "google"), ("vi", "elevenlabs")}:
                     raise ValueError("unsupported language/provider pair")
 
@@ -114,7 +117,9 @@ def render(plan, providers, cache=None, *, deadline: float | None = None) -> Ren
             while chunk := audio.read(1024 * 1024):
                 checksum.update(chunk)
                 remaining(budget)
-        return actual, output, checksum.hexdigest(), sections, markdown
+        artifact_identity = digest([actual.identity, actual.executed_digest])
+        remaining(budget)
+        return actual, output, artifact_identity, checksum.hexdigest(), sections, markdown
 
     result = None
     try:
@@ -127,14 +132,15 @@ def render(plan, providers, cache=None, *, deadline: float | None = None) -> Ren
             except Exception as fallback_error:
                 diagnostics.append(Diagnostic("english_render", type(fallback_error).__name__))
     if result is None:
-        actual, audio_path, artifact_identity = replace(english, status="text"), None, None
+        actual = replace(english, status="text")
+        audio_path, artifact_identity, audio_sha256 = None, None, None
         try:
             sections, markdown = present(actual)
         except Exception as error:
             diagnostics.append(Diagnostic("presentation", type(error).__name__))
             sections, markdown = (Section("transcript", plan.source),), plan.source
     else:
-        actual, audio_path, artifact_identity, sections, markdown = result
+        actual, audio_path, artifact_identity, audio_sha256, sections, markdown = result
     # Cleanup failure must not erase a usable rendition or escape as a new refusal.
     for output in outputs:
         if output != audio_path:
@@ -148,4 +154,6 @@ def render(plan, providers, cache=None, *, deadline: float | None = None) -> Ren
         except OSError:
             diagnostics.append(Diagnostic("cleanup", "directory_unavailable"))
     actual = replace(actual, diagnostics=tuple(diagnostics))
-    return Rendering(audio_path, artifact_identity, actual, sections, markdown, tuple(diagnostics), hits)
+    return Rendering(
+        audio_path, artifact_identity, actual, sections, markdown, tuple(diagnostics), hits, audio_sha256
+    )

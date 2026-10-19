@@ -61,19 +61,26 @@ plan = better_speech.compile(text, profile, model_call=model_call, deadline=dead
 rendering = better_speech.render(plan, providers, clip_cache, deadline=deadline)
 ```
 
-`rendering` returns `audio_path` (Ogg/Opus or `None`), `artifact_identity` (audio
-SHA-256), **executed** `plan`, structured `sections`, Markdown and `diagnostics`.
+`rendering` returns `audio_path` (Ogg/Opus or `None`), `artifact_identity` (rendition
+custody key), `audio_sha256` (file checksum), **executed** `plan`, structured
+`sections`, Markdown and `diagnostics`. Text-only results have neither audio key.
 Copy the temporary audio into host artifact custody, then clean up its temporary
 directory. Cache hits call no provider/wrapper. Optional lesson failure produces
 complete English; total synthesis failure retains a text result. Keep the host's
 existing English/text delivery path available, with no new refusal or required
 field for ordinary notes.
 
-**Custody, transcript, send.** Key rendition custody on `Plan.identity`: the digest
-of `(learner_id, curriculum_snapshot_digest, source_text, profile_digest)`. Different
-learners/curricula must not share lesson artifacts, although identical clips can
-share the clip cache. Persist `rendering.plan.to_dict()` (executed lesson manifest),
-plan identity, artifact identity and durable audio reference **before publishing**.
+**Custody, transcript, send.** Key rendition custody on `Rendering.artifact_identity`
+and persist the executed plan with it. This key is the digest of
+`(Plan.identity, Plan.executed_digest)`. `executed_digest` hashes the ordered
+executed clips and lessons; it is set only when `executed=True` and is stable
+across processes. `Plan.identity` still hashes
+`(learner_id, curriculum_snapshot_digest, source_text, profile_digest)` for input
+grouping and voice seeding. **Do not reuse a rendition by `Plan.identity` alone**:
+changed ledger state, model placement or English fallback can change its execution.
+Identical clips can still share the clip cache. Persist
+`rendering.plan.to_dict()` (executed lesson manifest), input identity, artifact
+identity, file checksum and durable audio reference **before publishing**.
 Use that stored executed plan on retry, rather than recompiling a previously
 prepared artifact. On English fallback, remove the lesson section from the
 companion transcript message that `store_modules/runtime_state.py` materializes
