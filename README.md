@@ -68,9 +68,13 @@ temporary directory after use. The CLI handles this when writing `--out`.
 
 Optional lesson failures yield the complete English note and remove its lesson
 section. A contextual model failure retains the reserved deterministic lesson.
+The manifest and numbered lesson block list each phrase once, in first audible
+occurrence order.
 If English synthesis or ffmpeg is also unavailable, the result has
 `audio_path=None`, `status="text"`, and the full transcript. CLI degradation
-prints diagnostics to stderr and keeps exit status zero; invalid commands or
+prints diagnostics to stderr and keeps exit status zero. On text-only degradation,
+`speak render --out PATH` removes a pre-existing file at `PATH` so callers cannot
+send stale audio. Invalid commands or
 unreadable input files return a command error. No send or exposure is inferred
 from preparation.
 

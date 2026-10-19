@@ -122,3 +122,38 @@ def test_simultaneous_learns_preserve_both_phrases(tmp_path):
     rows = json.loads(learner_path(profile(state_dir=str(tmp_path))).read_text())["focusPhrases"]
     assert {row["l2"] for row in rows} == {"Học nữa.", "Học tiếp nhé."}
     assert all(row["pending_learning"] for row in rows)
+
+
+def test_cli_text_degradation_removes_previous_successful_output(config, tmp_path, monkeypatch, capsys):
+    provider = ToneProvider()
+    monkeypatch.setattr("better_speech.providers.google.GoogleProvider", lambda: provider)
+    monkeypatch.setattr("better_speech.providers.elevenlabs.ElevenLabsProvider", lambda key: provider)
+    source, output = tmp_path / "in.md", tmp_path / "note.ogg"
+    args = [
+        "render",
+        str(source),
+        "--out",
+        str(output),
+        "--profile",
+        str(config),
+        "--cache",
+        str(tmp_path / "cache"),
+    ]
+    source.write_text("The earlier note.")
+    assert main(args) == 0
+    assert output.read_bytes().startswith(b"OggS")
+    capsys.readouterr()
+
+    class Unavailable:
+        def synthesize(self, clip, *, timeout):
+            raise TimeoutError("provider unavailable")
+
+    monkeypatch.setattr("better_speech.providers.google.GoogleProvider", Unavailable)
+    monkeypatch.setattr("better_speech.providers.elevenlabs.ElevenLabsProvider", lambda key: Unavailable())
+    source.write_text("A different complete note.")
+    assert main(args) == 0
+    printed = capsys.readouterr()
+    assert "A different complete note." in printed.out
+    assert "Vietnamese lesson" not in printed.out
+    assert "english_render" in printed.err
+    assert not output.exists()

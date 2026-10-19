@@ -83,6 +83,8 @@ def main(argv=None):
                             Path(temporary).unlink(missing_ok=True)
                         result.audio_path.unlink(missing_ok=True)
                         result.audio_path.parent.rmdir()
+                else:
+                    args.out.unlink(missing_ok=True)
                 print(result.markdown, end="")
                 for diagnostic in result.diagnostics:
                     print(f"speak: {diagnostic.stage}: {diagnostic.reason}", file=sys.stderr)

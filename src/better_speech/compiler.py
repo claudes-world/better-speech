@@ -266,9 +266,12 @@ def compile(
                 curated, internal = reserved_rows, reserved_plan
             if internal.status == "applied":
                 primary = _clips(internal, curated)
+                by_key = {r["ledger_identity"]: r for r in curated}
+                audible_keys = dict.fromkeys(c.phrase_key for c in primary if c.phrase_key in by_key)
+                audible_rows = [by_key[key] for key in audible_keys]
                 selected = tuple(
                     Lesson(r["id"], r["ledger_identity"], canonical_json(r), bool(r.get("landed")))
-                    for r in curated
+                    for r in audible_rows
                 )
                 remaining(deadline)
             elif internal.reason:
