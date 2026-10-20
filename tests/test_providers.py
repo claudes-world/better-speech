@@ -141,3 +141,54 @@ def test_missing_credential_never_makes_paid_attempt():
     pytest.importorskip("httpx")
     with pytest.raises(ValueError):
         ElevenLabsProvider().synthesize(clip("elevenlabs", "vi"), timeout=1)
+
+
+@pytest.mark.parametrize('mode', ['stall', 'headers', 'gzip'])
+def test_elevenlabs_total_deadline_including_buffered_progress(mode):
+    httpx = pytest.importorskip('httpx')
+    closed = threading.Event()
+
+    class Stream(httpx.SyncByteStream):
+        def __iter__(self):
+            if mode == 'gzip':
+                import gzip
+                for byte in gzip.compress(b'audio'):
+                    time.sleep(0.02)
+                    yield bytes([byte])
+            else:
+                time.sleep(0.07)
+                yield b'x'
+                time.sleep(0.15)
+                yield b'y'
+
+        def close(self):
+            closed.set()
+
+    def respond(request):
+        if mode == 'headers':
+            time.sleep(0.25)
+        return httpx.Response(200, stream=Stream(), headers={'Content-Encoding': 'gzip'} if mode == 'gzip' else {})
+
+    with httpx.Client(transport=httpx.MockTransport(respond)) as client:
+        start = time.monotonic()
+        with pytest.raises(TimeoutError):
+            ElevenLabsProvider('test', client=client).synthesize(clip('elevenlabs', 'vi'), timeout=0.1)
+        assert time.monotonic() - start < 0.18
+    assert closed.wait(0.5)
+
+
+def test_elevenlabs_caps_audio_while_streaming(monkeypatch):
+    httpx = pytest.importorskip('httpx')
+    monkeypatch.setattr('better_speech.providers.elevenlabs.MAX_AUDIO_BYTES', 64 * 1024)
+    consumed = []
+
+    class Stream(httpx.SyncByteStream):
+        def __iter__(self):
+            for _ in range(100):
+                consumed.append(True)
+                yield b'x' * (64 * 1024)
+
+    with httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(200, stream=Stream()))) as client:
+        with pytest.raises(ValueError, match='size limit'):
+            ElevenLabsProvider('test', client=client).synthesize(clip('elevenlabs', 'vi'), timeout=2)
+    assert len(consumed) == 2
