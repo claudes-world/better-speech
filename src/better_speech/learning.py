@@ -15,7 +15,7 @@ from .types import Profile
 
 def _writable(profile):
     profile = resolve_profile(profile)
-    if "invalid_profile" in profile.config_diagnostics:
+    if {"invalid_profile", "profile_unavailable"}.intersection(profile.config_diagnostics):
         raise ValueError("invalid_profile: learner writes disabled")
     return profile
 
