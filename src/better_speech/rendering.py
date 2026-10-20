@@ -76,7 +76,7 @@ def render(
         for clip in requested.clips:
             clip = replace(clip, text=unicodedata.normalize("NFC", clip.text))
             if not clip.text.strip():
-                lowered.append(replace(clip, pause_after_s=clip.pause_after_s + 0.25))
+                lowered.append(replace(clip, pause_after_s=clip.pause_after_s + (0 if requested.executed else 0.25)))
                 continue
             provider = providers[clip.provider]
             if clip.language not in provider.languages or clip.output_format not in provider.formats:
