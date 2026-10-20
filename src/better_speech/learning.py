@@ -1,53 +1,27 @@
-"""Atomic learner curriculum edits. Adding/landing a phrase creates no exposure."""
+"""Atomic learner edits in the delivered-event ledger; edits create no exposure."""
 
 from __future__ import annotations
 
 import hashlib
-import json
-import os
-import tempfile
 from datetime import datetime, time, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from filelock import FileLock
-
 from .config import resolve_profile
-from .curriculum import canonical_phrase, learner_path, runtime_curriculum, validate_inventory
+from .curriculum import canonical_phrase, runtime_curriculum
 from .exposure import timestamp
 from .pacing import DEFAULT, compile_lesson
 from .types import Profile
 
 
-def _update(profile, edit):
-    path = learner_path(profile)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with FileLock(str(path) + ".lock", timeout=5):
-        value = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {"focusPhrases": []}
-        validate_inventory(value["focusPhrases"])
-        result = edit(value["focusPhrases"])
-        temporary = None
-        try:
-            with tempfile.NamedTemporaryFile(
-                mode="w", encoding="utf-8", dir=path.parent, delete=False
-            ) as stream:
-                temporary = stream.name
-                json.dump(value, stream, ensure_ascii=False, indent=2, allow_nan=False)
-                stream.write("\n")
-                stream.flush()
-                os.fsync(stream.fileno())
-            os.replace(temporary, path)
-        finally:
-            if temporary:
-                from pathlib import Path
-
-                Path(temporary).unlink(missing_ok=True)
-        return result
-
-
-def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, now: datetime | None = None) -> dict:
+def _writable(profile):
     profile = resolve_profile(profile)
     if "invalid_profile" in profile.config_diagnostics:
         raise ValueError("invalid_profile: learner writes disabled")
+    return profile
+
+
+def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, now: datetime | None = None) -> dict:
+    profile = _writable(profile)
     if not vietnamese.strip() or not gloss.strip():
         raise ValueError("phrase and gloss cannot be blank")
     candidate = {"phrase": vietnamese.strip(), "units": [vietnamese.strip()]}
@@ -60,49 +34,39 @@ def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, now: dat
     local = instant.astimezone(ZoneInfo(profile.timezone))
     midnight = datetime.combine(local.date() + timedelta(days=1), time(), ZoneInfo(profile.timezone))
     phrase = canonical_phrase(vietnamese.strip())
-    existing = next((r for r in runtime_curriculum(profile) if canonical_phrase(r["l2"]) == phrase), None)
-    key = existing["id"] if existing else "learn-" + hashlib.sha256(phrase.encode()).hexdigest()[:16]
 
     def edit(rows):
+        existing = next((r for r in runtime_curriculum(profile, additions=rows)
+                         if canonical_phrase(r["l2"]) == phrase), None)
         row = next((r for r in rows if canonical_phrase(r["l2"]) == phrase), None)
         if row is None:
-            row = (
-                dict(existing)
-                if existing
-                else {
-                    "id": key,
-                    "l2": phrase,
-                    "units": [phrase],
-                    "lesson_type": "learning_sentence",
-                    "vocabulary": [],
-                    "structure_pauses": [],
-                }
-            )
+            row = dict(existing) if existing else {
+                "id": "learn-" + hashlib.sha256(phrase.encode()).hexdigest()[:16],
+                "l2": phrase, "units": [phrase], "lesson_type": "learning_sentence",
+                "vocabulary": [], "structure_pauses": [],
+            }
             rows.append(row)
         row.update(
-            l1=gloss.strip(),
-            translation=gloss.strip(),
-            pending_learning=True,
-            landed=False,
-            boost_until=timestamp(midnight.isoformat()),
-            added_at=timestamp(instant.isoformat()),
+            l1=gloss.strip(), translation=gloss.strip(), pending_learning=True, landed=False,
+            boost_until=timestamp(midnight.isoformat()), added_at=timestamp(instant.isoformat()),
         )
+        # Validate the actual merged record, including existing unit/pacing metadata.
+        paced = compile_lesson({**row, "phrase": phrase}, profile=DEFAULT)
+        if len(paced.rendered.encode("utf-16-le")) // 2 > 4000:
+            raise ValueError("lesson step exceeds provider text bound")
         return dict(row)
 
-    return _update(profile, edit)
+    return ledger.edit_phrases(profile.learner_id, edit)
 
 
-def learned(key: str, profile: Profile = Profile()) -> dict:
-    profile = resolve_profile(profile)
-    if "invalid_profile" in profile.config_diagnostics:
-        raise ValueError("invalid_profile: learner writes disabled")
-    existing = next(
-        (r for r in runtime_curriculum(profile) if r["id"] == key or r["ledger_identity"] == key), None
-    )
-    if existing is None:
-        raise ValueError("unknown phrase key")
+def learned(key: str, profile: Profile = Profile(), *, ledger) -> dict:
+    profile = _writable(profile)
 
     def edit(rows):
+        existing = next((r for r in runtime_curriculum(profile, additions=rows)
+                         if r["id"] == key or r["ledger_identity"] == key), None)
+        if existing is None:
+            raise ValueError("unknown phrase key")
         row = next((r for r in rows if r["id"] == existing["id"]), None)
         if row is None:
             row = dict(existing)
@@ -110,16 +74,15 @@ def learned(key: str, profile: Profile = Profile()) -> dict:
         row.update(landed=True, pending_learning=False, boost_until=None)
         return dict(row)
 
-    return _update(profile, edit)
+    return ledger.edit_phrases(profile.learner_id, edit)
 
 
-def due(profile: Profile = Profile(), *, ledger=None, now: datetime | None = None) -> list[dict]:
+def due(profile: Profile = Profile(), *, ledger, now: datetime | None = None) -> list[dict]:
     from .compiler import _rank
-    from .ledger import Ledger
 
     at = timestamp((now or datetime.now(timezone.utc)).isoformat())
-    records = (ledger or Ledger.for_profile(profile)).snapshot(profile.learner_id)
-    rows = runtime_curriculum(profile)
+    records, additions = ledger.learner_state(profile.learner_id)
+    rows = runtime_curriculum(profile, additions=additions)
     return [
         {**r, "exposure": records.get(r["ledger_identity"])}
         for r in _rank(rows, records, at)

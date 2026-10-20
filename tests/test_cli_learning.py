@@ -7,8 +7,8 @@ import pytest
 from better_speech import compile
 from better_speech.cli import main
 from better_speech.config import load_profile
-from better_speech.curriculum import learner_path
 from better_speech.learning import learn
+from better_speech.ledger import Ledger
 from tests.test_model_free_audio import EmptyLedger, ToneProvider, profile
 
 
@@ -30,7 +30,7 @@ def config(tmp_path):
 def test_boost_next_local_midnight_in_profile_zone(tmp_path, zone, instant, expected):
     cfg = profile(state_dir=str(tmp_path), timezone=zone)
     assert (
-        learn("Học nhé.", "Let us learn.", cfg, now=datetime.fromisoformat(instant))["boost_until"]
+        learn("Học nhé.", "Let us learn.", cfg, now=datetime.fromisoformat(instant), ledger=Ledger.for_profile(cfg))["boost_until"]
         == expected
     )
 
@@ -38,12 +38,12 @@ def test_boost_next_local_midnight_in_profile_zone(tmp_path, zone, instant, expe
 def test_existing_sample_phrase_can_be_learned_and_reloaded(tmp_path):
     cfg = profile(state_dir=str(tmp_path))
     instant = datetime(2026, 10, 19, 12, tzinfo=timezone.utc)
-    row = learn("Cảm ơn nha!", "Thanks!", cfg, now=instant)
-    result = compile("The update is ready.", cfg, now=instant, ledger=EmptyLedger())
+    row = learn("Cảm ơn nha!", "Thanks!", cfg, now=instant, ledger=Ledger.for_profile(cfg))
+    result = compile("The update is ready.", cfg, now=instant, ledger=Ledger.for_profile(cfg))
     assert result.status == "bilingual", result.diagnostics
     assert result.lessons[0].id == row["id"]
     assert sum(c.language == "vi" for c in result.clips) == 2
-    assert json.loads(learner_path(cfg).read_text())["focusPhrases"]
+    assert Ledger.for_profile(cfg).learner_state(cfg.learner_id)[1]
 
 
 def test_cli_learn_due_plan_learned_and_learner_isolation(config, tmp_path, capsys):
@@ -58,12 +58,12 @@ def test_cli_learn_due_plan_learned_and_learner_isolation(config, tmp_path, caps
     plan = json.loads(capsys.readouterr().out)
     assert plan["learner_id"] == "other" and not plan["executed"]
     assert plan["lessons"][0]["id"] == learned_row["id"]
-    assert not (tmp_path / "state/ledger.sqlite3").exists()
+    assert Ledger(tmp_path / "state/ledger.sqlite3").snapshot("other") == {}
     assert main(["learned", learned_row["id"], *args]) == 0
     assert json.loads(capsys.readouterr().out)["landed"]
     cfg = load_profile(config)
-    assert not learner_path(cfg).exists()
-    assert learner_path(replace(cfg, learner_id="../../escape")).is_relative_to(tmp_path / "state")
+    assert not Ledger.for_profile(cfg).learner_state(cfg.learner_id)[1]
+    assert Ledger.for_profile(replace(cfg, learner_id="../../escape")).path == tmp_path / "state/ledger.sqlite3"
 
 
 def test_cli_render_prints_executed_transcript(config, tmp_path, monkeypatch, capsys):
@@ -101,7 +101,7 @@ def test_missing_profile_is_diagnostic_english(tmp_path):
 
 def queue_writer(state_dir, vietnamese, ready):
     ready.wait(10)
-    learn(vietnamese, "A learner phrase.", profile(state_dir=state_dir))
+    learn(vietnamese, "A learner phrase.", profile(state_dir=state_dir), ledger=Ledger.for_profile(profile(state_dir=state_dir)))
 
 
 def test_simultaneous_learns_preserve_both_phrases(tmp_path):
@@ -119,7 +119,7 @@ def test_simultaneous_learns_preserve_both_phrases(tmp_path):
     for process in processes:
         process.join(15)
         assert process.exitcode == 0
-    rows = json.loads(learner_path(profile(state_dir=str(tmp_path))).read_text())["focusPhrases"]
+    rows = Ledger.for_profile(profile(state_dir=str(tmp_path))).learner_state("liam")[1]
     assert {row["l2"] for row in rows} == {"Học nữa.", "Học tiếp nhé."}
     assert all(row["pending_learning"] for row in rows)
 

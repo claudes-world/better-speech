@@ -41,20 +41,20 @@ def test_malformed_voice_pool_is_diagnostic_english(tmp_path, value):
     pool.write_text(value)
     settings = tmp_path / "profile.toml"
     settings.write_text('voices_file="pool.json"\n')
-    plan = compile("Complete source.", load_profile(settings))
+    plan = compile("Complete source.", load_profile(settings), ledger=Ledger.for_profile(load_profile(settings)))
     assert not plan.lessons and any(d.stage == "config" for d in plan.diagnostics)
 
 
 def test_non_json_curriculum_does_not_raise_while_hashing_fallback(tmp_path):
     path = tmp_path / "curriculum.json"
     path.write_text('{"focusPhrases":[{"id":"x","l2":"Xin chào.","l1":"Hello.","unused":NaN}]}')
-    plan = compile("Source.", profile(curriculum_path=str(path), state_dir=str(tmp_path)))
+    plan = compile("Source.", profile(curriculum_path=str(path), state_dir=str(tmp_path)), ledger=Ledger.for_profile(profile(curriculum_path=str(path), state_dir=str(tmp_path))))
     assert plan.status == "english" and plan.diagnostics
     assert plan.identity
 
 
 def test_ledger_read_failure_does_not_reintroduce_unknown_mastered_phrases():
-    class Unavailable:
+    class Unavailable(EmptyLedger):
         def snapshot(self, *args, **kwargs):
             raise sqlite3.OperationalError("unavailable")
 
@@ -98,6 +98,7 @@ def test_contextual_size_overflow_cannot_evict_reserved_lesson(tmp_path):
 def test_render_setup_and_optional_metadata_fail_open(tmp_path, monkeypatch, failure):
     plan = compile("Complete source.", profile(), ledger=EmptyLedger())
     cache = tmp_path / "cache"
+    render_options = {}
     if failure == "setup":
 
         def unavailable(**kwargs):
@@ -107,10 +108,10 @@ def test_render_setup_and_optional_metadata_fail_open(tmp_path, monkeypatch, fai
     elif failure == "manifest":
         plan = replace(plan, lessons=(replace(plan.lessons[0], record_json="{}"),))
     elif failure == "settings":
-        plan = replace(plan, profile_json='{"render_timeout_s":"bad"}')
+        render_options = {"render_timeout_s": "bad"}
     else:
         cache = object()
-    result = render(plan, {"google": ToneProvider(), "elevenlabs": ToneProvider()}, cache)
+    result = render(plan, {"google": ToneProvider(), "elevenlabs": ToneProvider()}, cache, **render_options)
     assert result.diagnostics
     if failure == "setup":
         assert result.status == "text" and result.audio_path is None
@@ -148,7 +149,7 @@ def test_provider_returning_after_its_timeout_yields_english(tmp_path):
 
     plan = compile("Source.", profile(provider_timeout_s=0.02), ledger=EmptyLedger())
     result = render(
-        plan, {"google": ToneProvider(), "elevenlabs": LateNative()}, tmp_path, deadline=time.monotonic() + 3
+        plan, {"google": ToneProvider(), "elevenlabs": LateNative()}, tmp_path, deadline=time.monotonic() + 3, provider_timeout_s=0.02
     )
     assert result.status == "english" and result.audio_path
     assert any(d.reason == "TimeoutError" for d in result.diagnostics)

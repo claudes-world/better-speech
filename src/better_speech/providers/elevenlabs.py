@@ -10,7 +10,6 @@ from urllib.parse import quote
 from ..budget import remaining
 from ..types import Clip
 
-
 MAX_AUDIO_BYTES = 20 * 1024 * 1024
 
 

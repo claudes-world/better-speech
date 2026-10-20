@@ -60,8 +60,13 @@ class ProviderWrapper:
 ```
 
 ```python
-plan = better_speech.compile(text, profile, model_call=model_call, deadline=deadline)
-rendering = better_speech.render(plan, providers, clip_cache, deadline=deadline)
+ledger = better_speech.Ledger.for_profile(profile)  # host-owned state destination
+plan = better_speech.compile(text, profile, ledger=ledger, model_call=model_call, deadline=deadline)
+rendering = better_speech.render(
+    plan, providers, clip_cache, deadline=deadline,
+    render_timeout_s=profile.render_timeout_s, provider_timeout_s=profile.provider_timeout_s,
+    fallback_reserve_s=profile.fallback_reserve_s,
+)
 ```
 
 The API and ffmpeg assembly are synchronous. Async hosts call `render` through
@@ -89,8 +94,14 @@ Identical clips can still share the clip cache. Persist
 `rendering.plan.to_dict()` (executed lesson manifest), input identity, artifact
 identity, file checksum and durable audio reference **before publishing**.
 Restore with `Plan.from_dict`; it accepts only exact integer `schema_version=1`.
-The local ledger uses `PRAGMA user_version=1`; unknown versions fail with a diagnostic,
-without rewriting state. Unversioned package ledgers initialize transactionally.
+The local ledger uses `PRAGMA user_version=2`; unknown versions fail with a diagnostic,
+without rewriting state. Unversioned and version-1 package ledgers migrate transactionally, preserving events.
+Learner additions now live in `learner_phrases` in the same database; compilation
+reads both tables from one snapshot, and learn/learned edits use one writer transaction.
+Legacy learner JSON files are no longer read. Before switching an existing host,
+explicitly import its validated rows once using `ledger.edit_phrases(learner_id, edit)`;
+the host owns migration routing. Plans carry no paths, timeouts or model-executable
+settings. Resolve stores and render budgets from host configuration on every call.
 Use that stored executed plan on retry, rather than recompiling a previously
 prepared artifact. On English fallback, remove the lesson section from the
 companion transcript message that `store_modules/runtime_state.py` materializes
@@ -98,7 +109,7 @@ before publishing; updating only `file_ipc.py`'s final rendering is insufficient
 Publish the audio and its revised companion from the same persisted outcome.
 
 After **confirmed send**, call
-`record_delivered(rendering.plan, delivery_id, delivered_at)` with the host's stable
+`record_delivered(rendering.plan, delivery_id, delivered_at, ledger=ledger)` with the host's stable
 logical delivery ID and timezone-aware confirmation timestamp. Retry a failed
 ledger write with that same ID/time and stored executed plan; replay is idempotent.
 Never resend after an observed successful send. Preparation and publishing attempts

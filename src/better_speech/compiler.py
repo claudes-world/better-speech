@@ -44,7 +44,7 @@ def compile(
     profile: Profile,
     *,
     model_call=None,
-    ledger=None,
+    ledger,
     now: datetime | str | None = None,
     seed: str | int | None = None,
     deadline: float | None = None,
@@ -62,8 +62,12 @@ def compile(
         diagnostics.append(Diagnostic("markdown", "normalization_failed"))
     main = profile.english
     fallback, _ = sequence_clips(speech, inventory=(), placements=(), main=main, settings={})
-    frozen = canonical_json(profile.to_dict())
-    profile_hash = digest(profile.to_dict())
+    # Operational config remains caller-owned; persist only its semantic digest.
+    semantic_profile = {key: value for key, value in profile.to_dict().items()
+                        if key not in {"state_dir", "curriculum_path", "model", "claude_model",
+                                       "codex_model", "agy_model", "config_diagnostics"}
+                        and not key.endswith("_timeout_s") and key != "fallback_reserve_s"}
+    profile_hash = digest(semantic_profile)
     rows, selected, primary = (), (), fallback
     curriculum_hash = digest(rows)
     instant = now or datetime.now(timezone.utc)
@@ -72,20 +76,16 @@ def compile(
         remaining(deadline)
         if at is None:
             raise ValueError("invalid selection time")
-        rows = runtime_curriculum(profile)
+        try:
+            records, additions = ledger.learner_state(profile.learner_id, deadline=model_deadline)
+        except Exception:
+            diagnostics.append(Diagnostic("ledger", "snapshot_unavailable"))
+            raise
+        rows = runtime_curriculum(profile, additions=additions)
         curriculum_hash = digest(rows)
         if not profile.enabled or not speech.strip():
             diagnostics.append(Diagnostic("lesson", "disabled" if not profile.enabled else "empty_source"))
         else:
-            if ledger is None:
-                from .ledger import Ledger
-
-                ledger = Ledger.for_profile(profile)
-            try:
-                records = ledger.snapshot(profile.learner_id, deadline=model_deadline)
-            except Exception:
-                diagnostics.append(Diagnostic("ledger", "snapshot_unavailable"))
-                raise
             eligible = tuple(v for v in profile.voices if v.provider == "elevenlabs" and v.weight > 0)
             if not eligible:
                 raise ValueError("no_configured_vietnamese_voice")
@@ -245,6 +245,5 @@ def compile(
         selected,
         tuple(diagnostics),
         "bilingual" if selected else "english",
-        frozen,
         at or "",
     )

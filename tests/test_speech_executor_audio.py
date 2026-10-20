@@ -17,13 +17,13 @@ from pathlib import Path
 import pytest
 
 from better_speech.executor import ffmpeg_assembly_program
-from tests.reference.planner import SpeechStep
 from tests.reference.executor import (
     AudioPart,
     CompletedClip,
     NativeRateRejected,
     render_with_rate_fallback,
 )
+from tests.reference.planner import SpeechStep
 
 pytestmark = pytest.mark.skipif(
     not shutil.which("ffmpeg") or not shutil.which("ffprobe"),

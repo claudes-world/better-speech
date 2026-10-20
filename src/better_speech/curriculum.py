@@ -145,17 +145,7 @@ def grouped_literal(entry: Mapping) -> tuple[str, ...] | None:
     return tuple(groups)
 
 
-def learner_path(profile) -> object:
-    import hashlib
-
-    from .config import state_dir
-
-    # Learner identifiers are opaque; never allow them to traverse directories.
-    directory = hashlib.sha256(profile.learner_id.encode()).hexdigest()[:24]
-    return state_dir(profile) / "learners" / directory / "curriculum.json"
-
-
-def runtime_curriculum(profile) -> tuple[dict, ...]:
+def runtime_curriculum(profile, *, additions=()) -> tuple[dict, ...]:
     """Current sample plus explicit metadata and the learner's durable additions.
 
     Optional failures are handled by compile, rather than silently replacing a
@@ -169,11 +159,10 @@ def runtime_curriculum(profile) -> tuple[dict, ...]:
         raw = json.loads(files(__package__).joinpath("data/curriculum.vi.json").read_text(encoding="utf-8"))
     rows = deepcopy(raw["focusPhrases"])
     validate_inventory(rows)
-    metadata = json.loads(
+    metadata = {} if profile.curriculum_path else json.loads(
         files(__package__).joinpath("data/curriculum.vi.metadata.json").read_text(encoding="utf-8")
     )
-    personal = learner_path(profile)
-    additions = json.loads(personal.read_text(encoding="utf-8"))["focusPhrases"] if personal.exists() else []
+    additions = deepcopy(list(additions))
     validate_inventory(additions)
     by_key = {canonical_phrase(r["l2"]): r for r in rows}
     for row in additions:

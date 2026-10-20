@@ -14,6 +14,7 @@ from pathlib import Path
 from .compiler import compile
 from .config import load_profile
 from .learning import due, learn, learned
+from .ledger import Ledger
 from .rendering import render
 
 
@@ -43,14 +44,15 @@ def main(argv=None):
         profile = load_profile(args.profile)
         if args.learner:
             profile = replace(profile, learner_id=args.learner)
+        ledger = Ledger.for_profile(profile)
         if args.command == "learn":
-            print(json.dumps(learn(args.phrase, args.gloss, profile), ensure_ascii=False, indent=2))
+            print(json.dumps(learn(args.phrase, args.gloss, profile, ledger=ledger), ensure_ascii=False, indent=2))
         elif args.command == "learned":
-            print(json.dumps(learned(args.key, profile), ensure_ascii=False, indent=2))
+            print(json.dumps(learned(args.key, profile, ledger=ledger), ensure_ascii=False, indent=2))
         elif args.command == "due":
-            print(json.dumps(due(profile), ensure_ascii=False, indent=2))
+            print(json.dumps(due(profile, ledger=ledger), ensure_ascii=False, indent=2))
         else:
-            plan = compile(args.input.read_text(encoding="utf-8"), profile)
+            plan = compile(args.input.read_text(encoding="utf-8"), profile, ledger=ledger)
             if args.command == "plan":
                 print(json.dumps(plan.to_dict(), ensure_ascii=False, indent=2))
             else:
@@ -64,6 +66,9 @@ def main(argv=None):
                         "elevenlabs": ElevenLabsProvider(os.environ.get("ELEVENLABS_API_KEY")),
                     },
                     args.cache,
+                    render_timeout_s=profile.render_timeout_s,
+                    provider_timeout_s=profile.provider_timeout_s,
+                    fallback_reserve_s=profile.fallback_reserve_s,
                 )
                 if result.audio_path:
                     temporary = None

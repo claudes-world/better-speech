@@ -6,7 +6,6 @@ from pathlib import Path
 import pytest
 
 from better_speech.executor import ffmpeg_assembly_program
-from tests.reference.planner import SpeechPlan, SpeechStep
 from tests.reference.executor import (
     AudioPart,
     CompletedClip,
@@ -14,6 +13,7 @@ from tests.reference.executor import (
     execute_plan,
     render_with_rate_fallback,
 )
+from tests.reference.planner import SpeechPlan, SpeechStep
 
 FIXTURE = json.loads((Path(__file__).parent / "fixtures/enrichment/executor.json").read_text())
 

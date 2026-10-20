@@ -134,7 +134,6 @@ class Plan:
     lessons: tuple[Lesson, ...] = ()
     diagnostics: tuple[Diagnostic, ...] = ()
     status: str = "english"
-    profile_json: str = "{}"
     selection_time: str = ""
     executed: bool = False
     schema_version: int = 1

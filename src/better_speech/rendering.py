@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 import math
 import tempfile
 import time
@@ -21,7 +20,10 @@ from .transcript import present
 from .types import Diagnostic, Rendering, Section, digest
 
 
-def render(plan, providers, cache=None, *, deadline: float | None = None) -> Rendering:
+def render(
+    plan, providers, cache=None, *, deadline: float | None = None,
+    render_timeout_s: float = 180, provider_timeout_s: float = 60, fallback_reserve_s: float = 15,
+) -> Rendering:
     """Provider wrappers own budget/spend; they must honor the supplied timeout.
 
     Setup, assembly, hashing and presentation share the deadline and fail open.
@@ -32,7 +34,8 @@ def render(plan, providers, cache=None, *, deadline: float | None = None) -> Ren
     english = replace(plan, clips=plan.fallback_clips, lessons=(), status="english", executed=False)
     candidate = plan
     try:
-        settings = json.loads(plan.profile_json)
+        settings = dict(render_timeout_s=render_timeout_s, provider_timeout_s=provider_timeout_s,
+                        fallback_reserve_s=fallback_reserve_s)
         for key, default in (
             ("render_timeout_s", 180),
             ("provider_timeout_s", 60),

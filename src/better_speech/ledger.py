@@ -13,10 +13,17 @@ from filelock import FileLock
 
 from .budget import remaining
 from .config import state_dir
+from .curriculum import validate_inventory
 from .exposure import record_exposures, timestamp
 from .types import Diagnostic, Profile, canonical_json
 
 SCHEMA = """
+CREATE TABLE IF NOT EXISTS learner_phrases (
+    learner_id TEXT NOT NULL,
+    phrase_id TEXT NOT NULL,
+    record_json TEXT NOT NULL,
+    PRIMARY KEY (learner_id, phrase_id)
+);
 CREATE TABLE IF NOT EXISTS events (
     learner_id TEXT NOT NULL,
     delivery_id TEXT NOT NULL,
@@ -64,16 +71,16 @@ class Ledger:
             # Serialize initialization, including version inspection/migration.
             with FileLock(str(self.path) + ".init.lock", timeout=timeout):
                 version = self._execute(connection, "PRAGMA user_version", deadline=deadline).fetchone()[0]
-                if version not in (0, 1):
+                if version not in (0, 1, 2):
                     raise ValueError("unsupported ledger user_version")
-                if version == 0:
+                if version < 2:
                     self._execute(connection, "PRAGMA journal_mode=WAL", deadline=deadline)
                     self._execute(connection, "BEGIN IMMEDIATE", deadline=deadline)
                     try:
                         for statement in SCHEMA.split(";"):
                             if statement.strip():
                                 self._execute(connection, statement, deadline=deadline)
-                        self._execute(connection, "PRAGMA user_version=1", deadline=deadline)
+                        self._execute(connection, "PRAGMA user_version=2", deadline=deadline)
                         connection.commit()
                     except BaseException:
                         connection.rollback()
@@ -92,20 +99,55 @@ class Ledger:
             remaining(deadline)
         return cursor
 
-    def snapshot(self, learner_id="liam", *, deadline=None):
+    def learner_state(self, learner_id, *, deadline=None):
+        """Read exposure history and learner additions from one SQLite snapshot."""
         if not self.path.exists():
-            return {}
+            return {}, []
         connection = self._connect(deadline)
         try:
-            return {
+            self._execute(connection, "BEGIN", deadline=deadline)
+            records = {
                 key: json.loads(value)
                 for key, value in self._execute(
-                    connection,
-                    "SELECT phrase_key, record_json FROM phrases WHERE learner_id=?",
-                    (learner_id,),
-                    deadline=deadline,
+                    connection, "SELECT phrase_key, record_json FROM phrases WHERE learner_id=?",
+                    (learner_id,), deadline=deadline,
                 )
             }
+            rows = self._learner_rows(connection, learner_id, deadline=deadline)
+            return records, rows
+        finally:
+            connection.close()
+
+    def _learner_rows(self, connection, learner_id, *, deadline=None):
+        return [json.loads(raw) for (raw,) in self._execute(
+            connection, "SELECT record_json FROM learner_phrases WHERE learner_id=? ORDER BY rowid",
+            (learner_id,), deadline=deadline,
+        )]
+
+    def snapshot(self, learner_id="liam", *, deadline=None):
+        return self.learner_state(learner_id, deadline=deadline)[0]
+
+    def edit_phrases(self, learner_id, edit, *, deadline=None):
+        """Read/modify/write a learner's queue under the ledger's writer transaction."""
+        connection = self._connect(deadline)
+        try:
+            self._execute(connection, "BEGIN IMMEDIATE", deadline=deadline)
+            rows = self._learner_rows(connection, learner_id, deadline=deadline)
+            result = edit(rows)
+            validate_inventory(rows)
+            for row in rows:
+                self._execute(
+                    connection, "INSERT INTO learner_phrases VALUES(?,?,?) "
+                    "ON CONFLICT(learner_id,phrase_id) DO UPDATE SET record_json=excluded.record_json",
+                    (learner_id, row["id"], canonical_json(row)), deadline=deadline,
+                )
+            if deadline is not None:
+                remaining(deadline)
+            connection.commit()
+            return result
+        except BaseException:
+            connection.rollback()
+            raise
         finally:
             connection.close()
 
@@ -172,13 +214,11 @@ def record_delivered(
     delivery_id: str,
     delivered_at: datetime | str | None = None,
     *,
-    ledger: Ledger | None = None,
+    ledger: Ledger,
     deadline: float | None = None,
 ) -> DeliveryReceipt:
     """Call only after confirmed send; retry the same id/time without resending audio."""
     try:
-        profile = Profile.from_dict(json.loads(plan.profile_json))
-        ledger = ledger or Ledger.for_profile(profile)
         return ledger.record(plan, delivery_id, delivered_at or datetime.now(timezone.utc), deadline=deadline)
     except Exception as error:
         return DeliveryReceipt(diagnostics=(Diagnostic("ledger", type(error).__name__),))

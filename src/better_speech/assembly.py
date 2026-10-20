@@ -7,8 +7,8 @@ overwriting an existing artifact; custody must still authorize its publication.
 
 from __future__ import annotations
 
-import subprocess
 import os
+import subprocess
 import tempfile
 import time
 from collections.abc import Callable

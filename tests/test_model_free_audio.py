@@ -8,6 +8,9 @@ from better_speech import Profile, Voice, compile, render
 
 
 class EmptyLedger:
+    def learner_state(self, learner_id, **kwargs):
+        return self.snapshot(learner_id, **kwargs), []
+
     def snapshot(self, learner_id, **kwargs):
         return {}
 

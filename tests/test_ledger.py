@@ -7,7 +7,7 @@ from tests.test_model_free_audio import profile
 
 
 def executed_plan(directory, learner="liam"):
-    return replace(compile("Source.", profile(state_dir=str(directory), learner_id=learner)), executed=True)
+    return replace(compile("Source.", profile(state_dir=str(directory), learner_id=learner), ledger=Ledger.for_profile(profile(state_dir=str(directory), learner_id=learner))), executed=True)
 
 
 def writer(path, plan, worker_id, start):
@@ -66,7 +66,7 @@ def test_out_of_order_delivery_replay_is_identical(tmp_path):
 
 def test_preparation_duplicates_and_learner_isolation(tmp_path):
     ledger = Ledger(tmp_path / "ledger.db")
-    prepared = compile("Source.", profile(state_dir=str(tmp_path)))
+    prepared = compile("Source.", profile(state_dir=str(tmp_path)), ledger=Ledger.for_profile(profile(state_dir=str(tmp_path))))
     assert record_delivered(prepared, "not-sent", ledger=ledger).diagnostics
     assert ledger.snapshot() == {}
     plan = replace(prepared, executed=True)

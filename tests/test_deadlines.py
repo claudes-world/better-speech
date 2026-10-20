@@ -2,6 +2,7 @@ import time
 from dataclasses import replace
 
 from better_speech import compile, render
+from better_speech.ledger import Ledger
 from tests.test_model_free_audio import EmptyLedger, ToneProvider, profile, tone
 
 
@@ -23,7 +24,7 @@ def test_deadline_hit_during_lesson_yields_english(tmp_path):
 
 def test_expired_compile_and_render_return_english_content(tmp_path):
     source = "Complete source."
-    plan = compile(source, profile(), deadline=time.monotonic() - 1)
+    plan = compile(source, profile(), deadline=time.monotonic() - 1, ledger=Ledger.for_profile(profile()))
     assert not plan.lessons and plan.source == source and plan.diagnostics
     result = render(plan, {}, tmp_path, deadline=time.monotonic() - 1)
     assert result.audio_path is None and result.plan.status == "text"

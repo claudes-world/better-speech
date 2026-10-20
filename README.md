@@ -26,13 +26,14 @@ Vietnamese roster. Google receives plain text for English; ElevenLabs receives
 Vietnamese. Hosts must configure and authorize both providers.
 
 ```python
-from better_speech import compile, render, record_delivered
+from better_speech import Ledger, compile, render, record_delivered
 from better_speech.config import load_profile
 from better_speech.providers.google import GoogleProvider
 from better_speech.providers.elevenlabs import ElevenLabsProvider
 
 profile = load_profile("examples/profile.toml")
-plan = compile("The update is ready.", profile)
+ledger = Ledger.for_profile(profile)
+plan = compile("The update is ready.", profile, ledger=ledger)
 rendering = render(
     plan,
     {
@@ -43,13 +44,13 @@ rendering = render(
 )
 # Persist rendering.plan, artifact_identity, audio and sections before publishing.
 # After confirmed send only:
-receipt = record_delivered(rendering.plan, delivery_id, delivered_at)
+receipt = record_delivered(rendering.plan, delivery_id, delivered_at, ledger=ledger)
 ```
 
-`compile(text, profile, *, model_call=None, ledger=None, deadline=None)` preserves
+`compile(text, profile, *, ledger, model_call=None, now=None, seed=None, deadline=None)` preserves
 the source Markdown and produces a serializable `Plan` of `Clip`s: text,
 language, provider, model, voice, rate, format and pause-after. `Plan.to_dict()` /
-`Plan.from_dict()` round-trip its frozen profile, curriculum digest, lesson
+`Plan.from_dict()` round-trip its semantic clips, profile/curriculum digests, lesson
 manifest and diagnostics. The highest eligible learner phrase is reserved for
 the closing lesson: boosted first, then due, then one unseen introduction.
 Intensity 1/2/3 limits placement counts to 2/4/4, with at most two new phrases,
@@ -79,8 +80,9 @@ unreadable input files return a command error. No send or exposure is inferred
 from preparation.
 
 Both phases accept an absolute `time.monotonic()` deadline; pass the **same**
-deadline to bound the whole operation. Profile timeouts bound each phase and each
-provider/model call; lesson work reserves up to `fallback_reserve_s` (at most half
+deadline to bound the whole operation. Profile settings bound compile/model work;
+`render_timeout_s=180`, `provider_timeout_s=60`, and `fallback_reserve_s=15` are
+explicit `render` keyword arguments (the CLI supplies them from its profile); lesson work reserves up to `fallback_reserve_s` (at most half
 the remaining time) for English. Provider implementations must honor `timeout`.
 Subscription subprocesses, cache lock acquisition and ffmpeg are bounded;
 artifact hashing and presentation also share the deadline. Arbitrary injected
@@ -105,15 +107,17 @@ from subprocesses. Inject one `ModelCall` object (`__call__(payload, *, timeout)
 -> str`) or add a module and `models.register_model(name, factory)` to extend the
 registry without changing the compiler.
 
-Learner additions are written atomically under
-`$XDG_DATA_HOME/better-speech/learners/<learner-hash>/curriculum.json`; exposure
-events live in the single `ledger.sqlite3` there. `state_dir` overrides the root.
+Learner additions and exposure events live in
+`$XDG_DATA_HOME/better-speech/ledger.sqlite3`, in `learner_phrases` and `events`.
+Edits run in one SQLite transaction; compile reads additions and exposures from
+one snapshot. The library requires an explicit `ledger` for compile, learner
+commands and acknowledgement; the CLI resolves it from the profile. `state_dir` overrides the root.
 `learn` boosts to next midnight in the profile's IANA `timezone` (default
 `Asia/Ho_Chi_Minh`) and keeps the learning echo until `learned <key>` marks it
 landed. Neither command records a hearing. `due` lists boosted/due phrases.
 `--learner` overrides the profile's default `liam` for every command.
 
-Call `record_delivered(rendering.plan, delivery_id, delivered_at)` only after a
+Call `record_delivered(rendering.plan, delivery_id, delivered_at, ledger=ledger)` only after a
 confirmed send; use the same ID and timestamp on replay. Each phrase counts once
 per delivery, including echoes. SQLite uses WAL, a busy timeout and
 `BEGIN IMMEDIATE`; chronological event replay preserves the 1/3/7/21-day schedule
