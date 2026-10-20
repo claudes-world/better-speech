@@ -13,7 +13,7 @@ import re
 
 from .curriculum import canonical_phrase, grouped_literal
 
-_LINK = re.compile(r"\[([^\]\n]+)\]\((https?://(?:[^()\s]|\([^()\s]*\))+)\)")
+_LINK = re.compile(r"\[([^\]\n]+)\]\((https?://(?:[^()<>\s]|\([^()<>\s]*\))+)\)")
 _BARE = re.compile(r"\bhttps?://(?:[^\s<>()\[\]]|\([^\s<>()\[\]]*\))+")
 
 

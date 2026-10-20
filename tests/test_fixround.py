@@ -48,3 +48,18 @@ def test_render_inside_running_loop_keeps_paid_audio(tmp_path):
     assert result.status == 'bilingual'
     assert result.audio_path.read_bytes().startswith(b'OggS')
     assert not any(d.stage == 'render' for d in result.diagnostics)
+
+
+@pytest.mark.parametrize('source', [
+    '[Read](https://example.org/><script>alert(1)</script>)',
+    '[Read](https://example.org/><img/src=x/onerror=alert(1)>)',
+    'https://example.org/><script>alert(1)</script>',
+])
+def test_links_do_not_inject_html(source):
+    from markdown_it import MarkdownIt
+    from better_speech.transcript import present
+
+    plan = compile(source, profile(enabled=False), ledger=EmptyLedger())
+    _, markdown = present(plan)
+    rendered = MarkdownIt('commonmark', {'html': True}).render(markdown)
+    assert '<script>' not in rendered and '<img' not in rendered
