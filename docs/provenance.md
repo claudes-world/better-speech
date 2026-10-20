@@ -42,9 +42,10 @@ Markdown normalization is copied from `speech.py` on WorldOS `origin/dev` at
 roles were copied. `compile`, provider routing, registry, CLI and current result
 contracts are week-one integration code around the copied pure components.
 
-`data/curriculum.vi.json` is the current **54-phrase**
-`world-os/marketplace/plugins/comms/polyglot-curriculum.json`, copied byte-for-byte.
-That source has no lesson classes, 47 rows without units, and 54 aligned literal
+`data/curriculum.vi.json` started as the **54-phrase**
+`world-os/marketplace/plugins/comms/polyglot-curriculum.json`, copied byte-for-byte,
+and has since gained three local shop phrases (`giu-tien-thua`, `xin-loi-noi-lai`,
+`cho-them-mot-cai-nua`), for 57 entries. That 54-phrase source has no lesson classes, 47 rows without units, and 54 aligned literal
 arrays. `curriculum.vi.metadata.json` is an explicit classification/unit metadata
 overlay. Unannotated learner phrases get one whole-phrase unit, with a one-element
 tiered list where required by the copied validator. Historical curriculum assets
