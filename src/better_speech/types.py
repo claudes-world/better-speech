@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Literal
@@ -34,6 +35,17 @@ class Voice:
     region: str | None = None
     weight: float = 1
     settings_json: str = "{}"
+
+    def validate(self):
+        if any(not isinstance(v, str) or not v for v in (self.provider, self.model, self.voice, self.output_format)):
+            raise ValueError("voice requires provider/model/voice/format")
+        if type(self.rate) not in (int, float) or not math.isfinite(self.rate) or self.rate <= 0:
+            raise ValueError("voice rate must be positive and finite")
+        settings = json.loads(self.settings_json)
+        if not isinstance(settings, dict):
+            raise ValueError("voice settings must be an object")
+        canonical_json(settings)
+
 
 
 @dataclass(frozen=True)

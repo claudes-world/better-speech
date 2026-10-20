@@ -17,7 +17,7 @@ from pathlib import Path
 import pytest
 
 from better_speech.executor import ffmpeg_assembly_program
-from better_speech.planner import SpeechStep
+from tests.reference.planner import SpeechStep
 from tests.reference.executor import (
     AudioPart,
     CompletedClip,

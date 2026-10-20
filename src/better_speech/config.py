@@ -30,14 +30,10 @@ def resolve_profile(profile: Profile) -> Profile:
     """Invalid optional settings disable lessons while preserving a usable narrator."""
     from dataclasses import replace
 
-    from .planner import RenderVoice
-
     diagnostics = []
     try:
         voice = profile.english
-        RenderVoice(
-            voice.provider, voice.model, voice.voice, voice.rate, voice.settings_json, voice.output_format
-        )
+        voice.validate()
     except Exception:
         profile = replace(profile, english=Profile().english)
         diagnostics.append("invalid_english_voice")

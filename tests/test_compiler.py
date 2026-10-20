@@ -131,7 +131,7 @@ def test_long_multibyte_source_and_pacing_do_not_change_transcript(tmp_path):
     source = "界😀" * 3500
     plan = compile(source, cfg, ledger=EmptyLedger())
     assert "".join(c.text for c in plan.fallback_clips) == source
-    assert all(len(c.text.encode()) <= 4500 for c in plan.fallback_clips)
+    assert len(plan.fallback_clips) == 1  # Semantic source; providers lower at render time.
     assert plan.source == source
 
 

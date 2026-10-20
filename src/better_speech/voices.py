@@ -10,12 +10,7 @@ import math
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 
-
-@dataclass(frozen=True)
-class VoiceRef:
-    provider: str
-    voice: str
-    region: str | None = None
+from .types import Voice
 
 
 def _roll(random: Callable[[], float]) -> float:
@@ -25,18 +20,18 @@ def _roll(random: Callable[[], float]) -> float:
     return value
 
 
-def _pick(pool: Sequence[VoiceRef], random: Callable[[], float]) -> VoiceRef:
+def _pick(pool: Sequence[Voice], random: Callable[[], float]) -> Voice:
     return pool[math.floor(_roll(random) * len(pool))]
 
 
 def resolve_repeat_voice(
-    primary: VoiceRef,
+    primary: Voice,
     *,
     random: Callable[[], float],
     repeat: bool = False,
     second_voice: bool = True,
-    pool: Sequence[VoiceRef] = (),
-) -> VoiceRef | None:
+    pool: Sequence[Voice] = (),
+) -> Voice | None:
     """Legacy accent preference. None means the executor reuses primary."""
     if not repeat or not second_voice:
         return None
@@ -49,21 +44,21 @@ def resolve_repeat_voice(
 
 @dataclass(frozen=True)
 class LessonVoices:
-    main: VoiceRef
-    lead: VoiceRef
-    echo: VoiceRef
+    main: Voice
+    lead: Voice
+    echo: Voice
 
 
 def choose_lesson_voices(
     *,
-    main: VoiceRef,
+    main: Voice,
     random: Callable[[], float],
     weights: Mapping[str, float] | None = None,
     excluded: Sequence[str] = (),
     repeat: bool = True,
     second_voice: bool = True,
     level: int = 1,
-    pool: Sequence[VoiceRef] = (),
+    pool: Sequence[Voice] = (),
 ) -> LessonVoices | None:
     """Owner delta: weighted eligible lead, safe echo, lane-owned narrator.
 
@@ -80,7 +75,7 @@ def choose_lesson_voices(
     configured = {}
     if weights is not None:
         configured.update(weights)
-    eligible: list[VoiceRef] = []
+    eligible: list[Voice] = []
     amounts: list[float] = []
     for voice in pool:
         if voice.voice in excluded:

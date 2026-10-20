@@ -14,7 +14,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, replace
 
 from better_speech.executor import AudioPart
-from better_speech.planner import SpeechPlan, SpeechStep
+from tests.reference.planner import SpeechPlan, SpeechStep
 
 
 @dataclass(frozen=True)

@@ -138,3 +138,15 @@ def test_plan_version_roundtrip_and_ledger_unknown_version(tmp_path):
         ledger.snapshot()
     with sqlite3.connect(ledger.path) as db:
         assert db.execute('PRAGMA user_version').fetchone()[0] == 999
+
+
+def test_provider_lowering_preserves_multibyte_source_ranges_and_final_pause():
+    from better_speech.chunking import lower_clip
+    plan = compile('Tiếng Việt ' * 20, profile(enabled=False), ledger=EmptyLedger())
+    from dataclasses import replace
+    clip = replace(plan.clips[0], pause_after_s=1.2)
+    parts = list(lower_clip(clip, 25))
+    assert ''.join(c.text for c in parts) == clip.text
+    assert all(len(c.text.encode()) <= 25 for c in parts)
+    assert all(c.text == plan.speech_text[c.source_start:c.source_end] for c in parts)
+    assert all(c.pause_after_s == 0 for c in parts[:-1]) and parts[-1].pause_after_s == 1.2

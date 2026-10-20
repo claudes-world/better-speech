@@ -36,6 +36,9 @@ English voice, explicit Vietnamese roster/weights, pacing and model settings;
 `ModelCall`; and host-wrapped provider objects. Credentials stay in those objects.
 Use one monotonic deadline bounded by the utterance claim, including time to
 persist the result. `model="none"` still teaches the reserved closing phrase.
+Plans contain one semantic `Clip` stream; sequencing uses the public `Voice` type.
+Compilation preserves source spans; rendering lowers clips to bounded provider
+requests and persists those actual clips in the executed plan.
 There is no `spend_hook` parameter. The provider contract is
 `synthesize(clip, *, timeout) -> bytes`; it must honor timeout and make one attempt.
 A minimal host wrapper, with host-defined budget/accounting callbacks, is:

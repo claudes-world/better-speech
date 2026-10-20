@@ -14,6 +14,7 @@ from pathlib import Path
 from .assembly import assemble_audio
 from .budget import phase_deadline, remaining
 from .cache import ClipCache
+from .chunking import lower_clip
 from .config import cache_dir
 from .executor import AudioPart
 from .transcript import present
@@ -70,7 +71,11 @@ def render(plan, providers, cache=None, *, deadline: float | None = None) -> Ren
         # Present before purchasing clips: a corrupt optional manifest is not audible authority.
         actual = replace(
             requested,
-            clips=tuple(replace(c, text=unicodedata.normalize("NFC", c.text)) for c in requested.clips),
+            clips=tuple(
+                part for c in requested.clips
+                for part in lower_clip(replace(c, text=unicodedata.normalize("NFC", c.text)),
+                                       4500 if c.provider == "google" else 12000)
+            ),
             executed=True,
         )
         sections, markdown = present(actual)

@@ -10,11 +10,12 @@ from __future__ import annotations
 import json
 import math
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from .boundaries import paragraph_boundaries
-from .curriculum import canonical_phrase, js_trim
+from .curriculum import canonical_phrase
 from .pacing import compile_lesson, resolve_profile
+from .types import Clip, Voice
 
 DEFAULTS = {
     "repeat": True,
@@ -60,112 +61,44 @@ def _sequence(segment: Mapping, config: Mapping, l1: Callable, l2: Callable, sil
 
 
 @dataclass(frozen=True)
-class RenderVoice:
-    provider: str
-    model: str
-    voice: str
-    rate: float
-    voice_settings_json: str = "{}"
-    audio_format: str = "ogg"
-
-    def __post_init__(self):
-        if any(
-            not isinstance(v, str) or not v
-            for v in (self.provider, self.model, self.voice, self.audio_format)
-        ):
-            raise ValueError("render voice requires actual provider/model/voice/format")
-        if type(self.rate) not in (int, float) or not math.isfinite(self.rate) or self.rate <= 0:
-            raise ValueError("render rate must be positive and finite")
-        settings = json.loads(self.voice_settings_json)
-        if not isinstance(settings, dict):
-            raise ValueError("voice settings must be an object")
-        object.__setattr__(
-            self,
-            "voice_settings_json",
-            json.dumps(settings, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False),
-        )
-
-
-@dataclass(frozen=True)
 class LessonPlacement:
     lesson_id: str
     offset: int
     position: str  # start or end: controls pacing slots, not model prose
-    lead: RenderVoice
-    echo: RenderVoice
+    lead: Voice
+    echo: Voice
     level: int = 1
     mode: str = "open"
 
 
-@dataclass(frozen=True)
-class SpeechStep:
-    kind: str
-    text: str = ""
-    display_text: str = ""
-    provider: str = ""
-    model: str = ""
-    voice: str = ""
-    rate: float = 1
-    input_mode: str = "text"
-    audio_format: str = "ogg"
-    voice_settings_json: str = "{}"
-    seconds: float = 0
-    purpose: str = ""
-    lesson_id: str = ""
-    source_start: int | None = None
-    source_end: int | None = None
-
-
-@dataclass(frozen=True)
-class SpeechPlan:
-    source: str
-    steps: tuple[SpeechStep, ...]
-    settings_json: str
-    status: str
-    reason: str | None = None
-    schema_version: int = 1
-
-
-def _tts(text: str, display: str, voice: RenderVoice, **fields) -> SpeechStep:
-    return SpeechStep(
-        "tts",
-        text,
-        display,
-        voice.provider,
-        voice.model,
-        voice.voice,
-        voice.rate,
-        audio_format=voice.audio_format,
-        voice_settings_json=voice.voice_settings_json,
-        **fields,
+def _tts(text: str, display: str, voice: Voice, **fields) -> Clip:
+    voice.validate()
+    return Clip(
+        text, "vi" if fields.get("purpose") == "lesson" else "en", voice.voice,
+        voice.rate, 0, voice.provider, voice.model, voice.output_format,
+        display, voice.settings_json, **fields,
     )
 
 
-def _chunks(text: str, limit: int = 4000):
-    """Complete contiguous UTF-16-bounded chunks, no source truncation."""
-    start = 0
-    while start < len(text):
-        end, units = start, 0
-        while end < len(text) and units + (2 if ord(text[end]) > 0xFFFF else 1) <= limit:
-            units += 2 if ord(text[end]) > 0xFFFF else 1
-            end += 1
-        if end < len(text):
-            spaces = [i for i in range(start, end) if not js_trim(text[i])]
-            if spaces:
-                end = spaces[-1] + 1
-        yield start, end, text[start:end]
-        start = end
+def _fold_pauses(clips):
+    result = []
+    for clip in clips:
+        if clip.purpose == "silence" and result:
+            result[-1] = replace(result[-1], pause_after_s=result[-1].pause_after_s + clip.pause_after_s)
+        else:
+            result.append(clip)
+    return tuple(result)
 
 
-def build_speech_plan(
+def sequence_clips(
     source: str,
     *,
     inventory: Sequence[Mapping],
     placements: Sequence[LessonPlacement],
-    main: RenderVoice,
+    main: Voice,
     settings: Mapping,
     protected_ranges: Sequence[tuple[int, int]] = (),
-) -> SpeechPlan:
+) -> tuple[tuple[Clip, ...], str | None]:
     """Frozen source/speech separation after ID/slot semantic selection.
 
     Invalid optional lessons/oversized enriched plans fall back to COMPLETE
@@ -193,13 +126,11 @@ def build_speech_plan(
     boundaries = starts | ends
 
     def source_steps(start, end):
-        return [
-            _tts(text, text, main, purpose="source", source_start=start + a, source_end=start + b)
-            for a, b, text in _chunks(source[start:end])
-        ]
+        return [_tts(source[start:end], source[start:end], main, purpose="source",
+                     source_start=start, source_end=end)] if start < end else []
 
     def plain(reason):
-        return SpeechPlan(source, tuple(source_steps(0, len(source))), frozen, "plain", reason)
+        return tuple(source_steps(0, len(source))), reason
 
     if invalid_settings:
         return plain("invalid optional settings snapshot")
@@ -214,7 +145,7 @@ def build_speech_plan(
             raise ValueError("duplicate curriculum id")
         if len(placements) > 4:
             raise ValueError("too many lesson placements")
-        steps: list[SpeechStep] = []
+        steps: list[Clip] = []
         seen: set[str] = set()
         counts = {"connector": 0, "learning_sentence": 0}
         cursor = 0
@@ -266,10 +197,10 @@ def build_speech_plan(
                 segment["literal"] = " — ".join(literal) if isinstance(literal, list) else literal
 
             def silence(seconds):
-                return SpeechStep("silence", seconds=seconds)
+                return replace(_tts("", "", main, purpose="silence"), pause_after_s=seconds)
 
             def l1(text, purpose):
-                return _tts(text, text, main, purpose=purpose, lesson_id=placement.lesson_id)
+                return _tts(text, text, main, purpose=purpose, phrase_key=identity)
 
             def l2(occurrence):
                 voice = (
@@ -291,11 +222,11 @@ def build_speech_plan(
                         if i:
                             rendered.append(silence(unit_break))
                         rendered.append(
-                            _tts(unit, unit, voice, purpose="lesson", lesson_id=placement.lesson_id)
+                            _tts(unit, unit, voice, purpose="lesson", phrase_key=identity)
                         )
                     return rendered
                 paced = compile_lesson(dict(record), profile=profile)
-                return [_tts(paced.rendered, phrase, voice, purpose="lesson", lesson_id=placement.lesson_id)]
+                return [_tts(paced.rendered, phrase, voice, purpose="lesson", phrase_key=identity)]
 
             lesson_cfg = {
                 **cfg,
@@ -316,6 +247,6 @@ def build_speech_plan(
             return plain("enriched plan exceeds speakable budget")
         if "".join(step.text for step in steps if step.purpose == "source") != source:
             return plain("source coverage mismatch")
-        return SpeechPlan(source, tuple(steps), frozen, "applied" if seen else "plain")
+        return _fold_pauses(steps), None
     except (ValueError, KeyError, TypeError, OverflowError):
         return plain("invalid optional lesson plan")
