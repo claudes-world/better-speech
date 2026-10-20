@@ -84,9 +84,9 @@ class ElevenLabsProvider:
         except TimeoutError:
             expired.set()
             # Closing the active response aborts the transport; before headers,
-            # close the client instead. Late worker results are never consumed.
+            # close only a client this provider created. Late worker results are never consumed.
             if responses:
                 responses[0].close()
-            else:
+            elif self.client is None:
                 client.close()
             raise

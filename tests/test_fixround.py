@@ -376,3 +376,25 @@ print(json.dumps({'added': [r.added for r in receipts], 'state': ledger.snapshot
     assert all(record['exposureCount'] == 1 for record in outcome['state'].values())
     assert ledger.snapshot('other') == {}
     assert not (tmp_path / 'unused').exists()
+
+
+def test_elevenlabs_preheader_timeout_keeps_injected_client_usable():
+    import time
+
+    httpx = pytest.importorskip("httpx")
+    from better_speech.providers.elevenlabs import ElevenLabsProvider
+    from tests.test_providers import clip
+
+    calls = []
+
+    def respond(request):
+        calls.append(request)
+        if len(calls) == 1:
+            time.sleep(0.25)
+        return httpx.Response(200, content=b"audio")
+
+    with httpx.Client(transport=httpx.MockTransport(respond)) as client:
+        provider = ElevenLabsProvider("test", client=client)
+        with pytest.raises(TimeoutError):
+            provider.synthesize(clip("elevenlabs", "vi"), timeout=0.1)
+        assert provider.synthesize(clip("elevenlabs", "vi"), timeout=2) == b"audio"
