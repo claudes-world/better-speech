@@ -1,0 +1,112 @@
+{
+  "classification": "v1-original",
+  "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+  "source_file": "polyglot-speak.test.ts",
+  "source_sha256": "92a98036688b267133a3080d3fe24294079678974051c89925c7b7ea43662b0b",
+  "source_test_names": [
+    "one L2 voice per message, resolved from the pool by the injected rng",
+    "an explicit Google voice gets the Google rate",
+    "L1 always speaks with the OpenAI voice at the L1 rate",
+    "l1_in_pool on: a low roll puts an OpenAI voice in the native lead role",
+    "mid_l1_lead flips the mid sequence into the sentence-end shape"
+  ],
+  "cases": [
+    {
+      "config": {},
+      "rng": [
+        0
+      ],
+      "expected": {
+        "provider": "elevenlabs",
+        "voice": "CE5BJM57m1rtrAFVXfCq",
+        "region": "central"
+      },
+      "rate": 0.9
+    },
+    {
+      "config": {
+        "l2Voice": "vi-VN-Chirp3-HD-Puck"
+      },
+      "rng": [],
+      "expected": {
+        "provider": "google",
+        "voice": "vi-VN-Chirp3-HD-Puck",
+        "region": "northern"
+      },
+      "rate": 0.95
+    },
+    {
+      "config": {
+        "l1InPool": true
+      },
+      "rng": [
+        0,
+        0
+      ],
+      "expected": {
+        "provider": "openai",
+        "voice": "nova"
+      },
+      "rate": 0.9
+    },
+    {
+      "config": {
+        "l1InPool": true
+      },
+      "rng": [
+        0.99,
+        0.99
+      ],
+      "expected": {
+        "provider": "google",
+        "voice": "vi-VN-Chirp3-HD-Leda",
+        "region": "northern"
+      },
+      "rate": 0.95
+    }
+  ],
+  "roles": [
+    {
+      "segment": {
+        "l2": "Hẹn gặp lại",
+        "l1": "See you again"
+      },
+      "config": {},
+      "expected": true
+    },
+    {
+      "segment": {
+        "l2": "Chào bạn",
+        "l1": "Hi friend",
+        "rest": "Deploy is done."
+      },
+      "config": {},
+      "expected": false
+    },
+    {
+      "segment": {
+        "rest": "Deploy is done."
+      },
+      "config": {
+        "midL1Lead": true
+      },
+      "expected": true
+    },
+    {
+      "segment": {
+        "rest": "Deploy is done."
+      },
+      "config": {
+        "midL1Close": false
+      },
+      "expected": null
+    },
+    {
+      "segment": {},
+      "config": {
+        "tailL1Lead": false
+      },
+      "expected": null
+    }
+  ]
+}

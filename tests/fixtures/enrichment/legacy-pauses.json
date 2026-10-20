@@ -1,0 +1,906 @@
+{
+  "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+  "source_file": "marketplace/plugins/comms/polyglot-pause.ts",
+  "source_sha256": "ea25257735bfc39d98383cf07b74764a5a18063d14d5c7b0bcfb7c01383c48dc",
+  "test_file": "marketplace/plugins/comms/polyglot-pause.test.ts",
+  "test_sha256": "e85cfb3af15bcf0c314d8697d609af984502cdeca6555e25410137551aa57507",
+  "provenance": "Original audio rendering, text rendering and fail-open suites plus separately identified runtime edge probes. Expected outputs replayed through unchanged source using Bun. No locked four-layer owner changes are applied to these legacy vectors.",
+  "cases": [
+    {
+      "name": "style16",
+      "op": "audio",
+      "text": "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+      "arg": "elevenlabs",
+      "style": "16",
+      "expected": "Cà phê • nóng – hay là – cà phê • đá?",
+      "source_test": "style 16 renders T1 as a spaced bullet and T3 as a spaced en dash"
+    },
+    {
+      "name": "style15",
+      "op": "audio",
+      "text": "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+      "arg": "openai",
+      "style": "15",
+      "expected": "Cà phê • nóng - hay là - cà phê • đá?",
+      "source_test": "style 15 differs from 16 only at T3 (plain hyphen)"
+    },
+    {
+      "name": "off",
+      "op": "audio",
+      "text": "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+      "arg": "google",
+      "style": "off",
+      "expected": "Cà phê nóng hay là cà phê đá?",
+      "source_test": "style 'off' is byte-identical to the plain phrase"
+    },
+    {
+      "name": "tier2",
+      "op": "audio",
+      "text": "a⟨2⟩b",
+      "arg": "elevenlabs",
+      "style": "16",
+      "expected": "a ... b",
+      "source_test": "T2 is the spaced ellipsis (Liam ruling 1)"
+    },
+    {
+      "name": "word-includes-tier0",
+      "op": "text",
+      "text": "một⟨0⟩cà phê⟨1⟩sữa",
+      "arg": "word",
+      "style": "16",
+      "expected": "một • cà phê • sữa",
+      "source_test": "mode 'word' puts a bullet at EVERY seam, tier 0 included"
+    },
+    {
+      "name": "none",
+      "op": "text",
+      "text": "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+      "arg": "none",
+      "style": "16",
+      "expected": "Cà phê nóng hay là cà phê đá?",
+      "source_test": "mode 'none' shows the plain phrase"
+    },
+    {
+      "name": "unknown-digit",
+      "op": "audio",
+      "text": "a⟨7⟩b⟨1⟩c",
+      "arg": "openai",
+      "style": "16",
+      "expected": "a b c"
+    },
+    {
+      "name": "half-open",
+      "op": "text",
+      "text": "a⟨1b⟨1⟩c",
+      "arg": "word",
+      "style": "16",
+      "expected": "a b c"
+    },
+    {
+      "name": "half-close",
+      "op": "audio",
+      "text": "a1⟩b⟨1⟩c",
+      "arg": "google",
+      "style": "16",
+      "expected": "a b c"
+    },
+    {
+      "name": "prototype-style",
+      "op": "audio",
+      "text": "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+      "arg": "openai",
+      "style": "constructor",
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "name": "runtime-bom",
+      "op": "audio",
+      "text": "﻿a⟨1⟩b﻿",
+      "arg": "openai",
+      "style": "16",
+      "expected": "a • b"
+    },
+    {
+      "name": "runtime-non-js-whitespace",
+      "op": "audio",
+      "text": "a⟨1⟩b",
+      "arg": "openai",
+      "style": "16",
+      "expected": "a • b"
+    },
+    {
+      "name": "runtime-non-ascii-digit",
+      "op": "audio",
+      "text": "a⟨١⟩b",
+      "arg": "openai",
+      "style": "16",
+      "expected": "a١b"
+    },
+    {
+      "name": "runtime-word-ignores-style",
+      "op": "text",
+      "text": "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+      "arg": "word",
+      "style": "nope",
+      "expected": "Cà phê • nóng • hay là • cà phê • đá?"
+    },
+    {
+      "name": "runtime-unknown-provider",
+      "op": "audio",
+      "text": "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+      "arg": "unknown",
+      "style": "16",
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "name": "runtime-unknown-mode",
+      "op": "text",
+      "text": "a⟨2⟩b",
+      "arg": "loud",
+      "style": "16",
+      "expected": "a ... b"
+    },
+    {
+      "name": "pause-mirrors-audio",
+      "op": "text",
+      "text": "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+      "arg": "pause",
+      "style": "16",
+      "expected": "Cà phê • nóng – hay là – cà phê • đá?",
+      "source_test": "mode 'pause' mirrors the audio markers"
+    }
+  ],
+  "contract_cases": [
+    {
+      "source_test": "every sentinel becomes exactly one space, reproducing l2",
+      "op": "stripTiers",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "every sentinel becomes exactly one space, reproducing l2",
+      "op": "hasTierSentinels",
+      "args": [
+        "Cà phê nóng hay là cà phê đá?"
+      ],
+      "expected": false
+    },
+    {
+      "source_test": "tier 0 seams strip the same as any other tier",
+      "op": "stripTiers",
+      "args": [
+        "Cho mình⟨2⟩một⟨0⟩cà phê⟨1⟩sữa⟨1⟩đá⟨3⟩nha."
+      ],
+      "expected": "Cho mình một cà phê sữa đá nha."
+    },
+    {
+      "source_test": "tier 0 seams strip the same as any other tier",
+      "op": "hasTierSentinels",
+      "args": [
+        "Cho mình một cà phê sữa đá nha."
+      ],
+      "expected": false
+    },
+    {
+      "source_test": "stray angle brackets are removed, not left to reach a provider",
+      "op": "stripTiers",
+      "args": [
+        "Đi⟨thôi!"
+      ],
+      "expected": "Đithôi!"
+    },
+    {
+      "source_test": "stray angle brackets are removed, not left to reach a provider",
+      "op": "hasTierSentinels",
+      "args": [
+        "Đithôi!"
+      ],
+      "expected": false
+    },
+    {
+      "source_test": "stray angle brackets are removed, not left to reach a provider",
+      "op": "stripTiers",
+      "args": [
+        "Đi⟨1⟩thôi!"
+      ],
+      "expected": "Đi thôi!"
+    },
+    {
+      "source_test": "stray angle brackets are removed, not left to reach a provider",
+      "op": "hasTierSentinels",
+      "args": [
+        "Đi thôi!"
+      ],
+      "expected": false
+    },
+    {
+      "source_test": "an orphaned digit from a half-written sentinel never survives (PR #939 round 2)",
+      "op": "stripTiers",
+      "args": [
+        "Đi⟨1thôi"
+      ],
+      "expected": "Đi thôi"
+    },
+    {
+      "source_test": "an orphaned digit from a half-written sentinel never survives (PR #939 round 2)",
+      "op": "hasTierSentinels",
+      "args": [
+        "Đi thôi"
+      ],
+      "expected": false
+    },
+    {
+      "source_test": "an orphaned digit from a half-written sentinel never survives (PR #939 round 2)",
+      "op": "stripTiers",
+      "args": [
+        "Đi1⟩thôi"
+      ],
+      "expected": "Đi thôi"
+    },
+    {
+      "source_test": "an orphaned digit from a half-written sentinel never survives (PR #939 round 2)",
+      "op": "hasTierSentinels",
+      "args": [
+        "Đi thôi"
+      ],
+      "expected": false
+    },
+    {
+      "source_test": "plain text without sentinels round-trips unchanged",
+      "op": "stripTiers",
+      "args": [
+        "Cà phê nóng hay là cà phê đá?"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "plain text without sentinels round-trips unchanged",
+      "op": "hasTierSentinels",
+      "args": [
+        "Cà phê nóng hay là cà phê đá?"
+      ],
+      "expected": false
+    },
+    {
+      "source_test": "plain text without sentinels round-trips unchanged",
+      "op": "hasTierSentinels",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?"
+      ],
+      "expected": true
+    },
+    {
+      "source_test": "v1 renders identically on all three providers (Liam ruling 2)",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "elevenlabs",
+        "16"
+      ],
+      "expected": "Cà phê • nóng – hay là – cà phê • đá?"
+    },
+    {
+      "source_test": "tier 0 is never audible, whatever the style",
+      "op": "renderPausesForAudio",
+      "args": [
+        "một⟨0⟩cà phê",
+        "elevenlabs",
+        "16"
+      ],
+      "expected": "một cà phê"
+    },
+    {
+      "source_test": "v1 renders identically on all three providers (Liam ruling 2)",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "elevenlabs",
+        "15"
+      ],
+      "expected": "Cà phê • nóng - hay là - cà phê • đá?"
+    },
+    {
+      "source_test": "tier 0 is never audible, whatever the style",
+      "op": "renderPausesForAudio",
+      "args": [
+        "một⟨0⟩cà phê",
+        "elevenlabs",
+        "15"
+      ],
+      "expected": "một cà phê"
+    },
+    {
+      "source_test": "v1 renders identically on all three providers (Liam ruling 2)",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "elevenlabs",
+        "off"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "tier 0 is never audible, whatever the style",
+      "op": "renderPausesForAudio",
+      "args": [
+        "một⟨0⟩cà phê",
+        "elevenlabs",
+        "off"
+      ],
+      "expected": "một cà phê"
+    },
+    {
+      "source_test": "v1 renders identically on all three providers (Liam ruling 2)",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "openai",
+        "16"
+      ],
+      "expected": "Cà phê • nóng – hay là – cà phê • đá?"
+    },
+    {
+      "source_test": "tier 0 is never audible, whatever the style",
+      "op": "renderPausesForAudio",
+      "args": [
+        "một⟨0⟩cà phê",
+        "openai",
+        "16"
+      ],
+      "expected": "một cà phê"
+    },
+    {
+      "source_test": "v1 renders identically on all three providers (Liam ruling 2)",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "openai",
+        "15"
+      ],
+      "expected": "Cà phê • nóng - hay là - cà phê • đá?"
+    },
+    {
+      "source_test": "tier 0 is never audible, whatever the style",
+      "op": "renderPausesForAudio",
+      "args": [
+        "một⟨0⟩cà phê",
+        "openai",
+        "15"
+      ],
+      "expected": "một cà phê"
+    },
+    {
+      "source_test": "v1 renders identically on all three providers (Liam ruling 2)",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "openai",
+        "off"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "tier 0 is never audible, whatever the style",
+      "op": "renderPausesForAudio",
+      "args": [
+        "một⟨0⟩cà phê",
+        "openai",
+        "off"
+      ],
+      "expected": "một cà phê"
+    },
+    {
+      "source_test": "v1 renders identically on all three providers (Liam ruling 2)",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "google",
+        "16"
+      ],
+      "expected": "Cà phê • nóng – hay là – cà phê • đá?"
+    },
+    {
+      "source_test": "tier 0 is never audible, whatever the style",
+      "op": "renderPausesForAudio",
+      "args": [
+        "một⟨0⟩cà phê",
+        "google",
+        "16"
+      ],
+      "expected": "một cà phê"
+    },
+    {
+      "source_test": "v1 renders identically on all three providers (Liam ruling 2)",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "google",
+        "15"
+      ],
+      "expected": "Cà phê • nóng - hay là - cà phê • đá?"
+    },
+    {
+      "source_test": "tier 0 is never audible, whatever the style",
+      "op": "renderPausesForAudio",
+      "args": [
+        "một⟨0⟩cà phê",
+        "google",
+        "15"
+      ],
+      "expected": "một cà phê"
+    },
+    {
+      "source_test": "v1 renders identically on all three providers (Liam ruling 2)",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "google",
+        "off"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "tier 0 is never audible, whatever the style",
+      "op": "renderPausesForAudio",
+      "args": [
+        "một⟨0⟩cà phê",
+        "google",
+        "off"
+      ],
+      "expected": "một cà phê"
+    },
+    {
+      "source_test": "the default style is 16",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "elevenlabs"
+      ],
+      "expected": "Cà phê • nóng – hay là – cà phê • đá?"
+    },
+    {
+      "source_test": "an unknown style id renders the plain phrase instead of throwing",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "elevenlabs",
+        "nope"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "an unknown style id renders the plain phrase instead of throwing",
+      "op": "renderPausesForText",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "pause",
+        "nope"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "an unknown style id renders the plain phrase instead of throwing",
+      "op": "isKnownPauseStyle",
+      "args": [
+        "nope"
+      ],
+      "expected": false
+    },
+    {
+      "source_test": "R1 fix: a prototype-property style id (toString/constructor) fails open, never throws",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "elevenlabs",
+        "toString"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "R1 fix: a prototype-property style id (toString/constructor) fails open, never throws",
+      "op": "renderPausesForText",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "pause",
+        "toString"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "R1 fix: a prototype-property style id (toString/constructor) fails open, never throws",
+      "op": "isKnownPauseStyle",
+      "args": [
+        "toString"
+      ],
+      "expected": false
+    },
+    {
+      "source_test": "R1 fix: a prototype-property style id (toString/constructor) fails open, never throws",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "elevenlabs",
+        "constructor"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "R1 fix: a prototype-property style id (toString/constructor) fails open, never throws",
+      "op": "renderPausesForText",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "pause",
+        "constructor"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "R1 fix: a prototype-property style id (toString/constructor) fails open, never throws",
+      "op": "isKnownPauseStyle",
+      "args": [
+        "constructor"
+      ],
+      "expected": false
+    },
+    {
+      "source_test": "R1 fix: a prototype-property style id (toString/constructor) fails open, never throws",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "elevenlabs",
+        "hasOwnProperty"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "R1 fix: a prototype-property style id (toString/constructor) fails open, never throws",
+      "op": "renderPausesForText",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "pause",
+        "hasOwnProperty"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "R1 fix: a prototype-property style id (toString/constructor) fails open, never throws",
+      "op": "isKnownPauseStyle",
+      "args": [
+        "hasOwnProperty"
+      ],
+      "expected": false
+    },
+    {
+      "source_test": "R1 fix: a prototype-property style id (toString/constructor) fails open, never throws",
+      "op": "renderPausesForAudio",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "elevenlabs",
+        "__proto__"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "R1 fix: a prototype-property style id (toString/constructor) fails open, never throws",
+      "op": "renderPausesForText",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "pause",
+        "__proto__"
+      ],
+      "expected": "Cà phê nóng hay là cà phê đá?"
+    },
+    {
+      "source_test": "R1 fix: a prototype-property style id (toString/constructor) fails open, never throws",
+      "op": "isKnownPauseStyle",
+      "args": [
+        "__proto__"
+      ],
+      "expected": false
+    },
+    {
+      "source_test": "an unknown sentinel digit falls open to the whole phrase stripped",
+      "op": "renderPausesForAudio",
+      "args": [
+        "a⟨7⟩b⟨1⟩c",
+        "elevenlabs",
+        "16"
+      ],
+      "expected": "a b c"
+    },
+    {
+      "source_test": "an unknown sentinel digit falls open to the whole phrase stripped",
+      "op": "renderPausesForText",
+      "args": [
+        "a⟨7⟩b⟨1⟩c",
+        "pause",
+        "16"
+      ],
+      "expected": "a b c"
+    },
+    {
+      "source_test": "an unknown sentinel digit falls open to the whole phrase stripped",
+      "op": "renderPausesForText",
+      "args": [
+        "a⟨7⟩b⟨1⟩c",
+        "word",
+        "16"
+      ],
+      "expected": "a b c"
+    },
+    {
+      "source_test": "an orphaned tier digit from a half-written sentinel never survives into rendered output (PR #939 round 2)",
+      "op": "renderPausesForAudio",
+      "args": [
+        "a⟨1b⟨1⟩c",
+        "elevenlabs",
+        "16"
+      ],
+      "expected": "a b c"
+    },
+    {
+      "source_test": "an orphaned tier digit from a half-written sentinel never survives into rendered output (PR #939 round 2)",
+      "op": "renderPausesForText",
+      "args": [
+        "a⟨1b⟨1⟩c",
+        "pause",
+        "16"
+      ],
+      "expected": "a b c"
+    },
+    {
+      "source_test": "an orphaned tier digit from a half-written sentinel never survives into rendered output (PR #939 round 2)",
+      "op": "renderPausesForText",
+      "args": [
+        "a⟨1b⟨1⟩c",
+        "word",
+        "16"
+      ],
+      "expected": "a b c"
+    },
+    {
+      "source_test": "an orphaned tier digit from a half-written sentinel never survives into rendered output (PR #939 round 2)",
+      "op": "renderPausesForAudio",
+      "args": [
+        "a1⟩b⟨1⟩c",
+        "elevenlabs",
+        "16"
+      ],
+      "expected": "a b c"
+    },
+    {
+      "source_test": "an orphaned tier digit from a half-written sentinel never survives into rendered output (PR #939 round 2)",
+      "op": "renderPausesForText",
+      "args": [
+        "a1⟩b⟨1⟩c",
+        "pause",
+        "16"
+      ],
+      "expected": "a b c"
+    },
+    {
+      "source_test": "an orphaned tier digit from a half-written sentinel never survives into rendered output (PR #939 round 2)",
+      "op": "renderPausesForText",
+      "args": [
+        "a1⟩b⟨1⟩c",
+        "word",
+        "16"
+      ],
+      "expected": "a b c"
+    },
+    {
+      "source_test": "a half-written sentinel never survives into rendered output",
+      "op": "renderPausesForAudio",
+      "args": [
+        "a⟩b⟨1⟩c",
+        "elevenlabs",
+        "16"
+      ],
+      "expected": "ab c"
+    },
+    {
+      "source_test": "rendering is idempotent — output carries no sentinels to render again",
+      "op": "idempotence",
+      "args": [
+        "renderPausesForAudio",
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "elevenlabs",
+        "16"
+      ],
+      "expected": {
+        "once": "Cà phê • nóng – hay là – cà phê • đá?",
+        "twice": "Cà phê • nóng – hay là – cà phê • đá?"
+      }
+    },
+    {
+      "source_test": "rendering is idempotent — output carries no sentinels to render again",
+      "op": "idempotence",
+      "args": [
+        "renderPausesForText",
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "word",
+        "16"
+      ],
+      "expected": {
+        "once": "Cà phê • nóng • hay là • cà phê • đá?",
+        "twice": "Cà phê • nóng • hay là • cà phê • đá?"
+      }
+    },
+    {
+      "source_test": "word mode never splits a multi-syllable word (Rule 0 is in the annotation)",
+      "op": "renderPausesForText",
+      "args": [
+        "Cà phê⟨1⟩nóng⟨3⟩hay là⟨3⟩cà phê⟨1⟩đá?",
+        "word",
+        "16"
+      ],
+      "expected": "Cà phê • nóng • hay là • cà phê • đá?"
+    },
+    {
+      "source_test": "style id helpers",
+      "op": "isPauseTextMode",
+      "args": [
+        "none"
+      ],
+      "expected": true
+    },
+    {
+      "source_test": "style id helpers",
+      "op": "isPauseTextMode",
+      "args": [
+        "pause"
+      ],
+      "expected": true
+    },
+    {
+      "source_test": "style id helpers",
+      "op": "isPauseTextMode",
+      "args": [
+        "word"
+      ],
+      "expected": true
+    },
+    {
+      "source_test": "style id helpers",
+      "op": "isPauseTextMode",
+      "args": [
+        "loud"
+      ],
+      "expected": false
+    },
+    {
+      "source_test": "style id helpers",
+      "op": "isKnownPauseStyle",
+      "args": [
+        "16"
+      ],
+      "expected": true
+    },
+    {
+      "source_test": "every style defines all three tiers for all three providers",
+      "op": "registry",
+      "args": [],
+      "expected": {
+        "styles": {
+          "15": {
+            "id": "15",
+            "audio": {
+              "elevenlabs": {
+                "1": " • ",
+                "2": " ... ",
+                "3": " - "
+              },
+              "openai": {
+                "1": " • ",
+                "2": " ... ",
+                "3": " - "
+              },
+              "google": {
+                "1": " • ",
+                "2": " ... ",
+                "3": " - "
+              }
+            },
+            "text": {
+              "1": " • ",
+              "2": " ... ",
+              "3": " - "
+            }
+          },
+          "16": {
+            "id": "16",
+            "audio": {
+              "elevenlabs": {
+                "1": " • ",
+                "2": " ... ",
+                "3": " – "
+              },
+              "openai": {
+                "1": " • ",
+                "2": " ... ",
+                "3": " – "
+              },
+              "google": {
+                "1": " • ",
+                "2": " ... ",
+                "3": " – "
+              }
+            },
+            "text": {
+              "1": " • ",
+              "2": " ... ",
+              "3": " – "
+            }
+          },
+          "off": {
+            "id": "off",
+            "audio": {
+              "elevenlabs": {
+                "1": " ",
+                "2": " ",
+                "3": " "
+              },
+              "openai": {
+                "1": " ",
+                "2": " ",
+                "3": " "
+              },
+              "google": {
+                "1": " ",
+                "2": " ",
+                "3": " "
+              }
+            },
+            "text": {
+              "1": " ",
+              "2": " ",
+              "3": " "
+            }
+          }
+        },
+        "default_style": "16",
+        "default_mode": "none",
+        "word_marker": " • ",
+        "banned": [
+          "—"
+        ]
+      }
+    },
+    {
+      "source_test": "no style anywhere renders a banned seam",
+      "op": "bannedSeams",
+      "args": [],
+      "expected": false
+    }
+  ],
+  "original_test_names": [
+    "every sentinel becomes exactly one space, reproducing l2",
+    "tier 0 seams strip the same as any other tier",
+    "stray angle brackets are removed, not left to reach a provider",
+    "an orphaned digit from a half-written sentinel never survives (PR #939 round 2)",
+    "plain text without sentinels round-trips unchanged",
+    "style 16 renders T1 as a spaced bullet and T3 as a spaced en dash",
+    "style 15 differs from 16 only at T3 (plain hyphen)",
+    "T2 is the spaced ellipsis (Liam ruling 1)",
+    "v1 renders identically on all three providers (Liam ruling 2)",
+    "style 'off' is byte-identical to the plain phrase",
+    "tier 0 is never audible, whatever the style",
+    "the default style is 16",
+    "an unknown style id renders the plain phrase instead of throwing",
+    "R1 fix: a prototype-property style id (toString/constructor) fails open, never throws",
+    "an unknown sentinel digit falls open to the whole phrase stripped",
+    "a half-written sentinel never survives into rendered output",
+    "an orphaned tier digit from a half-written sentinel never survives into rendered output (PR #939 round 2)",
+    "rendering is idempotent — output carries no sentinels to render again",
+    "mode 'none' shows the plain phrase",
+    "mode 'pause' mirrors the audio markers",
+    "mode 'word' puts a bullet at EVERY seam, tier 0 included",
+    "word mode never splits a multi-syllable word (Rule 0 is in the annotation)",
+    "no style anywhere renders a banned seam",
+    "every style defines all three tiers for all three providers",
+    "style id helpers"
+  ],
+  "coverage_note": "Portable rendering cases plus original strip/default/registry/idempotence and malformed contracts. Runtime probes in cases remain separately named runtime-*; no locked owner-layer delta."
+}

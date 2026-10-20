@@ -1,0 +1,8222 @@
+{
+  "classification": "source-derived-regression",
+  "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+  "source_file": "polyglot-speak.ts",
+  "source_sha256": "8c6e4b7e88c51df4c92238fd8c09bdfc487b922af3f11889767fa6f88c5a1186",
+  "source_tests": "polyglot-speak.test.ts open/close, meaning units and voice-role exposure sequencing suites",
+  "extraction": "64 actual V1 buildSpeechPlan outputs across both modes, repeat and all role toggles, tail/mid. No synthesis called. Extends original test combinations without changing expectations.",
+  "cases": [
+    {
+      "name": "open-false-false-false-false-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "open-false-false-false-false-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-false-false-false-true-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "open-false-false-false-true-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-false-false-true-false-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "open-false-false-true-false-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-false-false-true-true-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "open-false-false-true-true-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-false-true-false-false-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "open-false-true-false-false-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-false-true-false-true-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "open-false-true-false-true-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-false-true-true-false-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "open-false-true-true-false-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-false-true-true-true-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "open-false-true-true-true-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-true-false-false-false-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 1
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Wish you... one evening... happy.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        }
+      ]
+    },
+    {
+      "name": "open-true-false-false-false-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 1
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Wish you... one evening... happy.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-true-false-false-true-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 1
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Wish you... one evening... happy.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        }
+      ]
+    },
+    {
+      "name": "open-true-false-false-true-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-true-false-true-false-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 1
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Wish you... one evening... happy.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        }
+      ]
+    },
+    {
+      "name": "open-true-false-true-false-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-true-false-true-true-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 1
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Wish you... one evening... happy.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        }
+      ]
+    },
+    {
+      "name": "open-true-false-true-true-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-true-true-false-false-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "open-true-true-false-false-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 1
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Wish you... one evening... happy.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-true-true-false-true-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "open-true-true-false-true-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-true-true-true-false-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "open-true-true-true-false-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "open-true-true-true-true-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "open-true-true-true-true-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "open",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-false-false-false-false-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        }
+      ]
+    },
+    {
+      "name": "close-false-false-false-false-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-false-false-false-true-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        }
+      ]
+    },
+    {
+      "name": "close-false-false-false-true-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-false-false-true-false-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        }
+      ]
+    },
+    {
+      "name": "close-false-false-true-false-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-false-false-true-true-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        }
+      ]
+    },
+    {
+      "name": "close-false-false-true-true-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-false-true-false-false-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "close-false-true-false-false-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-false-true-false-true-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "close-false-true-false-true-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-false-true-true-false-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "close-false-true-true-false-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-false-true-true-true-tail",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "close-false-true-true-true-mid",
+      "config": {
+        "repeat": false,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-true-false-false-false-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 1
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Wish you... one evening... happy.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        }
+      ]
+    },
+    {
+      "name": "close-true-false-false-false-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 1
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Wish you... one evening... happy.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-true-false-false-true-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 1
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Wish you... one evening... happy.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        }
+      ]
+    },
+    {
+      "name": "close-true-false-false-true-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-true-false-true-false-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 1
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Wish you... one evening... happy.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        }
+      ]
+    },
+    {
+      "name": "close-true-false-true-false-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-true-false-true-true-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 1
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Wish you... one evening... happy.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        }
+      ]
+    },
+    {
+      "name": "close-true-false-true-true-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": false,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-true-true-false-false-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "close-true-true-false-false-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 1
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Wish you... one evening... happy.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-true-true-false-true-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "close-true-true-false-true-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": false,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-true-true-true-false-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "close-true-true-true-false-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": false,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    },
+    {
+      "name": "close-true-true-true-true-tail",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": ""
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "name": "close-true-true-true-true-mid",
+      "config": {
+        "repeat": true,
+        "tailL1Lead": true,
+        "midL1Close": true,
+        "midL1Lead": true,
+        "repeatSecondVoice": false
+      },
+      "document": {
+        "segments": [
+          {
+            "mode": "close",
+            "l2": [
+              "Chúc bạn",
+              "một buổi tối",
+              "vui vẻ"
+            ],
+            "l1": "Have a good evening",
+            "literal": "Wish you... one evening... happy.",
+            "rest": "Following source."
+          }
+        ]
+      },
+      "steps": [
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Have a good evening",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.25
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "Chúc bạn",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "một buổi tối",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.4
+        },
+        {
+          "kind": "tts",
+          "lang": "l2",
+          "text": "vui vẻ",
+          "voice": {
+            "provider": "elevenlabs",
+            "voice": "CE5BJM57m1rtrAFVXfCq",
+            "region": "central"
+          },
+          "rate": 0.9
+        },
+        {
+          "kind": "silence",
+          "seconds": 0.6
+        },
+        {
+          "kind": "tts",
+          "lang": "l1",
+          "text": "Following source.",
+          "voice": {
+            "provider": "openai",
+            "voice": "onyx"
+          },
+          "rate": 1.15
+        }
+      ]
+    }
+  ]
+}

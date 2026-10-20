@@ -1,0 +1,28 @@
+# Explicitly use the model-free path for a first listen.
+model = "none"
+codex_model = "gpt-6-luna"
+claude_model = "claude-haiku-5-5"
+agy_model = "gemini-3-flash"
+timezone = "Asia/Ho_Chi_Minh"
+learner_id = "liam"
+enabled = true
+intensity = 1
+repeat = true
+repeat_second_voice = true
+voices_file = "voices.vi.json"
+model_timeout_s = 5
+provider_timeout_s = 60
+fallback_reserve_s = 15
+
+[english]
+provider = "google"
+model = "neural2"
+voice = "en-US-Neural2-J"
+rate = 1.05
+output_format = "mp3"
+
+[pacing.default]
+p0 = ", "
+p1 = " – "
+p2_0 = ""
+p2_1 = ""

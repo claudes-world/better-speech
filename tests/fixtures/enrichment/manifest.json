@@ -1,0 +1,467 @@
+{
+  "schema_version": 1,
+  "v1_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+  "scope": "A2 27-row matrix; partial evidence is not a completed port",
+  "fixtures": [
+    {
+      "path": "pacing-layers.json",
+      "sha256": "3dee4ab89fb3e1579649d4440793561ecfbf56d19af68e62b44074d95b3b1d64",
+      "classification": "owner-extension",
+      "source_file": "voice-samples-20260916/pacing_compile.py",
+      "source_commit": null,
+      "source_sha256": "7bbae88f4951dc66b0c73f76468580afd265b66348ac1c1ddfdba0a5767338cb",
+      "source_test_names": [
+        "1",
+        "1b",
+        "2",
+        "2b",
+        "2c",
+        "3",
+        "3b",
+        "3c"
+      ],
+      "authority_file": "LESSON-PACING-SCHEMA-20260917.md",
+      "authority_sha256": "3d2d37fecc9868f7d77f1e3562f56a7952e2567efcbfbcb6c17a2ac6028ca7a9",
+      "expectation_delta": "None versus reference outputs. Schema-shaped vocabulary/structure records replace prototype bare strings. This is not a legacy v1 fixture."
+    },
+    {
+      "path": "curriculum.json",
+      "sha256": "9110cae061d1ccc125c1126cefa9a4500ffbf924cbffa989ea9abb3e5bf1cc03",
+      "classification": "v1-original",
+      "source_file": "polyglot-hook.test.ts",
+      "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+      "source_sha256": "f6cc20592e3957f76ecf034479065fefd2f0a0168febbb8c70b37f9de8f7b940",
+      "source_test_names": [
+        "bundled Tier-1 set by default, with unique ids and the Liam-adopted stock sentences",
+        "POLYGLOT_CURRICULUM overrides; an unreadable/invalid file falls back to bundled"
+      ]
+    },
+    {
+      "path": "selection.json",
+      "sha256": "3d047c2031f2608ef04b5c9cd8879883761f36143c9b43a12c09ee7dcb40eb89",
+      "classification": "v1-original",
+      "source_file": "polyglot-hook.test.ts",
+      "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+      "source_sha256": "f6cc20592e3957f76ecf034479065fefd2f0a0168febbb8c70b37f9de8f7b940",
+      "source_test_names": [
+        "due reviews first (most overdue first), then new phrases in curriculum order, capped by intensity",
+        "phrases only heard in ANOTHER lane are not due here"
+      ],
+      "expectation_delta": "Original named vectors retained; separately labelled source-derived regressions preserve V1 semantics, not owner behavior changes."
+    },
+    {
+      "path": "srs.json",
+      "sha256": "4a10397077fef472cb48b87c487cad0789c8ba4a1af8e9499322637e0b41e68c",
+      "classification": "v1-original",
+      "source_file": "polyglot-exposure.test.ts",
+      "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+      "source_sha256": "b3238e4690838f540a3f97506f15ec31552905640d4184b67fd750c19c32e243",
+      "source_test_names": [
+        "a new phrase starts at intervalIndex 0, due firstHeard + 1 day",
+        "an exposure on/after dueAt advances the interval and reschedules",
+        "massed exposure before dueAt counts but does NOT advance the schedule",
+        "R3-M2d: a valid OFFSET timestamp advances the schedule (no lexicographic freeze)"
+      ],
+      "expectation_delta": "Original named vectors retained; separately labelled source-derived regressions preserve V1 semantics, not owner behavior changes."
+    },
+    {
+      "path": "rewriter.json",
+      "sha256": "fe938d9ebab159b82e81f7593955895d393968b418249cec7549e429d3e333f5",
+      "classification": "v1-original",
+      "source_file": "polyglot-rewriter.test.ts",
+      "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+      "source_sha256": "5dea3c5720ea2ccbf2995d9a3857628e2fb7d365fd0ac0bb21225201e9ac3a07",
+      "source_test_names": [
+        "plan is assembled into a SegmentDoc with inventory strings verbatim",
+        "echo yields two segments with verbatim inventory l2 and ONE extracted phrase",
+        "parsePlan rejects non-object items and empty plans",
+        "unknown phraseId drops just that sprinkle"
+      ]
+    },
+    {
+      "path": "segments.json",
+      "sha256": "eecce8e822a91be5c45a1ab6e3f0b65fde25dfb234dbf2c121c7d65ba982519c",
+      "classification": "legacy-parity",
+      "source_file": "marketplace/plugins/comms/polyglot-segments.test.ts",
+      "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+      "source_sha256": "a41084fd812510acf6a6e63a4360eba1fbac9c7a160d7231c81cc8522fed286c",
+      "source_test_names": [
+        "a rest-only segment (untranslated remainder)",
+        "unknown fields, so a chatty model is not rejected for extra keys",
+        "unparseable JSON",
+        "a non-object root",
+        "null",
+        "a missing segments array",
+        "segments as an object",
+        "an empty segments array",
+        "a non-object segment",
+        "an empty segment",
+        "a bad mode value",
+        "l2 of the wrong type",
+        "an empty l2 string",
+        "an empty l2 array",
+        "a blank unit inside l2",
+        "literal without l2",
+        "l2 without an l1 gloss — the failure that actively harms the learner",
+        "reports every error, not just the first, so one pass fixes a prompt",
+        "a valid annotation survives validation and is exposed as units",
+        "an array annotation mirrors an array l2",
+        "a strip-invariant violation DROPS the field but keeps the message",
+        "a shape mismatch against l2 drops the field, never fails the doc/string-array",
+        "a shape mismatch against l2 drops the field, never fails the doc/array-string",
+        "a shape mismatch against l2 drops the field, never fails the doc/array-length",
+        "a shape mismatch against l2 drops the field, never fails the doc/non-string",
+        "an annotation without an l2 to annotate is dropped",
+        "sentinels in l1/rest/literal are stripped — they belong only in l2Tiered",
+        "sentinels smuggled directly in l2 are stripped, not just l1/rest/literal (R1 fix)",
+        "an l2 unit that is ONLY sentinel chars strips to empty and is rejected, not silently spoken blank (codex follow-on)/string",
+        "an l2 unit that is ONLY sentinel chars strips to empty and is rejected, not silently spoken blank (codex follow-on)/array",
+        "sentinels smuggled in an l2 array unit are stripped per-unit (R1 fix)",
+        "a well-formed document",
+        "a raw JSON string, since models return text",
+        "helpers",
+        "the bundled curriculum satisfies the strip invariant for every phrase",
+        "no bundled phrase carries a sentinel in a plain field"
+      ],
+      "expectation_delta": "Original named vectors retained; separately labelled source-derived regressions preserve V1 semantics, not owner behavior changes."
+    },
+    {
+      "path": "voices.json",
+      "sha256": "854ad6f49ae30893a2613ff139f53438aa44daac1a54e3fc8432e3d15ab91e87",
+      "classification": "v1-original",
+      "source_file": "polyglot-speak.test.ts",
+      "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+      "source_sha256": "92a98036688b267133a3080d3fe24294079678974051c89925c7b7ea43662b0b",
+      "source_test_names": [
+        "one L2 voice per message, resolved from the pool by the injected rng",
+        "an explicit Google voice gets the Google rate",
+        "L1 always speaks with the OpenAI voice at the L1 rate",
+        "l1_in_pool on: a low roll puts an OpenAI voice in the native lead role",
+        "mid_l1_lead flips the mid sequence into the sentence-end shape"
+      ]
+    },
+    {
+      "path": "echo.json",
+      "sha256": "501c73b106213d393749b13004d6e833eeb48d6861ef0fbabecdaf9f561d90fe",
+      "classification": "v1-original",
+      "source_file": "polyglot-speak.test.ts",
+      "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+      "source_sha256": "92a98036688b267133a3080d3fe24294079678974051c89925c7b7ea43662b0b",
+      "source_test_names": [
+        "repeat_second_voice picks the echo from a DIFFERENT accent region",
+        "repeat_second_voice off: the echo reuses the primary voice",
+        "no second voice resolved when repeat is off (rotation stays one call)"
+      ]
+    },
+    {
+      "path": "sequences.json",
+      "sha256": "df8fdaa787c611566c13ed1dd83ff64b4ed8b0e1d5d0ce54586185d3d5268125",
+      "classification": "source-derived-regression",
+      "source_file": "polyglot-speak.ts",
+      "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+      "source_sha256": "8c6e4b7e88c51df4c92238fd8c09bdfc487b922af3f11889767fa6f88c5a1186",
+      "source_test_names": ["polyglot-speak.test.ts open/close, meaning units and voice-role exposure sequencing suites"],
+      "expectation_delta": "64 unchanged V1 buildSpeechPlan outputs extend original combinations; no synthesis or runtime wiring claimed."
+    },
+    {
+      "path": "executor.json",
+      "sha256": "91f8c0029c5d64fdda90c850e96fd629a74cef610c98e3800d7dfab445c49fee",
+      "classification": "source-derived-regression-with-labelled-owner-deltas",
+      "source_file": "polyglot-speak.ts",
+      "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+      "source_sha256": "8c6e4b7e88c51df4c92238fd8c09bdfc487b922af3f11889767fa6f88c5a1186",
+      "source_test_names": ["all provider calls are in flight before any resolves, and output order follows step order", "a failing step rejects the whole plan with the provider error and still cleans up"],
+      "expectation_delta": "Injected bounded concurrency and custody-aware outcomes; uncertain requests never blindly retry. Runtime integration is tested separately at 69ab55b; this fixture itself remains a pure executor vector."
+    },
+    {
+      "path": "settings.json",
+      "sha256": "cfec8033ac853018e0c2480281425fa3ed8f4271184e4db3695c4edeb7d13e5b",
+      "classification": "v1-original",
+      "source_file": "polyglot-tool.test.ts",
+      "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+      "source_sha256": "dd6012b037dab131ee3ebf9995930d55fe0dcd87be92ad4798262ef59e7204d1",
+      "source_test_names": ["the engine default applies with no arg, no env and no lane row", "a per-call arg outranks everything", "env wins over a stored budget", "an invalid env value warns and the store still gets its turn"],
+      "expectation_delta": "Fixture contains additional hook/config source hashes; pure resolution only, not all runtime consumers."
+    },
+    {
+      "path": "legacy-pauses.json",
+      "sha256": "b8393fee57f6655e75975de4b4165dccb2cbb4bf01d59a6c421c26d058140931",
+      "classification": "v1-original-with-source-derived-edge-probes",
+      "source_file": "marketplace/plugins/comms/polyglot-pause.ts",
+      "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+      "source_sha256": "ea25257735bfc39d98383cf07b74764a5a18063d14d5c7b0bcfb7c01383c48dc",
+      "source_test_names": ["style 16 renders T1 as a spaced bullet and T3 as a spaced en dash", "style 15 differs from 16 only at T3 (plain hyphen)"],
+      "expectation_delta": "Every original pause test attributed inside fixture; additional edge probes separately labelled. Locked four-layer owner changes are not legacy parity."
+    },
+    {
+      "path": "curriculum-aligned.json",
+      "sha256": "dd5390b5fbd30fdd88dcb0ba12a2068c091823dcca3a46d2046018644e61694a",
+      "classification": "recovered-authoritative-v1-data",
+      "source_file": "marketplace/plugins/comms/polyglot-curriculum.json",
+      "source_commit": "5c4205c440f5a836373d8fc8160aa4c861427c58",
+      "source_sha256": "e9a3f428ece83f20f65024ffdaa2c839cd37a19b5f7c5632257745f08652a28c",
+      "source_test_names": ["every bundled phrase carries an l1_literal gloss", "each l1_literal covers every token of its phrase, in order", "a bracketed particle gloss is always closed, and particles are glossed as particles", "one particle never carries two different bracketed glosses"],
+      "expectation_delta": "PR1010 aligned glosses recovered unchanged by ID and exact source match. This later approved asset is not the baseline 5b61b0f fixture; no lesson classification inferred."
+    },
+    {
+      "path": "sequences-owner.json",
+      "sha256": "072141090005a89c841971aee605b42d9bf1178d7084bc6587246cbb4f5656c4",
+      "classification": "owner-extension",
+      "source_file": "LESSON-PACING-SCHEMA-20260917.md",
+      "source_commit": null,
+      "source_sha256": "3d2d37fecc9868f7d77f1e3562f56a7952e2567efcbfbcb6c17a2ac6028ca7a9",
+      "source_test_names": ["end-narrator-leads", "close-repeat-two-voices", "manual-recall-no-new-accent"],
+      "expectation_delta": "Owner assertions for lane narrator, four-slot compiler and manual level-two echo reuse; case names refer to these new vectors, not unchanged V1 tests."
+    },
+    {
+      "path": "voices-owner.json",
+      "sha256": "00a28c11148cc4b206c9c5d2e92eafb21b8906f68b83422467957db912bc3044",
+      "classification": "owner-extension",
+      "source_file": "LESSON-PACING-SCHEMA-20260917.md",
+      "source_commit": null,
+      "source_sha256": "3d2d37fecc9868f7d77f1e3562f56a7952e2567efcbfbcb6c17a2ac6028ca7a9",
+      "source_test_names": ["weighted-first", "weighted-last", "excluded-first", "level-two-no-new-accent", "zero-weight-first", "repeat-off"],
+      "expectation_delta": "Locked eleven-voice ElevenLabs-only pool and weights supersede baseline mixed-provider rotation. Owner vector names, not V1 tests; later CamHong weight three is retained."
+    },
+    {
+      "path": "settings-owner.json",
+      "sha256": "1dc6dd960b46d099c3e96997159d16ffc95674087bafac890aac12b0e5de9832",
+      "classification": "owner-extension",
+      "source_file": "PLAN-codex-voice-pipeline-20260916.md",
+      "source_commit": null,
+      "source_sha256": "7b5beaa639af37223adcc126775466c9c6c9dd3e96616d357b9243c852518ea0",
+      "source_test_names": ["absent-off", "explicit-enabled", "lane-off", "operator-off", "tight-deadline", "explicit-budget", "locked-pool", "false-role", "invalid-role-inherits", "expired-budget"],
+      "expectation_delta": "A2 owner vectors: no implicit v2 enablement, one shared deadline, legacy l1InPool retained as inactive provenance. Case names identify new assertions, not baseline V1 tests."
+    },
+    {
+      "path": "cache-keys-owner.json",
+      "sha256": "28fbc664a1f9d9a04ddb3ab85ea7ae89e38db0ab989f27da30c1fd7683296c66",
+      "classification": "owner-extension",
+      "source_file": "PLAN-codex-voice-pipeline-20260916.md",
+      "source_commit": null,
+      "source_sha256": "7b5beaa639af37223adcc126775466c9c6c9dd3e96616d357b9243c852518ea0",
+      "source_test_names": ["independent Bun canonical JSON and node:crypto SHA256 owner clip-identity vectors"],
+      "expectation_delta": "Versioned actual-input identity adds model, settings and mode; recursively sorted keys, JS number spellings and NFC text. No fallback to V1 keys; baseline key vectors remain separate."
+    },
+    {
+      "path": "cache-keys.json",
+      "sha256": "80f82e5d203ae8f77d72c1fa781fcd568caffa33d547cc63ec15695c912309c8",
+      "classification": "v1-original",
+      "source_file": "polyglot-cache.test.ts",
+      "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+      "source_sha256": "7bf3b65019009c210c8a8a07c56d0384d573f40af5685ebd8ce9d90b4de9e6b7",
+      "source_test_names": [
+        "NFC and NFD spellings of the same phrase hash identically",
+        "a different voice is a different key",
+        "a different rate is a different key",
+        "a different provider or format is a different key"
+      ]
+    }
+  ],
+  "integration_checkpoint": {
+    "commit": "69ab55b",
+    "scope": "Source integration and offline/fake-provider PostgreSQL evidence; not deployment, audible UAT, or completion of all 27 rows",
+    "postgres_receipt": "44159: 15 passed, including execution custody nine, retention four, lock-order one, migration one",
+    "offline_receipt": "94017: 40 passed, including inventory, actual worker/builder/entrypoint, toolchain and two-tick exposure projection",
+    "separate_exposure_receipt": "76727: 20 passed including nine delivery-ack/import ledger cases; those seed final assembly manifest separately from actual provider custody",
+    "remaining_global": ["exact-head broad CI and installed-artifact checks", "full source-derived 27-row golden coverage", "artifact/preview user-visible evidence", "approved deployment and actual helper/provider/audible acceptance"],
+    "activation": "No production services, settings, credentials or provider calls changed"
+  },
+  "operator_checkpoint": {
+    "scope": "Source/operator evidence only; no live configuration apply, legacy ledger import, deployment or full V1 parity acceptance",
+    "components": [
+      {
+        "id": "config-candidate-cli",
+        "commit": "de1a6c5f3cf81d261f4ed6cfb0ca38ccd2e9061c",
+        "test_paths": ["apps/control-plane/tests/test_polyglot_config_cli.py"],
+        "evidence": "Candidate-only configuration get/list/set/role/pause/text/budget surface; tests use fake authority with real candidate validation, preserve parent enablement, reject stale previews and never overwrite existing candidate files. Existing config-release-apply remains the separate activation authority.",
+        "limits": "No actual configuration-store PostgreSQL receipt attributed to this checkpoint; no installed operator or live apply acceptance"
+      },
+      {
+        "id": "authorized-ledger-cli",
+        "commit": "19e8c76de3c0cc70e68372813eca5169202a1692",
+        "test_paths": ["apps/control-plane/tests/test_polyglot_ledger_cli.py", "apps/control-plane/tests/test_polyglot_ledger_authority.py"],
+        "evidence": "Read commands require config:view; import/set-level require config:apply through the actual configuration store on the same borrowed transaction. Disposable PostgreSQL cases cover import replay/alias/collision, denied/view-only actors and mutation rollback.",
+        "limits": "Fixtures are not an actual legacy user ledger import or installed CLI acceptance"
+      },
+      {
+        "id": "atomic-manual-level",
+        "commit": "7dbea45f2abff22270e687c26ef528ca3bdd2c4b",
+        "test_paths": ["apps/control-plane/tests/test_speech_manual_level.py"],
+        "evidence": "Existing exposure ledger and shared advisory lock; canonical phrase identity, level-only changes, invalid/unknown no-change and preserved counts/schedule/history/lanes. Concurrent accepted projection test checks final state, not deterministic lock blocking.",
+        "limits": "No live mastery mutation or audible manual-level acceptance"
+      }
+    ],
+    "manual_and_ledger_receipt": {
+      "execution_handle": "7618",
+      "test_paths": ["apps/control-plane/tests/test_speech_manual_level.py", "apps/control-plane/tests/test_polyglot_ledger_authority.py"],
+      "result": "25 passed in 4.08 seconds: 19 offline and six actual disposable PostgreSQL cases (three manual-level, three ledger-authority)",
+      "isolation": "Network-none Unix-socket disposable PostgreSQL; owned container, anonymous volume and socket directory removed; no production state changed"
+    },
+    "remaining": ["Complete original operator contract/vector attribution", "Installed entrypoint and authorized real legacy ledger import acceptance", "Separate approved configuration activation", "No helper/provider/audible acceptance is supplied by operator tests"]
+  },
+  "matrix": [
+    {
+      "id": "curriculum",
+      "status": "partial",
+      "evidence": "Baseline asset plus unchanged PR1010 aligned pairs; opt-in loader and runtime snapshot wired",
+      "remaining": "Accepted per-entry lesson classes, connector set and complete authored unit/vocabulary/structure metadata"
+    },
+    {
+      "id": "segments",
+      "status": "partial",
+      "evidence": "Original contract vectors, Unicode/JSON boundary corrections and source-preserving builder composition",
+      "remaining": "Final complete legacy case attribution and mixed protected-content end-to-end matrix"
+    },
+    {
+      "id": "exposure",
+      "status": "partial",
+      "evidence": "Persistent canonical ledger, durable SENT projector and normal TTS-loop retry path",
+      "remaining": "Broader original exposure JSON vectors and combined real assembled delivery-to-ack acceptance"
+    },
+    {
+      "id": "srs",
+      "status": "partial",
+      "evidence": "Pure interval/manual-level parity, persistent shared/per-lane counts and atomic level-only persistence with actual PostgreSQL preservation/no-change/concurrent-projection cases; see operator_checkpoint",
+      "remaining": "Complete original SRS clock/import/collision vector attribution"
+    },
+    {
+      "id": "exposure-import",
+      "status": "partial",
+      "evidence": "Immutable import receipts, copied-hash alias receipts, replay idempotency and changed-source collision PG tests; authorized same-transaction CLI import/denial/rollback tests in operator_checkpoint",
+      "remaining": "Installed operational entrypoint and actual legacy ledger import acceptance; complete original import-vector attribution"
+    },
+    {
+      "id": "selection",
+      "status": "partial",
+      "evidence": "Due/new caps applied after helper semantic choice; pinned time/exposure/seed in execution snapshot",
+      "remaining": "Complete source golden intensity matrix and approved curated inventory acceptance"
+    },
+    {
+      "id": "rewriter",
+      "status": "partial",
+      "evidence": "ID-only helper routes, shared deadline, immutable source anchors and execution-plan recovery",
+      "remaining": "Full original rewriter regression attribution and approved actual subscription helper acceptance"
+    },
+    {
+      "id": "placement-owner",
+      "status": "partial",
+      "evidence": "Structural paragraph/note slots, no external semantic classifier, helper-selected fitting IDs and pinned placement snapshot",
+      "remaining": "Complete portable placement owner vectors and curated content acceptance"
+    },
+    {
+      "id": "payloads",
+      "status": "partial",
+      "evidence": "Source/allowed inventory/slot payloads exclude mutable exposure authority; strict ID-only result parsing",
+      "remaining": "Complete protected-payload/source golden matrix across all entrypoints"
+    },
+    {
+      "id": "sequences",
+      "status": "partial",
+      "evidence": "64 unchanged V1 combinations, separate owner vectors and runtime ordered actual-plan assembly",
+      "remaining": "Audible mixed-provider sequencing acceptance and complete row sign-off"
+    },
+    {
+      "id": "voices",
+      "status": "partial",
+      "evidence": "Original voice/RNG fixtures plus locked owner pool, configured-provider filtering and pinned actual clip identity",
+      "remaining": "Approved configured eleven-voice pool and audible weighted/exclusion acceptance"
+    },
+    {
+      "id": "echo",
+      "status": "partial",
+      "evidence": "Different-region echo and level-two reuse in builder/planner, separate legacy and owner vectors",
+      "remaining": "Audible cross-accent and manual-level acceptance"
+    },
+    {
+      "id": "legacy-pauses",
+      "status": "partial",
+      "evidence": "Original pause vectors and separate owner renderer now reach actual-input custody and local assembly",
+      "remaining": "Actual provider pronunciation/pause acceptance and complete legacy attribution review"
+    },
+    {
+      "id": "pacing-layers",
+      "status": "partial",
+      "evidence": "Four-layer compiler and owner golden outputs feed pinned speech plans",
+      "remaining": "Complete legacy ancestor attribution and extension edge-vector audit"
+    },
+    {
+      "id": "pacing-slots",
+      "status": "partial",
+      "evidence": "Settings precedence, whole-phrase slots and ordered silence assembly implemented",
+      "remaining": "Long-break audible acceptance and complete unit-gap owner-delta vectors"
+    },
+    {
+      "id": "main-voice",
+      "status": "partial",
+      "evidence": "Lane-owned English voice is checked against pinned authorization; actual provider budget/allowlist substitutions get new cache identity",
+      "remaining": "Installed configuration and audible lane-narrator acceptance"
+    },
+    {
+      "id": "lesson-units",
+      "status": "partial",
+      "evidence": "Aligned gloss loader, unit coverage compiler and grouped transcript renderers",
+      "remaining": "Complete approved unit-aligned lesson corpus and audible phrase/unit fallback acceptance"
+    },
+    {
+      "id": "presentation",
+      "status": "partial",
+      "evidence": "Actual executed lessons only; original Markdown/links preserved; expanded durable companion parts and producer replay PG-tested",
+      "remaining": "User-visible before/after evidence and real rich-message transport acceptance"
+    },
+    {
+      "id": "cache-keys",
+      "status": "partial",
+      "evidence": "Legacy keys preserved; versioned actual voice/rate/settings/NFC/mode keys used in custody; NFD/NFC consumers tested",
+      "remaining": "Complete original plus owner key-vector attribution and installed provider acceptance"
+    },
+    {
+      "id": "cache-io",
+      "status": "partial",
+      "evidence": "Existing PG rendition cache, effective fallback/substitution links, retention protection and actual concurrent lock test",
+      "remaining": "Complete corruption/transient cache-failure acceptance and released assembly rehydration across pinned toolchains"
+    },
+    {
+      "id": "config-cli",
+      "status": "partial",
+      "evidence": "Explicit operator configuration candidate/preview commands plus authorized ledger reads/import/manual-level commands; source commits, test paths and bounded receipts in operator_checkpoint. Production TTS worker wiring alone is not this evidence.",
+      "remaining": "Complete original operator parity and installed entrypoint acceptance; actual legacy import and separately approved configuration activation remain unverified"
+    },
+    {
+      "id": "settings",
+      "status": "partial",
+      "evidence": "Typed producer snapshot, owner precedence and actual builder/CLI consumer wiring; operator configuration candidates preserve parent enablement and reject stale snapshots without rebase, see operator_checkpoint",
+      "remaining": "Complete legacy settings/operator surface and installed all-entrypoint acceptance"
+    },
+    {
+      "id": "lesson-caps",
+      "status": "partial",
+      "evidence": "Post-fit intensity/due/new caps, class caps, deduplication and date restriction in shared stage",
+      "remaining": "Portable full owner cap matrix and approved curated-corpus acceptance"
+    },
+    {
+      "id": "exposure-ack",
+      "status": "partial",
+      "evidence": "Durable SENT/late-adoption projection, job-plus-phrase idempotency, retained-audio metadata and two-tick retry tests",
+      "remaining": "Combined assembled-audio real transport acknowledgment acceptance; preview/generation remain non-counting"
+    },
+    {
+      "id": "delivery",
+      "status": "partial",
+      "evidence": "Chat/artifact/preview preparation authority, ready-only assembly derivative, durable result reference and transcript separation",
+      "remaining": "Cross-surface visible/audio acceptance, final transport bounds and full failure-recovery matrix"
+    },
+    {
+      "id": "executor",
+      "status": "partial",
+      "evidence": "Actual targeted provider custody, bounded parallel executor, deterministic toolchain-pinned local assembly and fenced publication",
+      "remaining": "Exact-head broad CI/installed artifact checks and approved actual provider/audible acceptance"
+    },
+    {
+      "id": "degradation",
+      "status": "partial",
+      "evidence": "Definitive SSML-to-plain retry preserves identity; uncertain outcomes never blindly resubmit; held/text preparation keeps source and receipts",
+      "remaining": "Full fault-injection matrix, installed interruption/recovery and user-visible degraded presentation acceptance"
+    }
+  ]
+}

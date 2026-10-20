@@ -1,0 +1,20 @@
+{
+  "source_commit": "5c4205c440f5a836373d8fc8160aa4c861427c58",
+  "source_pr": 1010,
+  "source_file": "marketplace/plugins/comms/polyglot-curriculum.json",
+  "source_sha256": "e9a3f428ece83f20f65024ffdaa2c839cd37a19b5f7c5632257745f08652a28c",
+  "source_test_file": "marketplace/plugins/comms/polyglot-segments.test.ts",
+  "source_test_sha256": "b078655b815dd2eeffdfcc441795f23cf13018cf7d6fd8ceaee8878719255625",
+  "source_test_names": [
+    "every bundled phrase carries an l1_literal gloss",
+    "each l1_literal covers every token of its phrase, in order",
+    "a bracketed particle gloss is always closed, and particles are glossed as particles",
+    "one particle never carries two different bracketed glosses"
+  ],
+  "authority": "Liam10100; mergedPR1010 data/types only. A2 requires recovery of aligned-gloss asset.",
+  "inventory_count": 54,
+  "overlay_fields": ["l1_literal"],
+  "unchanged_legacy_asset": "curriculum-v1.json",
+  "activation": "None. Child-register metadata is historical provenance, not active policy. No lesson_type classification or missing connector translations are inferred.",
+  "remaining_fields": ["accepted per-entry connector/learning_sentence classification", "authored logical-comma phrase variants", "complete unit-aligned lesson records", "curated vocabulary/structure metadata"]
+}

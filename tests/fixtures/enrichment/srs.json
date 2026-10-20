@@ -1,0 +1,107 @@
+{
+  "classification": "v1-original",
+  "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+  "source_file": "polyglot-exposure.test.ts",
+  "source_sha256": "b3238e4690838f540a3f97506f15ec31552905640d4184b67fd750c19c32e243",
+  "source_test_names": [
+    "a new phrase starts at intervalIndex 0, due firstHeard + 1 day",
+    "an exposure on/after dueAt advances the interval and reschedules",
+    "massed exposure before dueAt counts but does NOT advance the schedule",
+    "R3-M2d: a valid OFFSET timestamp advances the schedule (no lexicographic freeze)"
+  ],
+  "phrase": {
+    "l2": "Chào bạn",
+    "l1": "Hi friend"
+  },
+  "cases": [
+    {
+      "name": "new",
+      "times": [
+        "2026-08-11T10:00:00.000Z"
+      ],
+      "count": 1,
+      "index": 0,
+      "due": "2026-08-12T10:00:00.000Z"
+    },
+    {
+      "name": "due",
+      "times": [
+        "2026-08-11T10:00:00.000Z",
+        "2026-08-12T10:00:00.000Z"
+      ],
+      "count": 2,
+      "index": 1,
+      "due": "2026-08-15T10:00:00.000Z"
+    },
+    {
+      "name": "massed",
+      "times": [
+        "2026-08-11T10:00:00.000Z",
+        "2026-08-11T11:00:00.000Z",
+        "2026-08-11T12:00:00.000Z"
+      ],
+      "count": 3,
+      "index": 0,
+      "due": "2026-08-12T10:00:00.000Z"
+    },
+    {
+      "name": "offset",
+      "times": [
+        "2026-08-11T10:00:00.000Z",
+        "2026-08-12T08:00:00.000-04:00"
+      ],
+      "count": 2,
+      "index": 1,
+      "due": "2026-08-15T12:00:00.000Z"
+    }
+  ],
+  "source_derived_regressions": {
+    "source_file": "polyglot-exposure.ts",
+    "source_sha256": "e3a7e1f9d33ac4b4986eae40851b900481eb4b163aeb39178bbe0337c2810a81",
+    "classification": "source-derived-regression",
+    "note": "Additional cases derived from original source semantics, not mislabelled as existing V1 named tests.",
+    "integral_index": {
+      "input": 2.0,
+      "expected_index": 2,
+      "expected_due": "2026-08-18T10:00:00.000Z"
+    },
+    "manual_levels": [
+      {
+        "input": 2.0,
+        "changed": true,
+        "expected": 2
+      },
+      {
+        "input": 1.0,
+        "changed": true,
+        "expected": 1
+      },
+      {
+        "input": 3,
+        "changed": false,
+        "expected": 1
+      },
+      {
+        "input": true,
+        "changed": false,
+        "expected": 1
+      },
+      {
+        "input": "2",
+        "changed": false,
+        "expected": 1
+      },
+      {
+        "input": null,
+        "changed": false,
+        "expected": 1
+      }
+    ],
+    "empty_stats": {
+      "totalPhrases": 0,
+      "totalExposures": 0,
+      "byLevel": {},
+      "byLane": {}
+    }
+  }
+}

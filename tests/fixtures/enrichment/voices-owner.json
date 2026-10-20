@@ -1,0 +1,94 @@
+{
+  "classification": "owner-extension",
+  "authority_file": "LESSON-PACING-SCHEMA-20260917.md",
+  "authority_sha256": "3d2d37fecc9868f7d77f1e3562f56a7952e2567efcbfbcb6c17a2ac6028ca7a9",
+  "authority": "Liam10376, lockedvoicepool/weights",
+  "expectation_delta": "ElevenLabs-only eleven-voice lead pool replaces legacy eight-voice mixed-provider rotation. Later locked CamHongweight3 supersedes earlier exclusion. Exclusions/weights supplied as lane settings; main narrator is lane-owned. No provider registration removed.",
+  "cases": [
+    {"name":"weighted-first","draws":[0,0],"settings":{},"lead_index":0,"echo_index":9},
+    {"name":"weighted-last","draws":[0.99,0],"settings":{},"lead_index":10,"echo_index":0},
+    {"name":"excluded-first","draws":[0,0],"settings":{"excluded":["ZvBK3ITp9pAzXbi1yZZH"]},"lead_index":1,"echo_index":9},
+    {"name":"level-two-no-new-accent","draws":[0],"settings":{"level":2},"lead_index":0,"echo_index":0},
+    {"name":"zero-weight-first","draws":[0,0],"settings":{"weights":{"ZvBK3ITp9pAzXbi1yZZH":0}},"lead_index":1,"echo_index":9},
+    {"name":"repeat-off","draws":[0],"settings":{"repeat":false},"lead_index":0,"echo_index":0}
+  ],
+  "voices": [
+    {
+      "name": "Tony",
+      "provider": "elevenlabs",
+      "voice": "ZvBK3ITp9pAzXbi1yZZH",
+      "region": "central",
+      "weight": 1
+    },
+    {
+      "name": "Binh Dinh",
+      "provider": "elevenlabs",
+      "voice": "uN2lv5lSgnxa1hcYRElP",
+      "region": "central",
+      "weight": 2
+    },
+    {
+      "name": "VânCa",
+      "provider": "elevenlabs",
+      "voice": "CE5BJM57m1rtrAFVXfCq",
+      "region": "central",
+      "weight": 4
+    },
+    {
+      "name": "Linh",
+      "provider": "elevenlabs",
+      "voice": "L5c6tGA8OiORYKxez5Zu",
+      "region": "central",
+      "weight": 4
+    },
+    {
+      "name": "Thuy Hoa",
+      "provider": "elevenlabs",
+      "voice": "9FhIljxdGFirnCpAoUES",
+      "region": "central",
+      "weight": 1
+    },
+    {
+      "name": "Ngan",
+      "provider": "elevenlabs",
+      "voice": "a3AkyqGG4v8Pg7SWQ0Y3",
+      "region": "central",
+      "weight": 4
+    },
+    {
+      "name": "Minh",
+      "provider": "elevenlabs",
+      "voice": "IZKDEBDVLx4BnFc8W03D",
+      "region": "central",
+      "weight": 2
+    },
+    {
+      "name": "Bao",
+      "provider": "elevenlabs",
+      "voice": "zRKf3RQpAJq11rSezsxD",
+      "region": "central",
+      "weight": 1
+    },
+    {
+      "name": "Tieu",
+      "provider": "elevenlabs",
+      "voice": "iCOyvtdHUPOHaQYt93QQ",
+      "region": "central",
+      "weight": 3
+    },
+    {
+      "name": "Tung",
+      "provider": "elevenlabs",
+      "voice": "2G3KT0n4xucedtpsBlU2",
+      "region": "southern",
+      "weight": 1
+    },
+    {
+      "name": "Cẩm Hồng",
+      "provider": "elevenlabs",
+      "voice": "x4KAhuXs2G8TfK9Zr7Q4",
+      "region": "southern",
+      "weight": 3
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "classification": "v1-original",
+  "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+  "source_file": "polyglot-hook.test.ts",
+  "source_sha256": "f6cc20592e3957f76ecf034479065fefd2f0a0168febbb8c70b37f9de8f7b940",
+  "source_test_names": [
+    "due reviews first (most overdue first), then new phrases in curriculum order, capped by intensity",
+    "phrases only heard in ANOTHER lane are not due here"
+  ],
+  "now": "2026-08-30T06:00:00.000Z",
+  "curriculum": [
+    {
+      "id": "di-thoi",
+      "l2": "Đi thôi!",
+      "l1": "Let's go!"
+    },
+    {
+      "id": "ngon-qua",
+      "l2": "Ngon quá!",
+      "l1": "So delicious!"
+    },
+    {
+      "id": "met-qua",
+      "l2": "Mệt quá!",
+      "l1": "So tired!"
+    },
+    {
+      "id": "vui-qua",
+      "l2": "Vui quá!",
+      "l1": "So fun!"
+    }
+  ],
+  "exposures": [
+    {
+      "l2": "Mệt quá!",
+      "l1": "So tired!",
+      "lane": "lane-a",
+      "timestamp": "2026-08-20T00:00:00.000Z"
+    },
+    {
+      "l2": "Vui quá!",
+      "l1": "So fun!",
+      "lane": "lane-a",
+      "timestamp": "2026-08-29T12:00:00.000Z"
+    }
+  ],
+  "expected_light": [
+    "met-qua",
+    "di-thoi"
+  ],
+  "expected_dense": [
+    "met-qua",
+    "di-thoi",
+    "ngon-qua"
+  ],
+  "expected_other_lane": [
+    "di-thoi",
+    "ngon-qua"
+  ],
+  "source_derived_regressions": {
+    "classification": "source-derived-regression",
+    "source_file": "polyglot-hook.ts",
+    "source_sha256": "9d34d4d3d28c540881fac0d9b388c0bf894eb60cf461afa92a6b810e2b2887a0",
+    "note": "Six due candidates distinguish intensity caps; source-derived beyond original smaller hook test.",
+    "curriculum": [
+      {
+        "id": "due-0",
+        "l2": "phrase 0",
+        "l1": "gloss 0"
+      },
+      {
+        "id": "due-1",
+        "l2": "phrase 1",
+        "l1": "gloss 1"
+      },
+      {
+        "id": "due-2",
+        "l2": "phrase 2",
+        "l1": "gloss 2"
+      },
+      {
+        "id": "due-3",
+        "l2": "phrase 3",
+        "l1": "gloss 3"
+      },
+      {
+        "id": "due-4",
+        "l2": "phrase 4",
+        "l1": "gloss 4"
+      },
+      {
+        "id": "due-5",
+        "l2": "phrase 5",
+        "l1": "gloss 5"
+      }
+    ],
+    "expected_by_intensity": {
+      "1": [
+        "due-0",
+        "due-1"
+      ],
+      "2": [
+        "due-0",
+        "due-1",
+        "due-2",
+        "due-3"
+      ],
+      "3": [
+        "due-0",
+        "due-1",
+        "due-2",
+        "due-3",
+        "due-4",
+        "due-5"
+      ]
+    }
+  }
+}

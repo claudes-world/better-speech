@@ -1,0 +1,183 @@
+{
+  "classification": "owner-extension",
+  "authority": "A2 clip identity row; LOCKED schema rule 6",
+  "expectation_delta": "Versioned key adds model, provider settings and input mode; keys recursively sorted; no profile labels. JS binary64 numeric spellings and NFC text; never fall back to V1 cache keys.",
+  "extraction": "Independent Bun canonical JSON and node:crypto SHA256; no provider invocation",
+  "cases": [
+    {
+      "name": "base",
+      "input": {
+        "schema_version": "worldos.speech-clip/v1",
+        "provider": "elevenlabs",
+        "model": "eleven_turbo_v2_5",
+        "voice": "L5c6tGA8OiORYKxez5Zu",
+        "rate": 1,
+        "text": "Chào bạn",
+        "format": "ogg",
+        "voice_settings": {
+          "stability": 0.5,
+          "speed": 1
+        },
+        "input_mode": "text"
+      },
+      "canonical": "{\"format\":\"ogg\",\"input_mode\":\"text\",\"model\":\"eleven_turbo_v2_5\",\"provider\":\"elevenlabs\",\"rate\":1,\"schema_version\":\"worldos.speech-clip/v1\",\"text\":\"Chào bạn\",\"voice\":\"L5c6tGA8OiORYKxez5Zu\",\"voice_settings\":{\"speed\":1,\"stability\":0.5}}",
+      "sha256": "30f384762abdf44335a40496b93ce29af41a9fe5c069dc2e1aa53fa2975574c5"
+    },
+    {
+      "name": "model",
+      "input": {
+        "schema_version": "worldos.speech-clip/v1",
+        "provider": "elevenlabs",
+        "model": "other",
+        "voice": "L5c6tGA8OiORYKxez5Zu",
+        "rate": 1,
+        "text": "Chào bạn",
+        "format": "ogg",
+        "voice_settings": {
+          "stability": 0.5,
+          "speed": 1
+        },
+        "input_mode": "text"
+      },
+      "canonical": "{\"format\":\"ogg\",\"input_mode\":\"text\",\"model\":\"other\",\"provider\":\"elevenlabs\",\"rate\":1,\"schema_version\":\"worldos.speech-clip/v1\",\"text\":\"Chào bạn\",\"voice\":\"L5c6tGA8OiORYKxez5Zu\",\"voice_settings\":{\"speed\":1,\"stability\":0.5}}",
+      "sha256": "99e5fa0c22f0988b2600c73714244762f84bc76b94a5f94f63c85b23405d6871"
+    },
+    {
+      "name": "settings",
+      "input": {
+        "schema_version": "worldos.speech-clip/v1",
+        "provider": "elevenlabs",
+        "model": "eleven_turbo_v2_5",
+        "voice": "L5c6tGA8OiORYKxez5Zu",
+        "rate": 1,
+        "text": "Chào bạn",
+        "format": "ogg",
+        "voice_settings": {
+          "speed": 1,
+          "stability": 0.6
+        },
+        "input_mode": "text"
+      },
+      "canonical": "{\"format\":\"ogg\",\"input_mode\":\"text\",\"model\":\"eleven_turbo_v2_5\",\"provider\":\"elevenlabs\",\"rate\":1,\"schema_version\":\"worldos.speech-clip/v1\",\"text\":\"Chào bạn\",\"voice\":\"L5c6tGA8OiORYKxez5Zu\",\"voice_settings\":{\"speed\":1,\"stability\":0.6}}",
+      "sha256": "f5ff55d444df27eae05a2c80dab6fd876e0b2b33bbb4156ae1a62d290dda1c04"
+    },
+    {
+      "name": "ssml",
+      "input": {
+        "schema_version": "worldos.speech-clip/v1",
+        "provider": "elevenlabs",
+        "model": "eleven_turbo_v2_5",
+        "voice": "L5c6tGA8OiORYKxez5Zu",
+        "rate": 1,
+        "text": "Chào bạn",
+        "format": "ogg",
+        "voice_settings": {
+          "stability": 0.5,
+          "speed": 1
+        },
+        "input_mode": "ssml"
+      },
+      "canonical": "{\"format\":\"ogg\",\"input_mode\":\"ssml\",\"model\":\"eleven_turbo_v2_5\",\"provider\":\"elevenlabs\",\"rate\":1,\"schema_version\":\"worldos.speech-clip/v1\",\"text\":\"Chào bạn\",\"voice\":\"L5c6tGA8OiORYKxez5Zu\",\"voice_settings\":{\"speed\":1,\"stability\":0.5}}",
+      "sha256": "ad38799154f03d54df9c4c955ba41b7df33c9525048f550c6f6427bb20963336"
+    },
+    {
+      "name": "marked",
+      "input": {
+        "schema_version": "worldos.speech-clip/v1",
+        "provider": "elevenlabs",
+        "model": "eleven_turbo_v2_5",
+        "voice": "L5c6tGA8OiORYKxez5Zu",
+        "rate": 1,
+        "text": "Chào, bạn",
+        "format": "ogg",
+        "voice_settings": {
+          "stability": 0.5,
+          "speed": 1
+        },
+        "input_mode": "text"
+      },
+      "canonical": "{\"format\":\"ogg\",\"input_mode\":\"text\",\"model\":\"eleven_turbo_v2_5\",\"provider\":\"elevenlabs\",\"rate\":1,\"schema_version\":\"worldos.speech-clip/v1\",\"text\":\"Chào, bạn\",\"voice\":\"L5c6tGA8OiORYKxez5Zu\",\"voice_settings\":{\"speed\":1,\"stability\":0.5}}",
+      "sha256": "873e58a4c8b1e5cd3e13a1ea2a4f803e5d3e0df16b0f380728ae1673710dd8f8"
+    },
+    {
+      "name": "nested-key-order",
+      "input": {
+        "schema_version": "worldos.speech-clip/v1",
+        "provider": "elevenlabs",
+        "model": "eleven_turbo_v2_5",
+        "voice": "L5c6tGA8OiORYKxez5Zu",
+        "rate": 1,
+        "text": "Chào bạn",
+        "format": "ogg",
+        "voice_settings": {
+          "z": [
+            true,
+            null,
+            1
+          ],
+          "a": {
+            "b": 0.1,
+            "a": 2
+          }
+        },
+        "input_mode": "text"
+      },
+      "canonical": "{\"format\":\"ogg\",\"input_mode\":\"text\",\"model\":\"eleven_turbo_v2_5\",\"provider\":\"elevenlabs\",\"rate\":1,\"schema_version\":\"worldos.speech-clip/v1\",\"text\":\"Chào bạn\",\"voice\":\"L5c6tGA8OiORYKxez5Zu\",\"voice_settings\":{\"a\":{\"a\":2,\"b\":0.1},\"z\":[true,null,1]}}",
+      "sha256": "e0e8aa27cf86e8aa060570db70c56df7226a9b7a2a54cde724a4b8aea767b2fb"
+    }
+  ],
+  "numbers": [
+    {
+      "input": 0,
+      "canonical": "0"
+    },
+    {
+      "input": 0,
+      "canonical": "0"
+    },
+    {
+      "input": 1,
+      "canonical": "1"
+    },
+    {
+      "input": 1,
+      "canonical": "1"
+    },
+    {
+      "input": 0.9,
+      "canonical": "0.9"
+    },
+    {
+      "input": 1e-7,
+      "canonical": "1e-7"
+    },
+    {
+      "input": 0.000001,
+      "canonical": "0.000001"
+    },
+    {
+      "input": 100000000000000000000,
+      "canonical": "100000000000000000000"
+    },
+    {
+      "input": 1e+21,
+      "canonical": "1e+21"
+    },
+    {
+      "input": 1.234e-7,
+      "canonical": "1.234e-7"
+    },
+    {
+      "input": 333333333.3333333,
+      "canonical": "333333333.3333333"
+    },
+    {
+      "input": 5e-324,
+      "canonical": "5e-324"
+    },
+    {
+      "input": 1.7976931348623157e+308,
+      "canonical": "1.7976931348623157e+308"
+    }
+  ]
+}

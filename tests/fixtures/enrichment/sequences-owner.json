@@ -1,0 +1,12 @@
+{
+  "classification": "owner-extension",
+  "authority_file": "LESSON-PACING-SCHEMA-20260917.md",
+  "authority_sha256": "3d2d37fecc9868f7d77f1e3562f56a7952e2567efcbfbcb6c17a2ac6028ca7a9",
+  "expectation_delta": "Frozen lane narrator, four-slot whole-phrase compiler, exact source preservation and manual level 2 echo reuse. These are owner assertions, not unchanged V1 outputs.",
+  "source": "Done.",
+  "cases": [
+    {"name":"end-narrator-leads","settings":{"repeat":true},"level":1,"mode":"open","voices":["main","main","main","lead"],"purposes":["source","lesson","translation","lesson"],"lesson_texts":["Cho mình, một cà phê sữa đá, nha.","Cho mình – một, cà phê sữa đá – nha."]},
+    {"name":"close-repeat-two-voices","settings":{"tailL1Lead":false,"repeat":true},"level":1,"mode":"close","voices":["main","main","lead","main","echo"],"purposes":["source","translation","lesson","literal","lesson"],"lesson_texts":["Cho mình – một, cà phê sữa đá – nha.","Cho mình – một, cà phê sữa đá – nha."]},
+    {"name":"manual-recall-no-new-accent","settings":{"tailL1Lead":false,"repeat":true},"level":2,"mode":"close","voices":["main","main","lead","main","lead"],"purposes":["source","translation","lesson","literal","lesson"],"lesson_texts":["Cho mình – một, cà phê sữa đá – nha.","Cho mình – một, cà phê sữa đá – nha."]}
+  ]
+}

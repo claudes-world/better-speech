@@ -1,0 +1,22 @@
+{
+  "classification": "owner-extension",
+  "authority": "LESSON-PACING-SCHEMA-20260917.md / LOCKED 10362 and configurability 10367",
+  "source": "voice-samples-20260916/pacing_compile.py",
+  "record": {
+    "phrase": "Cho mình một cà phê sữa đá, nha",
+    "units": ["Cho mình", "một", "cà phê sữa đá", "nha"],
+    "vocabulary": [{"term": "sữa"}, {"term": "đá"}],
+    "structure_pauses": [{"before": "một"}]
+  },
+  "source_shape_delta": "Reference string entries are represented by schema term/before objects; no phrase or expected rendering changes.",
+  "cases": [
+    {"id":"1", "profile":{"p0":"", "p1":", ", "p2_0":"… ", "p2_1":""}, "expected":"Cho mình… một cà phê sữa đá, nha"},
+    {"id":"1b", "profile":{"p0":"", "p1":", ", "p2_0":" – ", "p2_1":""}, "expected":"Cho mình – một cà phê sữa đá, nha"},
+    {"id":"2", "profile":{"p0":", ", "p1":"… ", "p2_0":" – ", "p2_1":", "}, "expected":"Cho mình – một, cà phê, sữa, đá… nha"},
+    {"id":"2b", "profile":{"p0":", ", "p1":"… ", "p2_0":" – ", "p2_1":""}, "expected":"Cho mình – một, cà phê sữa đá… nha"},
+    {"id":"2c", "profile":{"p0":", ", "p1":"… ", "p2_0":" – ", "p2_1":"… "}, "expected":"Cho mình – một, cà phê… sữa… đá… nha"},
+    {"id":"3", "profile":{"p0":", ", "p1":" – ", "p2_0":" – ", "p2_1":""}, "expected":"Cho mình – một, cà phê sữa đá – nha"},
+    {"id":"3b", "profile":{"p0":", ", "p1":" – ", "p2_0":"", "p2_1":""}, "expected":"Cho mình, một, cà phê sữa đá – nha"},
+    {"id":"3c", "profile":{"p0":", ", "p1":"… ", "p2_0":"", "p2_1":""}, "expected":"Cho mình, một, cà phê sữa đá… nha"}
+  ]
+}

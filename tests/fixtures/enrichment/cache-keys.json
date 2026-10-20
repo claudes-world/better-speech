@@ -1,0 +1,92 @@
+{
+  "classification": "v1-original",
+  "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
+  "source_file": "polyglot-cache.test.ts",
+  "source_sha256": "7bf3b65019009c210c8a8a07c56d0384d573f40af5685ebd8ce9d90b4de9e6b7",
+  "source_test_names": [
+    "NFC and NFD spellings of the same phrase hash identically",
+    "a different voice is a different key",
+    "a different rate is a different key",
+    "a different provider or format is a different key"
+  ],
+  "extraction": "Exact original test inputs evaluated by unchanged phraseKeyHash via Bun; canonical bytes additionally captured with original insertion order.",
+  "cases": [
+    {
+      "input": {
+        "provider": "elevenlabs",
+        "voice": "vi-female-1",
+        "rate": 0.9,
+        "text": "Chào bạn",
+        "format": "mp3"
+      },
+      "canonical": "{\"provider\":\"elevenlabs\",\"voice\":\"vi-female-1\",\"rate\":0.9,\"text\":\"Chào bạn\",\"format\":\"mp3\"}",
+      "sha256": "31af34f65c1224123c8ea456e22465f83e56ede6f5d920de4547c8bc07ff6d23"
+    },
+    {
+      "input": {
+        "provider": "elevenlabs",
+        "voice": "vi-female-1",
+        "rate": 0.9,
+        "text": "Chào bạn một buổi tối",
+        "format": "mp3"
+      },
+      "canonical": "{\"provider\":\"elevenlabs\",\"voice\":\"vi-female-1\",\"rate\":0.9,\"text\":\"Chào bạn một buổi tối\",\"format\":\"mp3\"}",
+      "sha256": "24c05a2a89d07be2733aac0a03482cd37e23d6f411174e684a8410defaab41f4"
+    },
+    {
+      "input": {
+        "provider": "elevenlabs",
+        "voice": "vi-female-1",
+        "rate": 0.9,
+        "text": "Chào bạn một buổi tối",
+        "format": "mp3"
+      },
+      "canonical": "{\"provider\":\"elevenlabs\",\"voice\":\"vi-female-1\",\"rate\":0.9,\"text\":\"Chào bạn một buổi tối\",\"format\":\"mp3\"}",
+      "sha256": "24c05a2a89d07be2733aac0a03482cd37e23d6f411174e684a8410defaab41f4"
+    },
+    {
+      "input": {
+        "provider": "elevenlabs",
+        "voice": "vi-male-2",
+        "rate": 0.9,
+        "text": "Chào bạn",
+        "format": "mp3"
+      },
+      "canonical": "{\"provider\":\"elevenlabs\",\"voice\":\"vi-male-2\",\"rate\":0.9,\"text\":\"Chào bạn\",\"format\":\"mp3\"}",
+      "sha256": "a6d265db1138cb2bdd84d3c3d776ea0b714c7f2272a29842d8f1391bc7f9e589"
+    },
+    {
+      "input": {
+        "provider": "elevenlabs",
+        "voice": "vi-female-1",
+        "rate": 1,
+        "text": "Chào bạn",
+        "format": "mp3"
+      },
+      "canonical": "{\"provider\":\"elevenlabs\",\"voice\":\"vi-female-1\",\"rate\":1,\"text\":\"Chào bạn\",\"format\":\"mp3\"}",
+      "sha256": "4c6393609aa220692aa7b97dbe93063d5844fa14751c52053f30db0fa30f4e35"
+    },
+    {
+      "input": {
+        "provider": "google",
+        "voice": "vi-female-1",
+        "rate": 0.9,
+        "text": "Chào bạn",
+        "format": "mp3"
+      },
+      "canonical": "{\"provider\":\"google\",\"voice\":\"vi-female-1\",\"rate\":0.9,\"text\":\"Chào bạn\",\"format\":\"mp3\"}",
+      "sha256": "09be4168e3e4cc0654a9c4a9c0b190880793f5d237471662087d9416569cfc04"
+    },
+    {
+      "input": {
+        "provider": "elevenlabs",
+        "voice": "vi-female-1",
+        "rate": 0.9,
+        "text": "Chào bạn",
+        "format": "ogg"
+      },
+      "canonical": "{\"provider\":\"elevenlabs\",\"voice\":\"vi-female-1\",\"rate\":0.9,\"text\":\"Chào bạn\",\"format\":\"ogg\"}",
+      "sha256": "276a789c56f486be3913f54c8a2cfa81d91c1619ac07315fca59c56c554974fb"
+    }
+  ]
+}
