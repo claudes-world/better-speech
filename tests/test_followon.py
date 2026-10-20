@@ -19,3 +19,17 @@ def test_nfc_executed_source_spans_match_speech_after_roundtrip(tmp_path, byte_l
     assert executed.clips[0].source_start == 0
     assert executed.clips[-1].source_end == len(executed.speech_text)
     assert all(a.source_end == b.source_start for a, b in zip(executed.clips, executed.clips[1:]))
+
+
+@pytest.mark.parametrize("unavailable", ["missing", "invalid_toml"])
+def test_unavailable_profile_refuses_learner_writes(tmp_path, monkeypatch, unavailable):
+    from better_speech.cli import main
+
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "default"))
+    path = tmp_path / "alice.toml"
+    if unavailable == "invalid_toml":
+        path.write_text('learner_id="alice"\nstate_dir="alice-state"\nmodel = none\n')
+    assert main(["learn", "Học tiếp nhé.", "--gloss", "Keep learning.", "--profile", str(path)]) == 2
+    assert main(["learned", "cam-on-nha", "--profile", str(path)]) == 2
+    assert not (tmp_path / "default").exists()
+    assert not (tmp_path / "alice-state").exists()
