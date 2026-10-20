@@ -84,3 +84,32 @@ def test_bad_profile_preserves_routing_and_refuses_learner_writes(tmp_path, monk
     assert main(['learned', 'cam-on-nha', '--profile', str(path)]) == 2
     assert not (tmp_path / 'alice-state').exists()
     assert not (tmp_path / 'default').exists()
+
+
+def test_two_boosted_phrases_rotate_until_local_midnight(tmp_path):
+    from dataclasses import replace
+    from datetime import timedelta
+    from better_speech.ledger import Ledger
+
+    cfg = profile(state_dir=str(tmp_path), timezone='America/New_York')
+    ledger = Ledger.for_profile(cfg)
+    a = learn('Cảm ơn nhiều.', 'Many thanks.', cfg, now=NOW)
+    first = compile('Update.', cfg, ledger=ledger, now=NOW)
+    ledger.record(replace(first, executed=True), 'first', NOW)
+    b = learn('Hẹn gặp lại.', 'See you again.', cfg, now=NOW + timedelta(hours=1))
+    selected = []
+    for hour in range(1, 6):
+        at = NOW + timedelta(hours=hour)
+        plan = compile('Update.', cfg, ledger=ledger, now=at)
+        selected.append(plan.lessons[0].id)
+        ledger.record(replace(plan, executed=True), str(hour), at)
+    assert selected == [b['id'], a['id'], b['id'], a['id'], b['id']]
+
+
+def test_unheard_boost_tie_prefers_newest(tmp_path):
+    from datetime import timedelta
+    cfg = profile(state_dir=str(tmp_path))
+    learn('Học nữa.', 'Learn more.', cfg, now=NOW)
+    latest = learn('Học tiếp nhé.', 'Keep learning.', cfg, now=NOW + timedelta(minutes=1))
+    plan = compile('Update.', cfg, ledger=EmptyLedger(), now=NOW + timedelta(minutes=2))
+    assert plan.lessons[0].id == latest['id']

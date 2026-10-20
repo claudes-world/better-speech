@@ -78,8 +78,11 @@ def _rank(rows, records, now):
         boosted = bool(boost and boost > now and not row.get("landed"))
         due = bool(record.get("dueAt") and record["dueAt"] <= now)
         unseen = not record
+        if boosted:
+            added = timestamp(row.get("added_at"))
+            return (0, record.get("lastHeard", ""), -datetime.fromisoformat(added).timestamp() if added else 0)
         return (
-            0 if boosted else 1 if due else 2 if unseen else 3,
+            1 if due else 2 if unseen else 3,
             0 if row.get("learner_phrase") else 1,
             record.get("dueAt", ""),
             row.get("added_at", ""),
