@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 
 from filelock import FileLock
 
+from .config import resolve_profile
 from .curriculum import canonical_phrase, learner_path, runtime_curriculum, validate_inventory
 from .exposure import timestamp
 from .pacing import DEFAULT, compile_lesson
@@ -44,6 +45,9 @@ def _update(profile, edit):
 
 
 def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, now: datetime | None = None) -> dict:
+    profile = resolve_profile(profile)
+    if "invalid_profile" in profile.config_diagnostics:
+        raise ValueError("invalid_profile: learner writes disabled")
     if not vietnamese.strip() or not gloss.strip():
         raise ValueError("phrase and gloss cannot be blank")
     candidate = {"phrase": vietnamese.strip(), "units": [vietnamese.strip()]}
@@ -89,6 +93,9 @@ def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, now: dat
 
 
 def learned(key: str, profile: Profile = Profile()) -> dict:
+    profile = resolve_profile(profile)
+    if "invalid_profile" in profile.config_diagnostics:
+        raise ValueError("invalid_profile: learner writes disabled")
     existing = next(
         (r for r in runtime_curriculum(profile) if r["id"] == key or r["ledger_identity"] == key), None
     )

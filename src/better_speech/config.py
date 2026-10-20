@@ -11,6 +11,21 @@ from pathlib import Path
 from .types import Profile, Voice
 
 
+def _identity_fields(data):
+    """Retain independently usable learner routing even when optional config fails."""
+    from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+    fields = {key: data[key] for key in ("learner_id", "state_dir", "curriculum_path")
+              if isinstance(data.get(key), str) and data[key].strip()}
+    try:
+        if isinstance(data.get("timezone"), str):
+            ZoneInfo(data["timezone"])
+            fields["timezone"] = data["timezone"]
+    except (ValueError, ZoneInfoNotFoundError):
+        pass
+    return fields
+
+
 def resolve_profile(profile: Profile) -> Profile:
     """Invalid optional settings disable lessons while preserving a usable narrator."""
     from dataclasses import replace
@@ -71,8 +86,7 @@ def resolve_profile(profile: Profile) -> Profile:
         fallback = Profile(
             english=profile.english,
             enabled=False,
-            learner_id=profile.learner_id if isinstance(profile.learner_id, str) else "liam",
-            state_dir=profile.state_dir if isinstance(profile.state_dir, str) else None,
+            **_identity_fields(vars(profile)),
             config_diagnostics=tuple(diagnostics) + ("invalid_profile",),
         )
         try:
@@ -132,4 +146,7 @@ def load_profile(path: str | Path | None = None) -> Profile:
             voice = Voice(**english) if english else Profile().english
         except (TypeError, ValueError):
             voice = Profile().english
-        return resolve_profile(Profile(english=voice, enabled=False, config_diagnostics=("invalid_profile",)))
+        return resolve_profile(Profile(
+            english=voice, enabled=False, **_identity_fields(data),
+            config_diagnostics=("invalid_profile",),
+        ))

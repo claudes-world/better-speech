@@ -63,3 +63,24 @@ def test_links_do_not_inject_html(source):
     _, markdown = present(plan)
     rendered = MarkdownIt('commonmark', {'html': True}).render(markdown)
     assert '<script>' not in rendered and '<img' not in rendered
+
+
+@pytest.mark.parametrize('broken', ['modle="none"', '[voices]\nvoice="broken"'])
+def test_bad_profile_preserves_routing_and_refuses_learner_writes(tmp_path, monkeypatch, broken):
+    from better_speech.cli import main
+    from better_speech.config import load_profile
+
+    monkeypatch.setenv('XDG_DATA_HOME', str(tmp_path / 'default'))
+    path = tmp_path / 'profile.toml'
+    path.write_text('learner_id="alice"\nstate_dir="alice-state"\ncurriculum_path="custom.json"\n'
+                    'timezone="America/New_York"\n' + broken)
+    cfg = load_profile(path)
+    assert cfg.learner_id == 'alice'
+    assert cfg.state_dir == str(tmp_path / 'alice-state')
+    assert cfg.curriculum_path == str(tmp_path / 'custom.json')
+    assert cfg.timezone == 'America/New_York'
+    assert 'invalid_profile' in cfg.config_diagnostics
+    assert main(['learn', 'Học nhé.', '--gloss', 'Learn.', '--profile', str(path)]) == 2
+    assert main(['learned', 'cam-on-nha', '--profile', str(path)]) == 2
+    assert not (tmp_path / 'alice-state').exists()
+    assert not (tmp_path / 'default').exists()
