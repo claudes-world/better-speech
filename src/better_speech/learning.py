@@ -13,6 +13,7 @@ from filelock import FileLock
 
 from .curriculum import canonical_phrase, learner_path, runtime_curriculum, validate_inventory
 from .exposure import timestamp
+from .pacing import DEFAULT, compile_lesson
 from .types import Profile
 
 
@@ -45,6 +46,10 @@ def _update(profile, edit):
 def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, now: datetime | None = None) -> dict:
     if not vietnamese.strip() or not gloss.strip():
         raise ValueError("phrase and gloss cannot be blank")
+    candidate = {"phrase": vietnamese.strip(), "units": [vietnamese.strip()]}
+    paced = compile_lesson(candidate, profile=DEFAULT)
+    if any(len(value.encode("utf-16-le")) // 2 > 4000 for value in (paced.rendered, gloss.strip())):
+        raise ValueError("lesson step exceeds provider text bound")
     instant = now or datetime.now(timezone.utc)
     if instant.tzinfo is None:
         raise ValueError("learning time must be timezone-aware")

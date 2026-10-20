@@ -153,21 +153,12 @@ def compile(
             voice_map = {v.voice: _voice(v) for v in eligible}
             ranked = _rank(rows, records, at)
             # Reserve the top boosted/due item. On a fresh queue, introduce one unseen item.
-            reservation = next(
-                (
-                    r
-                    for r in ranked
-                    if (
-                        not records.get(r["ledger_identity"])
-                        or records[r["ledger_identity"]]["dueAt"] <= at
-                        or ((timestamp(r.get("boost_until")) or "") > at and not r.get("landed"))
-                    )
-                ),
-                None,
-            )
-            chosen = []
-            if reservation:
-                chosen.append((reservation, len(speech), "end", "close"))
+            candidates = [r for r in ranked if (
+                not records.get(r["ledger_identity"])
+                or records[r["ledger_identity"]]["dueAt"] <= at
+                or ((timestamp(r.get("boost_until")) or "") > at and not r.get("landed"))
+            )]
+            reservation, chosen = None, []
             settings = {
                 "repeat": profile.repeat,
                 "repeatSecondVoice": profile.repeat_second_voice,
@@ -200,6 +191,14 @@ def compile(
                 )
 
             reserved_rows, reserved_plan = build(chosen)
+            for candidate in candidates:
+                choices = [(candidate, len(speech), "end", "close")]
+                candidate_rows, candidate_plan = build(choices)
+                if candidate_plan.status == "applied":
+                    reservation, chosen = candidate, choices
+                    reserved_rows, reserved_plan = candidate_rows, candidate_plan
+                    break
+                diagnostics.append(Diagnostic("lesson", "rejected_candidate:" + candidate["id"]))
             remaining(deadline)
             # Deterministic closing slot is unavailable to optional contextual selection.
             starts, ends = paragraph_boundaries(speech)
