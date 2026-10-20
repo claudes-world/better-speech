@@ -142,6 +142,13 @@ class Plan:
 
     @classmethod
     def from_dict(cls, value: dict) -> Plan:
+        version = value.get("schema_version")
+        if type(version) is not int or version != 1:
+            raise ValueError("unsupported plan schema_version")
+        return cls._from_v1(value)
+
+    @classmethod
+    def _from_v1(cls, value: dict) -> Plan:
         data = dict(value)
         data["clips"] = tuple(Clip(**v) for v in data["clips"])
         data["fallback_clips"] = tuple(Clip(**v) for v in data["fallback_clips"])

@@ -76,3 +76,18 @@ def test_preparation_duplicates_and_learner_isolation(tmp_path):
     plain = replace(plan, lessons=(), clips=plan.fallback_clips)
     assert record_delivered(plain, "english", ledger=ledger).added == 0
     assert next(iter(ledger.snapshot().values()))["exposureCount"] == 1
+
+
+def test_sixteen_concurrent_first_time_writers(tmp_path):
+    context = multiprocessing.get_context('spawn')
+    plan = executed_plan(tmp_path)
+    path = tmp_path / 'fresh.sqlite3'
+    start = context.Event()
+    processes = [context.Process(target=writer, args=(path, plan, i, start)) for i in range(16)]
+    for process in processes:
+        process.start()
+    start.set()
+    for process in processes:
+        process.join(30)
+        assert process.exitcode == 0
+    assert Ledger(path).snapshot()[plan.lessons[0].phrase_key]['exposureCount'] == 8 + 16 * 8

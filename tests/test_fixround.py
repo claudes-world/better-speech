@@ -113,3 +113,28 @@ def test_unheard_boost_tie_prefers_newest(tmp_path):
     latest = learn('Học tiếp nhé.', 'Keep learning.', cfg, now=NOW + timedelta(minutes=1))
     plan = compile('Update.', cfg, ledger=EmptyLedger(), now=NOW + timedelta(minutes=2))
     assert plan.lessons[0].id == latest['id']
+
+
+@pytest.mark.parametrize('version', [None, True, 1.0, '1', 0, 2])
+def test_plan_rejects_unsupported_exact_version(version):
+    from better_speech import Plan
+    value = compile('Update.', profile(), ledger=EmptyLedger()).to_dict()
+    value['schema_version'] = version
+    with pytest.raises(ValueError, match='schema_version'):
+        Plan.from_dict(value)
+
+
+def test_plan_version_roundtrip_and_ledger_unknown_version(tmp_path):
+    import sqlite3
+    from better_speech import Plan, Ledger
+    plan = compile('Update.', profile(), ledger=EmptyLedger())
+    assert Plan.from_dict(plan.to_dict()) == plan
+    ledger = Ledger(tmp_path / 'state.db')
+    ledger._connect().close()
+    with sqlite3.connect(ledger.path) as db:
+        assert db.execute('PRAGMA user_version').fetchone()[0] == 1
+        db.execute('PRAGMA user_version=999')
+    with pytest.raises(ValueError, match='user_version'):
+        ledger.snapshot()
+    with sqlite3.connect(ledger.path) as db:
+        assert db.execute('PRAGMA user_version').fetchone()[0] == 999

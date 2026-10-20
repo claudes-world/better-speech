@@ -9,6 +9,8 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
+from filelock import FileLock
+
 from .budget import remaining
 from .config import state_dir
 from .exposure import record_exposures, timestamp
@@ -58,10 +60,24 @@ class Ledger:
         try:
             if deadline is not None:
                 connection.set_progress_handler(lambda: int(time.monotonic() >= deadline), 1000)
-            self._execute(connection, "PRAGMA journal_mode=WAL", deadline=deadline)
-            for statement in SCHEMA.split(";"):
-                if statement.strip():
-                    self._execute(connection, statement, deadline=deadline)
+            # SQLite can return SQLITE_BUSY immediately during first WAL setup.
+            # Serialize initialization, including version inspection/migration.
+            with FileLock(str(self.path) + ".init.lock", timeout=timeout):
+                version = self._execute(connection, "PRAGMA user_version", deadline=deadline).fetchone()[0]
+                if version not in (0, 1):
+                    raise ValueError("unsupported ledger user_version")
+                if version == 0:
+                    self._execute(connection, "PRAGMA journal_mode=WAL", deadline=deadline)
+                    self._execute(connection, "BEGIN IMMEDIATE", deadline=deadline)
+                    try:
+                        for statement in SCHEMA.split(";"):
+                            if statement.strip():
+                                self._execute(connection, statement, deadline=deadline)
+                        self._execute(connection, "PRAGMA user_version=1", deadline=deadline)
+                        connection.commit()
+                    except BaseException:
+                        connection.rollback()
+                        raise
             return connection
         except BaseException:
             connection.close()

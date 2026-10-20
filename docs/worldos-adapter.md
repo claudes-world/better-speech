@@ -85,6 +85,9 @@ changed ledger state, model placement or English fallback can change its executi
 Identical clips can still share the clip cache. Persist
 `rendering.plan.to_dict()` (executed lesson manifest), input identity, artifact
 identity, file checksum and durable audio reference **before publishing**.
+Restore with `Plan.from_dict`; it accepts only exact integer `schema_version=1`.
+The local ledger uses `PRAGMA user_version=1`; unknown versions fail with a diagnostic,
+without rewriting state. Unversioned package ledgers initialize transactionally.
 Use that stored executed plan on retry, rather than recompiling a previously
 prepared artifact. On English fallback, remove the lesson section from the
 companion transcript message that `store_modules/runtime_state.py` materializes
