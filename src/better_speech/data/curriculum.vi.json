@@ -57,6 +57,9 @@
     { "id": "ngay-mai", "l2": "Ngày mai.", "l1": "Tomorrow.", "literal": "day — next", "l1_literal": [["Ngày", "day"], ["mai", "next"]] },
     { "id": "doi-qua", "l2": "Đói quá!", "l1": "So hungry!", "literal": "hungry — so", "l2Tiered": "Đói⟨3⟩quá!", "l1_literal": [["Đói", "hungry"], ["quá", "[so/very]"]] },
     { "id": "giup-minh-voi", "l2": "Giúp mình với!", "l1": "Help me!", "literal": "help — me — with", "l2Tiered": "Giúp⟨0⟩mình⟨3⟩với!", "l1_literal": [["Giúp", "help"], ["mình", "me"], ["với", "[with/too]"]] },
-    { "id": "hen-gap-lai", "l2": "Hẹn gặp lại!", "l1": "See you again!", "literal": "promise — meet — again", "l2Tiered": "Hẹn⟨1⟩gặp⟨0⟩lại!", "l1_literal": [["Hẹn", "promise"], ["gặp", "meet"], ["lại", "again"]] }
+    { "id": "hen-gap-lai", "l2": "Hẹn gặp lại!", "l1": "See you again!", "literal": "promise — meet — again", "l2Tiered": "Hẹn⟨1⟩gặp⟨0⟩lại!", "l1_literal": [["Hẹn", "promise"], ["gặp", "meet"], ["lại", "again"]] },
+    { "id": "giu-tien-thua", "l2": "Giữ tiền thừa nhé.", "l1": "Keep the change.", "literal": "keep — money — extra — okay?", "l2Tiered": "Giữ⟨1⟩tiền⟨0⟩thừa⟨3⟩nhé.", "l1_literal": [["Giữ", "keep"], ["tiền", "money"], ["thừa", "extra"], ["nhé", "[softener]"]] },
+    { "id": "xin-loi-noi-lai", "l2": "Xin lỗi, nói lại được không ạ?", "l1": "Sorry, could you say that again?", "literal": "beg — fault — speak — again — can — not — [polite]", "units": ["Xin lỗi","nói lại","được không ạ"], "l2Tiered": ["Xin⟨0⟩lỗi","nói⟨0⟩lại","được⟨1⟩không⟨3⟩ạ"], "l1_literal": [["Xin", "ask"], ["lỗi", "fault"], ["nói", "speak"], ["lại", "again"], ["được", "can"], ["không", "[question]"], ["ạ", "[polite]"]] },
+    { "id": "cho-them-mot-cai-nua", "l2": "Cho mình thêm một cái nữa nhé.", "l1": "Can I have one more, please?", "literal": "give — me — add — one — thing — more — okay?", "units": ["Cho mình","thêm một cái nữa","nhé"], "l2Tiered": ["Cho⟨0⟩mình","thêm⟨1⟩một⟨0⟩cái⟨1⟩nữa","nhé"], "l1_literal": [["Cho", "give"], ["mình", "me"], ["thêm", "add"], ["một", "one"], ["cái", "[classifier]"], ["nữa", "more"], ["nhé", "[softener]"]] }
   ]
 }
