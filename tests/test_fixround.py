@@ -333,3 +333,46 @@ def test_artifact_identity_requires_insert_once_custody_and_checksum(tmp_path):
     assert first.audio_path and second.audio_path
     assert first.artifact_identity == second.artifact_identity
     assert first.audio_sha256 != second.audio_sha256  # The host must retain the first outcome.
+
+
+@pytest.mark.parametrize('native_failure', [False, True])
+def test_persisted_execution_acknowledges_in_fresh_process(tmp_path, native_failure):
+    import subprocess
+    import sys
+
+    from better_speech import Plan, render
+    from tests.test_model_free_audio import ToneProvider
+
+    cfg = profile(learner_id='alice', state_dir=str(tmp_path / 'unused'))
+    ledger = Ledger(tmp_path / 'host-owned.db')
+    requested = compile('The complete note.', cfg, ledger=ledger, now=NOW)
+    restored = Plan.from_dict(json.loads(json.dumps(requested.to_dict())))
+    providers = {'google': ToneProvider()}
+    if not native_failure:
+        providers['elevenlabs'] = ToneProvider()
+    result = render(restored, providers, tmp_path / 'cache')
+    assert result.audio_path and result.plan.executed
+    assert result.status == ('english' if native_failure else 'bilingual')
+    assert not ledger.path.exists()  # Preparing or serializing never records delivery.
+    persisted = tmp_path / 'executed.json'
+    persisted.write_text(json.dumps(result.plan.to_dict()))
+    script = '''
+import json, sys
+from pathlib import Path
+from better_speech import Ledger, Plan, record_delivered
+plan = Plan.from_dict(json.loads(Path(sys.argv[1]).read_text()))
+ledger = Ledger(sys.argv[2])
+receipts = [record_delivered(plan, 'confirmed-send', sys.argv[3], ledger=ledger) for _ in range(2)]
+assert all(not receipt.diagnostics for receipt in receipts)
+print(json.dumps({'added': [r.added for r in receipts], 'state': ledger.snapshot(plan.learner_id)}))
+'''
+    process = subprocess.run(
+        [sys.executable, '-c', script, str(persisted), str(ledger.path), NOW.isoformat()],
+        capture_output=True, text=True, timeout=10, check=True,
+    )
+    outcome = json.loads(process.stdout)
+    assert outcome['added'] == [len(result.plan.lessons), 0]
+    assert set(outcome['state']) == {lesson.phrase_key for lesson in result.plan.lessons}
+    assert all(record['exposureCount'] == 1 for record in outcome['state'].values())
+    assert ledger.snapshot('other') == {}
+    assert not (tmp_path / 'unused').exists()
