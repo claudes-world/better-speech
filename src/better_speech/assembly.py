@@ -7,7 +7,7 @@ overwriting an existing artifact; custody must still authorize its publication.
 
 from __future__ import annotations
 
-import asyncio
+import subprocess
 import os
 import tempfile
 import time
@@ -21,50 +21,29 @@ class AssemblyError(RuntimeError):
     pass
 
 
-async def _settle(task):
-    """Drain local process ownership even if cancellation is repeated."""
-    while not task.done():
-        try:
-            await asyncio.shield(task)
-        except asyncio.CancelledError:
-            continue
-    return task.result()
-
-
-async def _run(command: tuple[str, ...], deadline: float, clock: Callable[[], float]):
+def _run(command: tuple[str, ...], deadline: float, clock: Callable[[], float]):
     if deadline <= clock():
         raise TimeoutError("assembly deadline expired")
-    # Shield process creation: cancellation between fork and its returned
-    # handle must not leave a writer running after scratch cleanup.
-    spawn = asyncio.create_task(
-        asyncio.create_subprocess_exec(
-            *command,
-            stdin=asyncio.subprocess.DEVNULL,
-            stdout=asyncio.subprocess.DEVNULL,
-            stderr=asyncio.subprocess.DEVNULL,
-        )
+    process = subprocess.Popen(
+        command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
     )
-    process = None
     try:
-        process = await asyncio.shield(spawn)
-        remaining = deadline - clock()
-        if remaining <= 0:
+        budget = deadline - clock()
+        if budget <= 0:
             raise TimeoutError("assembly deadline expired")
-        await asyncio.wait_for(process.wait(), timeout=remaining)
+        try:
+            process.wait(timeout=budget)
+        except subprocess.TimeoutExpired as error:
+            raise TimeoutError("assembly deadline expired") from error
         if process.returncode != 0:
             raise AssemblyError("ffmpeg assembly failed")
     finally:
-        if process is None:
-            process = await _settle(spawn)
-        if process.returncode is None:
-            try:
-                process.kill()
-            except ProcessLookupError:
-                pass
-            await _settle(asyncio.create_task(process.wait()))
+        if process.poll() is None:
+            process.kill()
+        process.wait()
 
 
-async def assemble_audio(
+def assemble_audio(
     parts: tuple[AudioPart, ...],
     *,
     scratch_parent: Path,
@@ -89,7 +68,7 @@ async def assemble_audio(
             program = ffmpeg_assembly_program(parts, scratch=Path(owned), output=staged)
             Path(program.manifest_path).write_text(program.manifest_text, encoding="utf-8")
             for command in program.commands:
-                await _run(command, deadline, clock)
+                _run(command, deadline, clock)
             if deadline <= clock():
                 raise TimeoutError("assembly deadline expired")
             if staged.stat().st_size == 0:

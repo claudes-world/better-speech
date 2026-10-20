@@ -61,6 +61,10 @@ plan = better_speech.compile(text, profile, model_call=model_call, deadline=dead
 rendering = better_speech.render(plan, providers, clip_cache, deadline=deadline)
 ```
 
+The API and ffmpeg assembly are synchronous. Async hosts call `render` through
+`await asyncio.to_thread(better_speech.render, plan, providers, clip_cache, deadline=deadline)`
+to keep their event loop responsive. Assembly kills and reaps children on timeout.
+
 `rendering` returns `audio_path` (Ogg/Opus or `None`), `artifact_identity` (rendition
 custody key), `audio_sha256` (file checksum), **executed** `plan`, structured
 `sections`, Markdown and `diagnostics`. Text-only results have neither audio key.

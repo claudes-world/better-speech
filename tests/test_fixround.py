@@ -31,3 +31,20 @@ def test_skip_invalid_persisted_candidate(tmp_path, landed):
     plan = compile('An update.', cfg, ledger=EmptyLedger(), now=NOW)
     assert plan.lessons and all(l.id != 'poison' for l in plan.lessons)
     assert any(d.reason == 'rejected_candidate:poison' for d in plan.diagnostics)
+
+
+def test_render_inside_running_loop_keeps_paid_audio(tmp_path):
+    import asyncio
+    from better_speech import render
+    from tests.test_model_free_audio import ToneProvider
+
+    plan = compile('An update.', profile(), ledger=EmptyLedger())
+    provider = ToneProvider()
+
+    async def run():
+        return render(plan, {'google': provider, 'elevenlabs': provider}, tmp_path)
+
+    result = asyncio.run(run())
+    assert result.status == 'bilingual'
+    assert result.audio_path.read_bytes().startswith(b'OggS')
+    assert not any(d.stage == 'render' for d in result.diagnostics)

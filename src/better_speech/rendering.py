@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import hashlib
 import json
 import math
@@ -110,7 +109,7 @@ def render(plan, providers, cache=None, *, deadline: float | None = None) -> Ren
                 if clip.pause_after_s:
                     parts.append(AudioPart("silence", seconds=clip.pause_after_s))
             remaining(budget)
-            asyncio.run(assemble_audio(tuple(parts), scratch_parent=scratch, output=output, deadline=budget))
+            assemble_audio(tuple(parts), scratch_parent=scratch, output=output, deadline=budget)
         remaining(budget)
         checksum = hashlib.sha256()
         with output.open("rb") as audio:
