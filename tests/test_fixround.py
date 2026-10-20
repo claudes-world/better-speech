@@ -319,3 +319,17 @@ def test_four_contextual_connectors_keep_three_lessons(intensity):
                    ledger=SeenLedger(), model_call=choose)
     assert plan.status == 'bilingual' and len(plan.lessons) == 3
 
+def test_artifact_identity_requires_insert_once_custody_and_checksum(tmp_path):
+    from better_speech import render
+    from tests.test_model_free_audio import ToneProvider, tone
+
+    class DifferentAudio(ToneProvider):
+        def synthesize(self, clip, *, timeout):
+            return tone(123)
+
+    plan = compile('Update.', profile(enabled=False), ledger=EmptyLedger())
+    first = render(plan, {'google': ToneProvider()}, tmp_path / 'first')
+    second = render(plan, {'google': DifferentAudio()}, tmp_path / 'second')
+    assert first.audio_path and second.audio_path
+    assert first.artifact_identity == second.artifact_identity
+    assert first.audio_sha256 != second.audio_sha256  # The host must retain the first outcome.

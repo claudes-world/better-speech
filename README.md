@@ -142,6 +142,8 @@ hashes its ordered clips and lessons. Key rendition custody on
 alongside the persisted executed plan. Ledger changes, contextual placements and
 English fallback can change the execution of the same input group. Identical clips
 still share the clip cache; `Rendering.audio_sha256` is the audio file checksum.
+Custody inserts each artifact identity once, checks `audio_sha256`, and reuses
+the first stored outcome; different bytes under the same key are a conflict.
 Persist the **executed** manifest: a requested bilingual plan can render English.
 See the exact [WorldOS integration contract](docs/worldos-adapter.md) and
 [source provenance](docs/provenance.md).

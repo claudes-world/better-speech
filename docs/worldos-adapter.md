@@ -100,6 +100,13 @@ changed ledger state, model placement or English fallback can change its executi
 Identical clips can still share the clip cache. Persist
 `rendering.plan.to_dict()` (executed lesson manifest), input identity, artifact
 identity, file checksum and durable audio reference **before publishing**.
+Custody must be **insert-once** for each artifact identity: this key describes an
+execution, not provider bytes. If concurrent renderings produce the same key,
+compare `audio_sha256`; reuse the already stored outcome and its executed plan.
+A different checksum is a conflict, never permission to overwrite the first audio
+or its manifest. Verify the stored checksum against the durable bytes before
+publication or retry. If those bytes are unavailable, do not silently regenerate
+and replace them under the existing key; custody must resolve that failure.
 Restore with `Plan.from_dict`; it accepts only exact integer `schema_version=1`.
 The local ledger uses `PRAGMA user_version=2`; unknown versions fail with a diagnostic,
 without rewriting state. Unversioned and version-1 package ledgers migrate transactionally, preserving events.
