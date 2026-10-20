@@ -91,7 +91,7 @@ def compile(
             eligible = tuple(v for v in profile.voices if v.weight > 0)
             if not eligible:
                 raise ValueError("no_configured_vietnamese_voice")
-            maximum = min(4, {1: 2, 2: 4, 3: 6}.get(profile.intensity, 2))
+            maximum = 2 if profile.intensity == 1 else 4
             inventory_hash = curriculum_hash
             identity = digest([profile.learner_id, inventory_hash, text, profile_hash])
             rng = random.Random(identity if seed is None else seed).random
@@ -200,6 +200,7 @@ def compile(
                             key in used
                             or proposal.slot_id in occupied
                             or len(chosen) >= maximum
+                            or sum(choice[3] == "open" for choice in chosen) >= 3
                             or (unseen and new_count >= 2)
                         ):
                             continue

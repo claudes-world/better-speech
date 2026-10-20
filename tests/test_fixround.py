@@ -298,3 +298,24 @@ def test_lone_surrogates_compile_and_roundtrip(source):
     assert Plan.from_dict(json.loads(json.dumps(plan.to_dict()))) == plan
     assert plan.fallback_clips
 
+@pytest.mark.parametrize("intensity", [2, 3])
+def test_four_contextual_connectors_keep_three_lessons(intensity):
+    from dataclasses import replace
+
+    from better_speech.curriculum import runtime_curriculum
+
+    class SeenLedger(EmptyLedger):
+        def snapshot(self, *args, **kwargs):
+            return {r['ledger_identity']: {'dueAt': '2099-01-01T00:00:00Z'}
+                    for r in runtime_curriculum(profile())}
+
+    def choose(payload, **kwargs):
+        return json.dumps({'placements': [
+            {'phraseId': row['id'], 'slotId': slot}
+            for row, slot in zip(payload['inventory'][:4], payload['slots'][:4])
+        ]})
+
+    plan = compile('First.\n\nSecond.\n\nThird.', replace(profile(intensity=intensity), model='fake'),
+                   ledger=SeenLedger(), model_call=choose)
+    assert plan.status == 'bilingual' and len(plan.lessons) == 3
+
