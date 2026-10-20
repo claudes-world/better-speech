@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import random
+import re
 import time
 from datetime import datetime, timezone
 
@@ -49,7 +50,8 @@ def compile(
     seed: str | int | None = None,
     deadline: float | None = None,
 ) -> Plan:
-    """Compile without synthesis or exposure writes. A selected model never replaces the closing lesson."""
+    """Compile without synthesis or exposure writes; replace invalid Unicode scalars with U+FFFD."""
+    text = re.sub(r"[\ud800-\udfff]", "\ufffd", text)
     started = time.monotonic()
     profile = resolve_profile(profile)
     deadline = min(deadline if deadline is not None else float("inf"), started + profile.compile_timeout_s)

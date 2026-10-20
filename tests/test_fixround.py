@@ -287,3 +287,14 @@ def test_adjacent_placements_preserve_blank_span_without_purchasing_it(tmp_path)
     assert result.status == 'bilingual', result.diagnostics
     assert any(c.text == '\n\n' for c in result.plan.clips)
     assert ''.join(c.text for c in result.plan.clips if c.purpose == 'source') == plan.speech_text
+
+
+@pytest.mark.parametrize('source', ['Before\ud800after.', '\udfff', '\ud800\n\nUpdate.'])
+def test_lone_surrogates_compile_and_roundtrip(source):
+    from better_speech import Plan
+    plan = compile(source, profile(), ledger=EmptyLedger())
+    plan.source.encode('utf-8')
+    assert '\ufffd' in plan.source
+    assert Plan.from_dict(json.loads(json.dumps(plan.to_dict()))) == plan
+    assert plan.fallback_clips
+
