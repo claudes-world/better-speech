@@ -144,7 +144,7 @@ def test_cli_text_degradation_removes_previous_successful_output(config, tmp_pat
     assert output.read_bytes().startswith(b"OggS")
     capsys.readouterr()
 
-    class Unavailable:
+    class Unavailable(ToneProvider):
         def synthesize(self, clip, *, timeout):
             raise TimeoutError("provider unavailable")
 

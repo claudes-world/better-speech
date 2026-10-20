@@ -86,7 +86,7 @@ def compile(
         if not profile.enabled or not speech.strip():
             diagnostics.append(Diagnostic("lesson", "disabled" if not profile.enabled else "empty_source"))
         else:
-            eligible = tuple(v for v in profile.voices if v.provider == "elevenlabs" and v.weight > 0)
+            eligible = tuple(v for v in profile.voices if v.weight > 0)
             if not eligible:
                 raise ValueError("no_configured_vietnamese_voice")
             maximum = min(4, {1: 2, 2: 4, 3: 6}.get(profile.intensity, 2))

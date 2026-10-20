@@ -34,6 +34,12 @@ def resolve_profile(profile: Profile) -> Profile:
     try:
         voice = profile.english
         voice.validate()
+        from .providers.elevenlabs import ElevenLabsProvider
+        from .providers.google import GoogleProvider
+
+        builtin = {"google": GoogleProvider, "elevenlabs": ElevenLabsProvider}.get(voice.provider)
+        if builtin and ("en" not in builtin.languages or voice.output_format not in builtin.formats):
+            raise ValueError("unsupported narrator language/format")
     except Exception:
         profile = replace(profile, english=Profile().english)
         diagnostics.append("invalid_english_voice")

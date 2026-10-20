@@ -10,6 +10,10 @@ from ..types import Clip
 
 
 class GoogleProvider:
+    languages = frozenset({"en"})
+    max_request_bytes = 4500
+    formats = frozenset({"mp3", "ogg_opus", "wav"})
+
     def __init__(self, client=None, *, credentials_file: str | None = None):
         self.client = client
         self.credentials_file = credentials_file

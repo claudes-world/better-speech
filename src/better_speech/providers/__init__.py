@@ -6,6 +6,10 @@ from ..types import Clip
 
 
 class Provider(Protocol):
+    languages: frozenset[str]
+    max_request_bytes: int
+    formats: frozenset[str]
+
     def synthesize(self, clip: Clip, *, timeout: float) -> bytes: ...
 
 

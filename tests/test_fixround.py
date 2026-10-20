@@ -212,3 +212,78 @@ def test_version_one_ledger_migrates_without_losing_exposures(tmp_path):
     assert ledger.learner_state(plan.learner_id)[1] == []
     with sqlite3.connect(ledger.path) as db:
         assert db.execute('PRAGMA user_version').fetchone()[0] == 2
+
+
+def test_third_provider_and_render_time_byte_limits(tmp_path):
+    from dataclasses import replace
+
+    from better_speech import Voice, render
+    from tests.test_model_free_audio import ToneProvider
+
+    class LocalProvider(ToneProvider):
+        max_request_bytes = 16
+        formats = frozenset({'wav'})
+
+    cfg = profile(english=Voice('local-en', 'local', 'small', 1, 'wav'))
+    cfg = replace(cfg, voices=(Voice('local-vi', 'local', 'small', 1, 'wav'),))
+    plan = compile('A longer source with several words.', cfg, ledger=EmptyLedger())
+    assert plan.lessons
+    provider = LocalProvider()
+    result = render(plan, {'local': provider}, tmp_path)
+    assert result.status == 'bilingual', result.diagnostics
+    assert all(len(c.text.encode()) <= 16 for c in provider.calls)
+    assert ''.join(c.text for c in result.plan.clips if c.purpose == 'source') == plan.speech_text
+    assert len(result.plan.clips) > len(plan.clips)
+
+
+def test_capabilities_rechecked_before_cache_hits(tmp_path):
+    from better_speech import render
+    from tests.test_model_free_audio import ToneProvider
+    provider = ToneProvider()
+    plan = compile('Update.', profile(), ledger=EmptyLedger())
+    assert render(plan, {'google': provider, 'elevenlabs': provider}, tmp_path).status == 'bilingual'
+    before = len(provider.calls)
+    provider.languages = frozenset({'en'})
+    result = render(plan, {'google': provider, 'elevenlabs': provider}, tmp_path)
+    assert result.status == 'english'
+    assert len(provider.calls) == before
+
+
+def test_google_voice_default_format_and_invalid_narrator_diagnostic():
+    from better_speech import Voice
+    from better_speech.config import resolve_profile
+    assert resolve_profile(profile(english=Voice('en-US-Narrator', provider='google'))).english.output_format == 'mp3'
+    resolved = resolve_profile(profile(english=Voice('native', provider='elevenlabs')))
+    assert 'invalid_english_voice' in resolved.config_diagnostics
+    assert resolved.english.provider == 'google' and not resolved.enabled
+
+
+def test_adjacent_placements_preserve_blank_span_without_purchasing_it(tmp_path):
+    from dataclasses import replace
+
+    from better_speech import render
+    from tests.test_model_free_audio import ToneProvider
+
+    class RejectBlank(ToneProvider):
+        def synthesize(self, clip, *, timeout):
+            assert clip.text.strip()
+            return super().synthesize(clip, timeout=timeout)
+
+    class SeenLedger(EmptyLedger):
+        def snapshot(self, *args, **kwargs):
+            from better_speech.curriculum import runtime_curriculum
+            return {r['ledger_identity']: {'dueAt': '2099-01-01T00:00:00Z'}
+                    for r in runtime_curriculum(profile())}
+
+    def choose(payload, **kwargs):
+        return json.dumps({'placements': [
+            {'phraseId': payload['inventory'][0]['id'], 'slotId': 'end:6'},
+            {'phraseId': payload['inventory'][1]['id'], 'slotId': 'start:8'},
+        ]})
+
+    plan = compile('First.\n\nSecond.', replace(profile(), model='fake'), ledger=SeenLedger(), model_call=choose)
+    provider = RejectBlank()
+    result = render(plan, {'google': provider, 'elevenlabs': provider}, tmp_path)
+    assert result.status == 'bilingual', result.diagnostics
+    assert any(c.text == '\n\n' for c in result.plan.clips)
+    assert ''.join(c.text for c in result.plan.clips if c.purpose == 'source') == plan.speech_text

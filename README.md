@@ -59,7 +59,9 @@ inherited 12,000 UTF-16-unit budget becomes complete English; source is never
 truncated. Numbered lessons come only from the executed plan.
 
 `render(plan, providers, cache=None, *, deadline=None)` takes a mapping of provider
-names to objects implementing `synthesize(clip, *, timeout) -> bytes`. The host
+names to objects declaring `languages`, `max_request_bytes` (UTF-8), and `formats`,
+and implementing `synthesize(clip, *, timeout) -> bytes`. Rendering chunks the
+semantic clips to the resolved provider limit. The host
 wraps these objects to enforce its budget and record every paid attempt. Cache
 hits never call a provider. The result contains a caller-owned temporary Ogg/Opus
 path, rendition artifact identity, audio SHA-256 checksum, executed plan, diagnostic records, Markdown and

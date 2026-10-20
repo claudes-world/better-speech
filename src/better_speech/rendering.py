@@ -72,15 +72,17 @@ def render(
         nonlocal hits, artifact_dir
         remaining(budget)
         # Present before purchasing clips: a corrupt optional manifest is not audible authority.
-        actual = replace(
-            requested,
-            clips=tuple(
-                part for c in requested.clips
-                for part in lower_clip(replace(c, text=unicodedata.normalize("NFC", c.text)),
-                                       4500 if c.provider == "google" else 12000)
-            ),
-            executed=True,
-        )
+        lowered = []
+        for clip in requested.clips:
+            clip = replace(clip, text=unicodedata.normalize("NFC", clip.text))
+            if not clip.text.strip():
+                lowered.append(replace(clip, pause_after_s=clip.pause_after_s + 0.25))
+                continue
+            provider = providers[clip.provider]
+            if clip.language not in provider.languages or clip.output_format not in provider.formats:
+                raise ValueError("provider does not support clip language/format")
+            lowered.extend(lower_clip(clip, provider.max_request_bytes))
+        actual = replace(requested, clips=tuple(lowered), executed=True)
         sections, markdown = present(actual)
         remaining(budget)
         if artifact_dir is None:
@@ -92,8 +94,9 @@ def render(
             parts = []
             for index, clip in enumerate(actual.clips):
                 remaining(budget)
-                if (clip.language, clip.provider) not in {("en", "google"), ("vi", "elevenlabs")}:
-                    raise ValueError("unsupported language/provider pair")
+                if not clip.text.strip():
+                    parts.append(AudioPart("silence", seconds=clip.pause_after_s))
+                    continue
 
                 def synthesize():
                     timeout = min(provider_timeout, remaining(budget))

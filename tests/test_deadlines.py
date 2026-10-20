@@ -9,7 +9,7 @@ from tests.test_model_free_audio import EmptyLedger, ToneProvider, profile, tone
 def test_deadline_hit_during_lesson_yields_english(tmp_path):
     plan = compile("Complete source.", profile(), ledger=EmptyLedger())
 
-    class SlowNative:
+    class SlowNative(ToneProvider):
         def synthesize(self, clip, *, timeout):
             time.sleep(timeout + 0.01)
             return tone()

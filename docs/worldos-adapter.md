@@ -41,12 +41,19 @@ Compilation preserves source spans; rendering lowers clips to bounded provider
 requests and persists those actual clips in the executed plan.
 There is no `spend_hook` parameter. The provider contract is
 `synthesize(clip, *, timeout) -> bytes`; it must honor timeout and make one attempt.
+Providers declare `languages`, `max_request_bytes` (UTF-8 text), and `formats`.
+The renderer validates capabilities before spending or using cache entries and
+lowers semantic clips against the resolved provider's byte limit. Blank source
+spans retain their offsets but render as silence, never paid speech requests.
 A minimal host wrapper, with host-defined budget/accounting callbacks, is:
 
 ```python
 class ProviderWrapper:
     def __init__(self, inner, authorize, record_attempt):
         self.inner, self.authorize, self.record = inner, authorize, record_attempt
+        self.languages = inner.languages
+        self.max_request_bytes = inner.max_request_bytes
+        self.formats = inner.formats
 
     def synthesize(self, clip, *, timeout):
         token = self.authorize(clip.provider, clip.voice, len(clip.text))

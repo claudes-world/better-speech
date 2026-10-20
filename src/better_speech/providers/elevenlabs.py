@@ -14,6 +14,10 @@ MAX_AUDIO_BYTES = 20 * 1024 * 1024
 
 
 class ElevenLabsProvider:
+    languages = frozenset({"vi"})
+    max_request_bytes = 12000
+    formats = frozenset({"mp3_44100_128"})
+
     def __init__(self, api_key: str | None = None, *, client=None):
         self.api_key = api_key
         self.client = client

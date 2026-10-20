@@ -31,10 +31,14 @@ class Voice:
     provider: str = "elevenlabs"
     model: str = "eleven_turbo_v2_5"
     rate: float = 0.9
-    output_format: str = "mp3_44100_128"
+    output_format: str = ""
     region: str | None = None
     weight: float = 1
     settings_json: str = "{}"
+
+    def __post_init__(self):
+        if not self.output_format:
+            object.__setattr__(self, "output_format", "mp3" if self.provider == "google" else "mp3_44100_128")
 
     def validate(self):
         if any(not isinstance(v, str) or not v for v in (self.provider, self.model, self.voice, self.output_format)):

@@ -29,6 +29,10 @@ def tone(hz=440, seconds=0.1):
 
 
 class ToneProvider:
+    languages = frozenset({"en", "vi"})
+    max_request_bytes = 4500
+    formats = frozenset({"mp3", "mp3_44100_128"})
+
     def __init__(self):
         self.calls = []
 
