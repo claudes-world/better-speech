@@ -1,6 +1,7 @@
 import json
 from dataclasses import replace
 from datetime import datetime, timezone
+from unittest.mock import Mock
 
 import pytest
 
@@ -10,6 +11,10 @@ from better_speech.config import load_profile
 from better_speech.learning import learn
 from better_speech.ledger import Ledger
 from tests.test_model_free_audio import EmptyLedger, ToneProvider, profile
+
+
+def provider_factory(provider):
+    return Mock(return_value=provider, languages=provider.languages, formats=provider.formats)
 
 
 @pytest.fixture
@@ -68,8 +73,8 @@ def test_cli_learn_due_plan_learned_and_learner_isolation(config, tmp_path, caps
 
 def test_cli_render_prints_executed_transcript(config, tmp_path, monkeypatch, capsys):
     provider = ToneProvider()
-    monkeypatch.setattr("better_speech.providers.google.GoogleProvider", lambda: provider)
-    monkeypatch.setattr("better_speech.providers.elevenlabs.ElevenLabsProvider", lambda key: provider)
+    monkeypatch.setattr("better_speech.providers.google.GoogleProvider", provider_factory(provider))
+    monkeypatch.setattr("better_speech.providers.elevenlabs.ElevenLabsProvider", provider_factory(provider))
     source, output = tmp_path / "in.md", tmp_path / "note.ogg"
     source.write_text("The update is ready.\n\n[Read more](https://example.org).")
     assert (
@@ -126,8 +131,8 @@ def test_simultaneous_learns_preserve_both_phrases(tmp_path):
 
 def test_cli_text_degradation_removes_previous_successful_output(config, tmp_path, monkeypatch, capsys):
     provider = ToneProvider()
-    monkeypatch.setattr("better_speech.providers.google.GoogleProvider", lambda: provider)
-    monkeypatch.setattr("better_speech.providers.elevenlabs.ElevenLabsProvider", lambda key: provider)
+    monkeypatch.setattr("better_speech.providers.google.GoogleProvider", provider_factory(provider))
+    monkeypatch.setattr("better_speech.providers.elevenlabs.ElevenLabsProvider", provider_factory(provider))
     source, output = tmp_path / "in.md", tmp_path / "note.ogg"
     args = [
         "render",
@@ -149,7 +154,7 @@ def test_cli_text_degradation_removes_previous_successful_output(config, tmp_pat
             raise TimeoutError("provider unavailable")
 
     monkeypatch.setattr("better_speech.providers.google.GoogleProvider", Unavailable)
-    monkeypatch.setattr("better_speech.providers.elevenlabs.ElevenLabsProvider", lambda key: Unavailable())
+    monkeypatch.setattr("better_speech.providers.elevenlabs.ElevenLabsProvider", provider_factory(Unavailable()))
     source.write_text("A different complete note.")
     assert main(args) == 0
     printed = capsys.readouterr()

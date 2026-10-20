@@ -57,7 +57,7 @@ def test_public_render_numbers_lessons_in_first_audible_order(tmp_path):
         if row["id"] in {"hieu-roi", "khong-sao-dau"}
     }
 
-    class KnownPhrases:
+    class KnownPhrases(EmptyLedger):
         def snapshot(self, *args, **kwargs):
             return records
 
