@@ -16,6 +16,7 @@ from .cache import ClipCache
 from .chunking import lower_clip
 from .config import cache_dir
 from .executor import AudioPart
+from .pronunciation import speech_input
 from .transcript import present
 from .types import Diagnostic, Rendering, Section, digest
 
@@ -74,14 +75,27 @@ def render(
         # Present before purchasing clips: a corrupt optional manifest is not audible authority.
         lowered = []
         for clip in requested.clips:
-            clip = replace(clip, text=unicodedata.normalize("NFC", clip.text))
+            normalized = unicodedata.normalize("NFC", clip.text)
+            if clip.pronunciations:
+                try:
+                    if normalized != clip.text:
+                        raise ValueError('pronunciation normalization changed offsets')
+                    speech_input(clip)
+                except Exception:
+                    diagnostics.append(Diagnostic('heteronym', 'invalid_pronunciations_plain_fallback'))
+                    clip = replace(clip, pronunciations=[])
+            clip = replace(clip, text=normalized)
             if not clip.text.strip():
                 lowered.append(replace(clip, pause_after_s=clip.pause_after_s + (0 if requested.executed else 0.25)))
                 continue
             provider = providers[clip.provider]
             if clip.language not in provider.languages or clip.output_format not in provider.formats:
                 raise ValueError("provider does not support clip language/format")
-            lowered.extend(lower_clip(clip, provider.max_request_bytes))
+            parts = tuple(lower_clip(clip, provider.max_request_bytes))
+            if sum(len(c.pronunciations) for c in parts) != len(clip.pronunciations):
+                diagnostics.append(Diagnostic('heteronym', 'provider_limit_plain_fallback'))
+                parts = tuple(lower_clip(replace(clip, pronunciations=[]), provider.max_request_bytes))
+            lowered.extend(parts)
         actual = replace(requested, clips=tuple(lowered), executed=True)
         sections, markdown = present(actual)
         remaining(budget)
@@ -133,10 +147,10 @@ def render(
 
     result = None
     try:
-        result = attempt(candidate, lesson_deadline if candidate.lessons else deadline, "note.ogg")
+        result = attempt(candidate, lesson_deadline if candidate.lessons or any(c.pronunciations for c in candidate.clips) else deadline, "note.ogg")
     except Exception as error:
         diagnostics.append(Diagnostic("render", type(error).__name__))
-        if candidate.lessons:
+        if candidate.lessons or any(c.pronunciations for c in candidate.clips):
             try:
                 result = attempt(english, deadline, "english.ogg")
             except Exception as fallback_error:

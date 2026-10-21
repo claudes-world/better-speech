@@ -141,7 +141,10 @@ def markdown_to_speech_structure(
     rendered = "\n".join(output).strip()
     if not rendered:
         return markdown, frozenset({0})
-    offsets = {0, *(min(len(rendered), sum(len(s) + 1 for s in output[:i])) for i in headings)}
+    positions = [0]
+    for line in output:
+        positions.append(positions[-1] + len(line) + 1)
+    offsets = {0, *(min(len(rendered), positions[i]) for i in headings)}
     return rendered, frozenset(offsets)
 
 

@@ -44,6 +44,8 @@ def resolve_profile(profile: Profile) -> Profile:
         profile = replace(profile, english=Profile().english)
         diagnostics.append("invalid_english_voice")
     try:
+        if profile.heteronyms is None:
+            profile = replace(profile, heteronyms=profile.model != "none")
         Profile.from_dict(profile.to_dict())
         for key in (
             "compile_timeout_s",
@@ -70,7 +72,7 @@ def resolve_profile(profile: Profile) -> Profile:
         if not isinstance(profile.pacing, dict):
             raise ValueError("pacing must be an object")
         if any(
-            type(getattr(profile, key)) is not bool for key in ("enabled", "repeat", "repeat_second_voice")
+            type(getattr(profile, key)) is not bool for key in ("enabled", "repeat", "repeat_second_voice", "heteronyms")
         ):
             raise ValueError("invalid boolean profile field")
         if type(profile.intensity) is not int or profile.intensity not in (1, 2, 3):

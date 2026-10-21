@@ -270,6 +270,10 @@ def compile(
             )
         )
         primary, selected = fallback, ()
+    from .heteronyms import apply
+
+    primary, heteronym_diagnostics = apply(primary, profile, model_call, deadline=model_deadline)
+    diagnostics.extend(heteronym_diagnostics)
     return Plan(
         digest([profile.learner_id, curriculum_hash, text, profile_hash]),
         text,

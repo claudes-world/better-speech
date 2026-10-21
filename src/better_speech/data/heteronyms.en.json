@@ -1,0 +1,786 @@
+{
+ "_meta": {
+  "note": "Heteronyms: one spelling, two or more pronunciations with different meanings. Each entry lists SENSES. The deterministic pass never picks a sense; it only decides whether a case is safe to skip. Rendering is per-engine, so senses carry both an IPA form (Google SSML, Kokoro) and a respelling (OpenAI, which has no pronunciation control).",
+  "suppressors": {
+   "ing": "an -ing form is morphologically forced to the verb reading",
+   "ed": "an -ed form is morphologically forced to the verb reading",
+   "case": "the capitalised form is a distinct proper noun; sentence-initial position does NOT count as evidence"
+  },
+  "kokoro": "The 'kokoro' field is misaki notation, NOT standard IPA -- misaki writes /ai/ as 'I', /au/ as 'W', /ou/ as 'O', /ei/ as 'A'. Every value here was produced by misaki itself, so it is guaranteed in-vocabulary; hand-written IPA passes through the G2P without an error and then lands out-of-distribution at the model, which is silent corruption. 'kokoro_never_disambiguates' marks words where the G2P returned the SAME phonemes for both senses -- measured 2026-09-01, so those always need the model."
+ },
+ "live": {
+  "senses": [
+   {
+    "id": "verb",
+    "gloss": "to be alive, to reside",
+    "ipa": "lɪv",
+    "respell": "lihv",
+    "kokoro": "lˈɪv"
+   },
+   {
+    "id": "adj",
+    "gloss": "happening now, broadcast in real time, not recorded",
+    "ipa": "laɪv",
+    "respell": "lyve",
+    "kokoro": "lˈIv"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "read": {
+  "senses": [
+   {
+    "id": "present",
+    "gloss": "present or infinitive: to read",
+    "ipa": "ɹiːd",
+    "respell": "reed",
+    "kokoro": "ɹˈid"
+   },
+   {
+    "id": "past",
+    "gloss": "past tense or past participle: has read",
+    "ipa": "ɹɛd",
+    "respell": "red",
+    "kokoro": "ɹˈɛd"
+   }
+  ],
+  "suppress": [
+   "ing"
+  ]
+ },
+ "lead": {
+  "senses": [
+   {
+    "id": "guide",
+    "gloss": "to guide, or the front position",
+    "ipa": "liːd",
+    "respell": "leed",
+    "kokoro": "lˈid"
+   },
+   {
+    "id": "metal",
+    "gloss": "the heavy grey metal, Pb",
+    "ipa": "lɛd",
+    "respell": "led",
+    "kokoro": "lˈɛd"
+   }
+  ],
+  "suppress": [
+   "ing"
+  ],
+  "kokoro_never_disambiguates": true
+ },
+ "close": {
+  "senses": [
+   {
+    "id": "near",
+    "gloss": "near, or nearly",
+    "ipa": "kloʊs",
+    "respell": "kloce",
+    "kokoro": "klˈOs"
+   },
+   {
+    "id": "shut",
+    "gloss": "to shut",
+    "ipa": "kloʊz",
+    "respell": "klohz",
+    "kokoro": "klˈOz"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "wind": {
+  "senses": [
+   {
+    "id": "air",
+    "gloss": "moving air",
+    "ipa": "wɪnd",
+    "respell": "wind",
+    "kokoro": "wˈɪnd"
+   },
+   {
+    "id": "coil",
+    "gloss": "to coil or turn something",
+    "ipa": "waɪnd",
+    "respell": "wynd",
+    "kokoro": "wˈInd"
+   }
+  ],
+  "suppress": [
+   "ing"
+  ]
+ },
+ "tear": {
+  "senses": [
+   {
+    "id": "eye",
+    "gloss": "a drop of liquid from the eye",
+    "ipa": "tɪɹ",
+    "respell": "teer",
+    "kokoro": "tˈɪɹ"
+   },
+   {
+    "id": "rip",
+    "gloss": "to rip, or a rip in something",
+    "ipa": "tɛɹ",
+    "respell": "tair",
+    "kokoro": "tˈɛɹ"
+   }
+  ],
+  "suppress": [
+   "ing"
+  ]
+ },
+ "bow": {
+  "senses": [
+   {
+    "id": "bend",
+    "gloss": "to bend at the waist, or the front of a ship",
+    "ipa": "baʊ",
+    "respell": "bau",
+    "kokoro": "bˈW"
+   },
+   {
+    "id": "weapon",
+    "gloss": "a bow for arrows, a violin bow, or a tied ribbon",
+    "ipa": "boʊ",
+    "respell": "boh",
+    "kokoro": "bˈO"
+   }
+  ],
+  "suppress": [
+   "ing"
+  ]
+ },
+ "bass": {
+  "senses": [
+   {
+    "id": "music",
+    "gloss": "low musical register or the instrument",
+    "ipa": "beɪs",
+    "respell": "base",
+    "kokoro": "bˈAs"
+   },
+   {
+    "id": "fish",
+    "gloss": "the fish",
+    "ipa": "bæs",
+    "respell": "bass",
+    "kokoro": "bˈæs"
+   }
+  ],
+  "suppress": [],
+  "kokoro_never_disambiguates": true
+ },
+ "sow": {
+  "senses": [
+   {
+    "id": "plant",
+    "gloss": "to plant seed",
+    "ipa": "soʊ",
+    "respell": "soh",
+    "kokoro": "sˈO"
+   },
+   {
+    "id": "pig",
+    "gloss": "a female pig",
+    "ipa": "saʊ",
+    "respell": "sau",
+    "kokoro": "sˈW"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "row": {
+  "senses": [
+   {
+    "id": "line",
+    "gloss": "a line of things, or to row a boat",
+    "ipa": "ɹoʊ",
+    "respell": "roh",
+    "kokoro": "ɹˈO"
+   },
+   {
+    "id": "argument",
+    "gloss": "a noisy quarrel",
+    "ipa": "ɹaʊ",
+    "respell": "rau",
+    "kokoro": "ɹˈW"
+   }
+  ],
+  "suppress": []
+ },
+ "dove": {
+  "senses": [
+   {
+    "id": "bird",
+    "gloss": "the bird",
+    "ipa": "dʌv",
+    "respell": "duv"
+   },
+   {
+    "id": "dived",
+    "gloss": "past tense of dive",
+    "ipa": "doʊv",
+    "respell": "dohv"
+   }
+  ],
+  "suppress": []
+ },
+ "wound": {
+  "senses": [
+   {
+    "id": "injury",
+    "gloss": "an injury, or to injure",
+    "ipa": "wuːnd",
+    "respell": "woond",
+    "kokoro": "wˈund"
+   },
+   {
+    "id": "coiled",
+    "gloss": "past tense of wind, coiled up",
+    "ipa": "waʊnd",
+    "respell": "wownd",
+    "kokoro": "wˈWnd"
+   }
+  ],
+  "suppress": []
+ },
+ "minute": {
+  "senses": [
+   {
+    "id": "time",
+    "gloss": "sixty seconds",
+    "ipa": "ˈmɪnɪt",
+    "respell": "MIN-it",
+    "kokoro": "mˈɪnət"
+   },
+   {
+    "id": "tiny",
+    "gloss": "extremely small",
+    "ipa": "maɪˈnjuːt",
+    "respell": "my-NEWT",
+    "kokoro": "mInˈut"
+   }
+  ],
+  "suppress": [],
+  "kokoro_never_disambiguates": true
+ },
+ "polish": {
+  "senses": [
+   {
+    "id": "shine",
+    "gloss": "to make shiny",
+    "ipa": "ˈpɒlɪʃ",
+    "respell": "POL-ish",
+    "kokoro": "pˈɑlɪʃ"
+   },
+   {
+    "id": "poland",
+    "gloss": "of Poland",
+    "ipa": "ˈpoʊlɪʃ",
+    "respell": "POH-lish",
+    "kokoro": "pˈOlɪʃ"
+   }
+  ],
+  "suppress": [
+   "case"
+  ]
+ },
+ "resume": {
+  "senses": [
+   {
+    "id": "continue",
+    "gloss": "to begin again",
+    "ipa": "ɹɪˈzuːm",
+    "respell": "ri-ZOOM",
+    "kokoro": "ɹəzˈum"
+   },
+   {
+    "id": "cv",
+    "gloss": "a CV, a summary of employment",
+    "ipa": "ˈɹɛzʊmeɪ",
+    "respell": "REZ-oo-may",
+    "kokoro": "ɹˈɛzəmA"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ],
+  "kokoro_never_disambiguates": true
+ },
+ "object": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "a thing",
+    "ipa": "ˈɒbdʒɛkt",
+    "respell": "OB-ject",
+    "kokoro": "ˈɑbʤəkt"
+   },
+   {
+    "id": "verb",
+    "gloss": "to raise an objection",
+    "ipa": "əbˈdʒɛkt",
+    "respell": "ob-JECT",
+    "kokoro": "əbʤˈɛkt"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "record": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "a stored account, or a best-ever mark",
+    "ipa": "ˈɹɛkɚd",
+    "respell": "REK-erd",
+    "kokoro": "ɹˈɛkəɹd"
+   },
+   {
+    "id": "verb",
+    "gloss": "to capture or write down",
+    "ipa": "ɹɪˈkɔɹd",
+    "respell": "ri-KORD",
+    "kokoro": "ɹəkˈɔɹd"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "present": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "a gift, or the current time; also the adjective",
+    "ipa": "ˈpɹɛzənt",
+    "respell": "PREZ-ent",
+    "kokoro": "pɹˈɛzᵊnt"
+   },
+   {
+    "id": "verb",
+    "gloss": "to show or hand over",
+    "ipa": "pɹɪˈzɛnt",
+    "respell": "pri-ZENT",
+    "kokoro": "pɹizˈɛnt"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "project": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "a piece of planned work",
+    "ipa": "ˈpɹɒdʒɛkt",
+    "respell": "PROJ-ect"
+   },
+   {
+    "id": "verb",
+    "gloss": "to cast forward or forecast",
+    "ipa": "pɹəˈdʒɛkt",
+    "respell": "pro-JECT"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "progress": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "forward movement",
+    "ipa": "ˈpɹɑɡɹɛs",
+    "respell": "PROG-ress"
+   },
+   {
+    "id": "verb",
+    "gloss": "to move forward",
+    "ipa": "pɹəˈɡɹɛs",
+    "respell": "pro-GRESS"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "contract": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "a binding agreement",
+    "ipa": "ˈkɒntɹækt",
+    "respell": "KON-tract"
+   },
+   {
+    "id": "verb",
+    "gloss": "to shrink, or to enter an agreement",
+    "ipa": "kənˈtɹækt",
+    "respell": "kon-TRACT"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "subject": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "a topic or a person under study",
+    "ipa": "ˈsʌbdʒɛkt",
+    "respell": "SUB-ject"
+   },
+   {
+    "id": "verb",
+    "gloss": "to force someone to undergo something",
+    "ipa": "səbˈdʒɛkt",
+    "respell": "sub-JECT"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "conduct": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "behaviour",
+    "ipa": "ˈkɒndʌkt",
+    "respell": "KON-duct"
+   },
+   {
+    "id": "verb",
+    "gloss": "to carry out or to lead",
+    "ipa": "kənˈdʌkt",
+    "respell": "kon-DUCT"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "increase": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "a rise in amount",
+    "ipa": "ˈɪnkɹiːs",
+    "respell": "IN-crease"
+   },
+   {
+    "id": "verb",
+    "gloss": "to make or become larger",
+    "ipa": "ɪnˈkɹiːs",
+    "respell": "in-CREASE"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "desert": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "arid land",
+    "ipa": "ˈdɛzɚt",
+    "respell": "DEZ-ert",
+    "kokoro": "dˈɛzəɹt"
+   },
+   {
+    "id": "verb",
+    "gloss": "to abandon",
+    "ipa": "dɪˈzɜɹt",
+    "respell": "di-ZERT",
+    "kokoro": "dəzˈɜɹt"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "separate": {
+  "senses": [
+   {
+    "id": "adj",
+    "gloss": "apart, not joined",
+    "ipa": "ˈsɛpɹɪt",
+    "respell": "SEP-rit"
+   },
+   {
+    "id": "verb",
+    "gloss": "to divide or move apart",
+    "ipa": "ˈsɛpəɹeɪt",
+    "respell": "SEP-a-rate"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "moderate": {
+  "senses": [
+   {
+    "id": "adj",
+    "gloss": "not extreme",
+    "ipa": "ˈmɒdəɹɪt",
+    "respell": "MOD-er-it"
+   },
+   {
+    "id": "verb",
+    "gloss": "to chair or to reduce",
+    "ipa": "ˈmɒdəɹeɪt",
+    "respell": "MOD-er-ate"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "delegate": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "a representative",
+    "ipa": "ˈdɛlɪɡɪt",
+    "respell": "DEL-i-git"
+   },
+   {
+    "id": "verb",
+    "gloss": "to hand work to someone",
+    "ipa": "ˈdɛlɪɡeɪt",
+    "respell": "DEL-i-gate"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "estimate": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "an approximate figure",
+    "ipa": "ˈɛstɪmɪt",
+    "respell": "ES-ti-mit"
+   },
+   {
+    "id": "verb",
+    "gloss": "to approximate",
+    "ipa": "ˈɛstɪmeɪt",
+    "respell": "ES-ti-mate"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "graduate": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "someone who has a degree",
+    "ipa": "ˈɡɹædʒuɪt",
+    "respell": "GRAD-you-it"
+   },
+   {
+    "id": "verb",
+    "gloss": "to complete a degree",
+    "ipa": "ˈɡɹædʒueɪt",
+    "respell": "GRAD-you-ate"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "duplicate": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "a copy",
+    "ipa": "ˈdjuːplɪkɪt",
+    "respell": "DOO-pli-kit"
+   },
+   {
+    "id": "verb",
+    "gloss": "to make a copy",
+    "ipa": "ˈdjuːplɪkeɪt",
+    "respell": "DOO-pli-kate"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "alternate": {
+  "senses": [
+   {
+    "id": "adj",
+    "gloss": "every other one, or a substitute",
+    "ipa": "ɔlˈtɜɹnɪt",
+    "respell": "al-TER-nit"
+   },
+   {
+    "id": "verb",
+    "gloss": "to switch back and forth",
+    "ipa": "ˈɔltɚneɪt",
+    "respell": "AL-ter-nate"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "invalid": {
+  "senses": [
+   {
+    "id": "notvalid",
+    "gloss": "not valid",
+    "ipa": "ɪnˈvælɪd",
+    "respell": "in-VAL-id"
+   },
+   {
+    "id": "person",
+    "gloss": "a person made weak by illness",
+    "ipa": "ˈɪnvəlɪd",
+    "respell": "IN-va-lid"
+   }
+  ],
+  "suppress": []
+ },
+ "refuse": {
+  "senses": [
+   {
+    "id": "verb",
+    "gloss": "to decline",
+    "ipa": "ɹɪˈfjuːz",
+    "respell": "ri-FYOOZ"
+   },
+   {
+    "id": "waste",
+    "gloss": "rubbish, waste material",
+    "ipa": "ˈɹɛfjuːs",
+    "respell": "REF-yoos"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "console": {
+  "senses": [
+   {
+    "id": "panel",
+    "gloss": "a control panel or games machine",
+    "ipa": "ˈkɒnsoʊl",
+    "respell": "KON-sole"
+   },
+   {
+    "id": "comfort",
+    "gloss": "to comfort someone",
+    "ipa": "kənˈsoʊl",
+    "respell": "kon-SOLE"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "content": {
+  "senses": [
+   {
+    "id": "noun",
+    "gloss": "what something contains",
+    "ipa": "ˈkɒntɛnt",
+    "respell": "KON-tent",
+    "kokoro": "kˈɑntɛnt"
+   },
+   {
+    "id": "adj",
+    "gloss": "satisfied, happy",
+    "ipa": "kənˈtɛnt",
+    "respell": "kon-TENT",
+    "kokoro": "kəntˈɛnt"
+   }
+  ],
+  "suppress": [],
+  "kokoro_never_disambiguates": true
+ },
+ "entrance": {
+  "senses": [
+   {
+    "id": "door",
+    "gloss": "a way in",
+    "ipa": "ˈɛntɹəns",
+    "respell": "EN-trance"
+   },
+   {
+    "id": "enchant",
+    "gloss": "to fill with delight or put in a trance",
+    "ipa": "ɪnˈtɹɑːns",
+    "respell": "en-TRANCE"
+   }
+  ],
+  "suppress": [
+   "ing",
+   "ed"
+  ]
+ },
+ "august": {
+  "senses": [
+   {
+    "id": "month",
+    "gloss": "the month",
+    "ipa": "ˈɔːɡəst",
+    "respell": "AW-gust"
+   },
+   {
+    "id": "majestic",
+    "gloss": "majestic, venerable",
+    "ipa": "ɔːˈɡʌst",
+    "respell": "aw-GUST"
+   }
+  ],
+  "suppress": [
+   "case"
+  ]
+ }
+}
