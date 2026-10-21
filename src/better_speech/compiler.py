@@ -14,7 +14,7 @@ from .boundaries import paragraph_boundaries
 from .budget import phase_deadline, remaining
 from .config import resolve_profile
 from .curriculum import runtime_curriculum
-from .exposure import timestamp
+from .exposure import anchor_floor, timestamp
 from .markdown import markdown_to_speech_structure
 from .planner import LessonPlacement, sequence_clips
 from .rewriter import parse_placements
@@ -88,6 +88,7 @@ def compile(
             raise
         rows = runtime_curriculum(profile, additions=additions)
         curriculum_hash = digest(rows)
+        records = anchor_floor(rows, records, profile.anchor_floor_days)
         if not profile.enabled or not speech.strip():
             diagnostics.append(Diagnostic("lesson", "disabled" if not profile.enabled else "empty_source"))
         else:

@@ -56,6 +56,7 @@ def resolve_profile(profile: Profile) -> Profile:
             "repeat_pause_s",
             "long_break_seconds",
             "greeting_gap_hours",
+            "anchor_floor_days",
         ):
             value = getattr(profile, key)
             minimum = (

@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 from .config import resolve_profile
 from .curriculum import canonical_phrase, runtime_curriculum
-from .exposure import timestamp
+from .exposure import anchor_floor, timestamp
 from .pacing import DEFAULT, compile_lesson
 from .types import Profile
 
@@ -83,6 +83,7 @@ def due(profile: Profile = Profile(), *, ledger, now: datetime | None = None) ->
     at = timestamp((now or datetime.now(timezone.utc)).isoformat())
     records, additions = ledger.learner_state(profile.learner_id)
     rows = runtime_curriculum(profile, additions=additions)
+    records = anchor_floor(rows, records, profile.anchor_floor_days)
     return [
         {**r, "exposure": records.get(r["ledger_identity"])}
         for r in _rank(rows, records, at)

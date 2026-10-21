@@ -93,3 +93,13 @@ def record_exposures(
                 record["dueAt"] = _plus_days(ts, INTERVALS[record["intervalIndex"]])
             summary["updated"].append(key)
     return result, summary
+
+
+def anchor_floor(rows, records, days):
+    """Cap effective due dates without changing the inherited interval scheduler."""
+    result = deepcopy(records)
+    for row in rows:
+        record = result.get(row["ledger_identity"])
+        if row.get("anchor") and record and record.get("lastHeard"):
+            record["dueAt"] = min(record["dueAt"], _plus_days(record["lastHeard"], days))
+    return result
