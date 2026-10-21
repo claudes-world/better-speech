@@ -71,3 +71,16 @@ ElevenLabs voices, English is Google plain text, no hard-coded Vietnamese pool,
 learning reservation precedes model selection, and the numbered lesson is
 collapsible with the exact header **Vietnamese lesson**. Model failures preserve
 deterministic lessons. No HTTP model adapter is included.
+
+Week two adds six greeting records and founder-editable pronunciation drafts to
+the 57-phrase curriculum (63 total), with anchor flags for the thank-you and
+excuse-me family. Hints are hand-drafted English respellings; sound reference:
+[Kirby (2011), Vietnamese (Hanoi Vietnamese)](https://doi.org/10.1017/S0025100311000181).
+`data/heteronyms.en.json` is a byte-for-byte copy of
+`/home/claude/claudes-world/.claude/skills/tts/heteronyms/lexicon.json`
+(SHA-256 `139ba2b5898c5c9520937a5b43b3dc276c84677a328aa95062b58f45ca84b5d1`).
+It contains 38 word entries plus `_meta`. `heteronyms.py` reduces the source
+scanner's sentence splitting and morphology/case suppression to a standalone
+whole-word pass, replacing the source Flash/engine code with the existing
+subscription-only registry. `pronunciation.py` renders trusted sense IPA using
+[Google's SSML phoneme format](https://docs.cloud.google.com/text-to-speech/docs/ssml#phoneme).

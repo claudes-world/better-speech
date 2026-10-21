@@ -1,5 +1,9 @@
 # Explicitly use the model-free path for a first listen.
 model = "none"
+# Heteronyms default on with a model, off with model = "none".
+heteronyms = false
+greeting_gap_hours = 2.0
+anchor_floor_days = 7
 codex_model = "gpt-6-luna"
 claude_model = "claude-haiku-5-5"
 agy_model = "gemini-3-flash"
