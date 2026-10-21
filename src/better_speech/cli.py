@@ -33,6 +33,7 @@ def parser():
         if name == "learn":
             command.add_argument("phrase")
             command.add_argument("--gloss", required=True)
+            command.add_argument("--hint")
         if name == "learned":
             command.add_argument("key")
     return root
@@ -46,7 +47,7 @@ def main(argv=None):
             profile = replace(profile, learner_id=args.learner)
         ledger = Ledger.for_profile(profile)
         if args.command == "learn":
-            print(json.dumps(learn(args.phrase, args.gloss, profile, ledger=ledger), ensure_ascii=False, indent=2))
+            print(json.dumps(learn(args.phrase, args.gloss, profile, ledger=ledger, hint=args.hint), ensure_ascii=False, indent=2))
         elif args.command == "learned":
             print(json.dumps(learned(args.key, profile, ledger=ledger), ensure_ascii=False, indent=2))
         elif args.command == "due":

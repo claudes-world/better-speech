@@ -20,7 +20,7 @@ def _writable(profile):
     return profile
 
 
-def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, now: datetime | None = None) -> dict:
+def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, now: datetime | None = None, hint: str | None = None) -> dict:
     profile = _writable(profile)
     if not vietnamese.strip() or not gloss.strip():
         raise ValueError("phrase and gloss cannot be blank")
@@ -50,6 +50,8 @@ def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, 
             l1=gloss.strip(), translation=gloss.strip(), pending_learning=True, landed=False,
             boost_until=timestamp(midnight.isoformat()), added_at=timestamp(instant.isoformat()),
         )
+        if hint is not None:
+            row["hint"] = hint.strip()
         # Validate the actual merged record, including existing unit/pacing metadata.
         paced = compile_lesson({**row, "phrase": phrase}, profile=DEFAULT)
         if len(paced.rendered.encode("utf-16-le")) // 2 > 4000:

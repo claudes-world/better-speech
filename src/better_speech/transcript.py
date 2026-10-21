@@ -96,6 +96,8 @@ def present(plan):
                 literal = " • ".join(literal)
             if literal:
                 lines.append("   *" + _label(literal) + "*")
+            if row.get("hint"):
+                lines.append("   *say: " + _label(row["hint"]) + "*")
             lines.append("   " + _label(row["translation"]))
         sections.append(Section("lesson", "\n".join(lines), True))
     sections.append(Section("transcript", plan.source, True))
