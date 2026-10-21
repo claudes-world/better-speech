@@ -16,6 +16,8 @@ from .cache import ClipCache
 from .chunking import lower_clip
 from .config import cache_dir
 from .executor import AudioPart
+from .pronunciation import speech_input
+from .providers.elevenlabs import ElevenLabsProvider
 from .transcript import present
 from .types import Diagnostic, Rendering, Section, digest
 
@@ -67,21 +69,41 @@ def render(
     hits = 0
     artifact_dir = None
     outputs = []
+    pronunciation_failure = False
 
     def attempt(requested, budget, name):
-        nonlocal hits, artifact_dir
+        nonlocal hits, artifact_dir, pronunciation_failure
+        pronunciation_failure = False
         remaining(budget)
         # Present before purchasing clips: a corrupt optional manifest is not audible authority.
         lowered = []
         for clip in requested.clips:
-            clip = replace(clip, text=unicodedata.normalize("NFC", clip.text))
+            normalized = unicodedata.normalize("NFC", clip.text)
+            if clip.pronunciations:
+                try:
+                    if normalized != clip.text:
+                        raise ValueError('pronunciation normalization changed offsets')
+                    speech_input(clip)
+                except Exception:
+                    diagnostics.append(Diagnostic('heteronym', 'invalid_pronunciations_plain_fallback'))
+                    clip = replace(clip, pronunciations=[])
+            clip = replace(clip, text=normalized)
             if not clip.text.strip():
                 lowered.append(replace(clip, pause_after_s=clip.pause_after_s + (0 if requested.executed else 0.25)))
                 continue
             provider = providers[clip.provider]
             if clip.language not in provider.languages or clip.output_format not in provider.formats:
                 raise ValueError("provider does not support clip language/format")
-            lowered.extend(lower_clip(clip, provider.max_request_bytes))
+            minimum_rate = getattr(provider, "minimum_rate",
+                                   ElevenLabsProvider.minimum_rate if clip.provider == "elevenlabs" else 0)
+            if clip.echo and clip.rate < minimum_rate:
+                clip = replace(clip, rate=minimum_rate)
+                diagnostics.append(Diagnostic("voice", "echo_rate_clamped_to_provider_minimum"))
+            parts = tuple(lower_clip(clip, provider.max_request_bytes))
+            if sum(len(c.pronunciations) for c in parts) != len(clip.pronunciations):
+                diagnostics.append(Diagnostic('heteronym', 'provider_limit_plain_fallback'))
+                parts = tuple(lower_clip(replace(clip, pronunciations=[]), provider.max_request_bytes))
+            lowered.extend(parts)
         actual = replace(requested, clips=tuple(lowered), executed=True)
         sections, markdown = present(actual)
         remaining(budget)
@@ -107,11 +129,13 @@ def render(
                         raise ValueError("invalid provider audio")
                     return audio
 
+                pronunciation_failure = bool(clip.pronunciations)
                 audio, hit = (
                     cache.get_or_synthesize(clip, synthesize, deadline=budget, diagnostics=diagnostics)
                     if cache is not None
                     else (synthesize(), False)
                 )
+                pronunciation_failure = False
                 hits += hit
                 remaining(budget)
                 path = scratch / f"{index}.audio"
@@ -133,10 +157,17 @@ def render(
 
     result = None
     try:
-        result = attempt(candidate, lesson_deadline if candidate.lessons else deadline, "note.ogg")
+        result = attempt(candidate, lesson_deadline if candidate.lessons or any(c.pronunciations for c in candidate.clips) else deadline, "note.ogg")
     except Exception as error:
         diagnostics.append(Diagnostic("render", type(error).__name__))
-        if candidate.lessons:
+        if pronunciation_failure:
+            diagnostics.append(Diagnostic("heteronym", "provider_error_plain_fallback"))
+            candidate = replace(candidate, clips=tuple(replace(c, pronunciations=[]) for c in candidate.clips))
+            try:
+                result = attempt(candidate, lesson_deadline if candidate.lessons else deadline, "plain.ogg")
+            except Exception as plain_error:
+                diagnostics.append(Diagnostic("plain_render", type(plain_error).__name__))
+        if result is None and (candidate.lessons or any(c.pronunciations for c in candidate.clips)):
             try:
                 result = attempt(english, deadline, "english.ogg")
             except Exception as fallback_error:

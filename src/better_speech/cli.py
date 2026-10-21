@@ -19,20 +19,25 @@ from .rendering import render
 
 
 def parser():
-    root = argparse.ArgumentParser(prog="speak", description="Vietnamese lessons inside English voice notes")
+    root = argparse.ArgumentParser(prog="speak", description="Vietnamese lexicon lessons inside English voice notes")
     commands = root.add_subparsers(dest="command", required=True)
     for name in ("plan", "render", "learn", "learned", "due"):
-        command = commands.add_parser(name)
+        command = commands.add_parser(name, help={
+            "learn": "add or edit a lexicon entry", "due": "show due lexicon entries",
+            "learned": "mark a lexicon entry learned",
+        }.get(name))
         command.add_argument("--profile", type=Path)
         command.add_argument("--learner")
         if name in ("plan", "render"):
             command.add_argument("input", type=Path)
+            command.add_argument("--greeting", action="store_true", help="open with a Vietnamese greeting")
         if name == "render":
             command.add_argument("--out", required=True, type=Path)
             command.add_argument("--cache", type=Path)
         if name == "learn":
             command.add_argument("phrase")
             command.add_argument("--gloss", required=True)
+            command.add_argument("--hint")
         if name == "learned":
             command.add_argument("key")
     return root
@@ -46,13 +51,13 @@ def main(argv=None):
             profile = replace(profile, learner_id=args.learner)
         ledger = Ledger.for_profile(profile)
         if args.command == "learn":
-            print(json.dumps(learn(args.phrase, args.gloss, profile, ledger=ledger), ensure_ascii=False, indent=2))
+            print(json.dumps(learn(args.phrase, args.gloss, profile, ledger=ledger, hint=args.hint), ensure_ascii=False, indent=2))
         elif args.command == "learned":
             print(json.dumps(learned(args.key, profile, ledger=ledger), ensure_ascii=False, indent=2))
         elif args.command == "due":
             print(json.dumps(due(profile, ledger=ledger), ensure_ascii=False, indent=2))
         else:
-            plan = compile(args.input.read_text(encoding="utf-8"), profile, ledger=ledger)
+            plan = compile(args.input.read_text(encoding="utf-8"), profile, ledger=ledger, greeting=args.greeting)
             if args.command == "plan":
                 print(json.dumps(plan.to_dict(), ensure_ascii=False, indent=2))
             else:

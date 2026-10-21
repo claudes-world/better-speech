@@ -48,10 +48,10 @@ def test_executed_blank_span_rerender_preserves_plan_identity_and_audio(tmp_path
     def choose(payload, **kwargs):
         return json.dumps({"placements": [
             {"phraseId": payload["inventory"][0]["id"], "slotId": "end:6"},
-            {"phraseId": payload["inventory"][1]["id"], "slotId": "start:8"},
+            {"phraseId": payload["inventory"][1]["id"], "slotId": "start:7"},
         ]})
 
-    plan = compile("First.\n\nSecond.", replace(profile(), model="fake"),
+    plan = compile("# First.\n\nSecond.", replace(profile(), model="fake"),
                    ledger=SeenLedger(), model_call=choose)
     assert [c.pause_after_s for c in plan.clips if not c.text.strip()] == [0]
     provider = ToneProvider()

@@ -88,12 +88,14 @@ def test_cli_render_prints_executed_transcript(config, tmp_path, monkeypatch, ca
                 str(config),
                 "--cache",
                 str(tmp_path / "cache"),
+                "--greeting",
             ]
         )
         == 0
     )
     markdown = capsys.readouterr().out
-    assert "<summary>🇻🇳 Vietnamese lesson</summary>" in markdown and "Links" in markdown
+    assert "<summary>🇻🇳 Vietnamese lexicon</summary>" in markdown and "Links" in markdown
+    assert any(phrase in markdown for phrase in ("Chào", "Xin chào", "Chúc ngủ ngon"))
     assert output.read_bytes().startswith(b"OggS")
     assert not (tmp_path / "state/ledger.sqlite3").exists()
 
@@ -159,6 +161,6 @@ def test_cli_text_degradation_removes_previous_successful_output(config, tmp_pat
     assert main(args) == 0
     printed = capsys.readouterr()
     assert "A different complete note." in printed.out
-    assert "Vietnamese lesson" not in printed.out
+    assert "Vietnamese lexicon" not in printed.out
     assert "english_render" in printed.err
     assert not output.exists()

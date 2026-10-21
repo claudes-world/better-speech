@@ -1,5 +1,8 @@
 # Explicitly use the model-free path for a first listen.
 model = "none"
+# Heteronyms default on with a model, off with model = "none".
+heteronyms = false
+anchor_floor_days = 7
 codex_model = "gpt-6-luna"
 claude_model = "claude-haiku-5-5"
 agy_model = "gemini-3-flash"
@@ -9,6 +12,7 @@ enabled = true
 intensity = 1
 repeat = true
 repeat_second_voice = true
+echo_rate = 0.75
 voices_file = "voices.vi.json"
 model_timeout_s = 5
 provider_timeout_s = 60

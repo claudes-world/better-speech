@@ -98,6 +98,7 @@ def sequence_clips(
     main: Voice,
     settings: Mapping,
     protected_ranges: Sequence[tuple[int, int]] = (),
+    opener_offsets: Sequence[int] = (0,),
 ) -> tuple[tuple[Clip, ...], str | None]:
     """Frozen source/speech separation after ID/slot semantic selection.
 
@@ -122,8 +123,8 @@ def sequence_clips(
     for key in ("repeat", "repeatSecondVoice"):
         if type(cfg[key]) is not bool:
             cfg[key] = DEFAULTS[key]
-    starts, ends = paragraph_boundaries(source)
-    boundaries = starts | ends
+    _, ends = paragraph_boundaries(source)
+    starts = frozenset(opener_offsets)
 
     def source_steps(start, end):
         return [_tts(source[start:end], source[start:end], main, purpose="source",
@@ -149,7 +150,7 @@ def sequence_clips(
         seen: set[str] = set()
         counts = {"connector": 0, "learning_sentence": 0}
         cursor = 0
-        for placement in sorted(placements, key=lambda p: p.offset):
+        for placement in sorted(placements, key=lambda p: (p.offset, p.mode == "close")):
             if placement.lesson_id not in entries:
                 continue  # unknown ID drops only this placement
             record = entries[placement.lesson_id]
@@ -157,7 +158,7 @@ def sequence_clips(
             if (
                 type(offset) is not int
                 or not 0 <= offset <= len(source)
-                or offset not in boundaries
+                or offset not in (starts if placement.position == "start" else ends)
                 or any(a < offset < b for a, b in protected_ranges)
             ):
                 raise ValueError("lesson is not at an authorized source boundary")
@@ -208,6 +209,8 @@ def sequence_clips(
                     if occurrence == 1 or placement.level == 2 or not cfg["repeatSecondVoice"]
                     else placement.echo
                 )
+                if occurrence == 2 and "echo_rate" in cfg:
+                    voice = replace(voice, rate=cfg["echo_rate"])
                 profile = resolve_profile(
                     cfg.get("pacing", {}), slot=f"{placement.position}_{occurrence}", voice=voice.voice
                 )
@@ -222,11 +225,11 @@ def sequence_clips(
                         if i:
                             rendered.append(silence(unit_break))
                         rendered.append(
-                            _tts(unit, unit, voice, purpose="lesson", phrase_key=identity)
+                            _tts(unit, unit, voice, purpose="lesson", phrase_key=identity, echo=occurrence == 2)
                         )
                     return rendered
                 paced = compile_lesson(dict(record), profile=profile)
-                return [_tts(paced.rendered, phrase, voice, purpose="lesson", phrase_key=identity)]
+                return [_tts(paced.rendered, phrase, voice, purpose="lesson", phrase_key=identity, echo=occurrence == 2)]
 
             lesson_cfg = {
                 **cfg,

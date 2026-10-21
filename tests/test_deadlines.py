@@ -18,7 +18,7 @@ def test_deadline_hit_during_lesson_yields_english(tmp_path):
         plan, {"google": ToneProvider(), "elevenlabs": SlowNative()}, tmp_path, deadline=time.monotonic() + 4
     )
     assert result.audio_path and result.plan.status == "english", result.diagnostics
-    assert not result.plan.lessons and "Vietnamese lesson" not in result.markdown
+    assert not result.plan.lessons and "Vietnamese lexicon" not in result.markdown
     assert "".join(c.text for c in result.plan.clips) == plan.speech_text
 
 

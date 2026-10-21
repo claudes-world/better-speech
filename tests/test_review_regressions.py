@@ -120,7 +120,7 @@ def test_render_setup_and_optional_metadata_fail_open(tmp_path, monkeypatch, fai
     else:
         assert result.status == "english" and result.audio_path
     if failure != "cache":
-        assert not result.plan.lessons and "Vietnamese lesson" not in result.markdown
+        assert not result.plan.lessons and "Vietnamese lexicon" not in result.markdown
     assert "Complete source." in result.markdown
 
 
@@ -138,7 +138,7 @@ def test_audio_hash_failure_renders_complete_english(tmp_path, monkeypatch):
     monkeypatch.setattr(Path, "open", open_file)
     result = render(plan, {"google": ToneProvider(), "elevenlabs": ToneProvider()}, tmp_path)
     assert failed and result.audio_path and result.status == "english"
-    assert not result.plan.lessons and "Vietnamese lesson" not in result.markdown
+    assert not result.plan.lessons and "Vietnamese lexicon" not in result.markdown
 
 
 def test_provider_returning_after_its_timeout_yields_english(tmp_path):

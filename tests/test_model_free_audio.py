@@ -64,7 +64,7 @@ def test_bilingual_ogg_with_no_model_executable(tmp_path, monkeypatch):
     assert result.audio_path and result.audio_path.read_bytes().startswith(b"OggS"), result.diagnostics
     assert result.plan.executed and result.plan.lessons
     assert [s.kind for s in result.sections] == ["title", "lesson", "transcript"]
-    assert "<summary>🇻🇳 Vietnamese lesson</summary>" in result.markdown
+    assert "<summary>🇻🇳 Vietnamese lexicon</summary>" in result.markdown
     assert "1. **" in result.markdown
     first_count = len(provider.calls)
     again = render(plan, {"google": provider, "elevenlabs": provider}, tmp_path / "cache")
@@ -78,5 +78,5 @@ def test_missing_native_provider_yields_complete_english(tmp_path):
     result = render(plan, {"google": ToneProvider()}, tmp_path / "cache")
     assert result.audio_path and result.plan.status == "english"
     assert not result.plan.lessons
-    assert "Vietnamese lesson" not in result.markdown
+    assert "Vietnamese lexicon" not in result.markdown
     assert "".join(c.text for c in result.plan.clips) == plan.speech_text

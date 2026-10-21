@@ -1,4 +1,4 @@
-"""Google plain-text synthesis, extracted from md-speak's google_synthesize."""
+"""Google text/IPA-SSML synthesis, extracted from md-speak's google_synthesize."""
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ import json
 import time
 
 from ..budget import remaining
+from ..pronunciation import speech_input
 from ..types import Clip
 
 
@@ -38,8 +39,9 @@ class GoogleProvider:
             )
             remaining(deadline)
         settings = json.loads(clip.settings_json)
+        mode, content = speech_input(clip)
         response = self.client.synthesize_speech(
-            input=texttospeech.SynthesisInput(text=clip.text),
+            input=texttospeech.SynthesisInput(**{mode: content}),
             voice=texttospeech.VoiceSelectionParams(
                 language_code="-".join(clip.voice.split("-")[:2]), name=clip.voice
             ),

@@ -24,7 +24,7 @@ consume the prepared utterance result without synthesizing it again.
 `speech_transcript.py:build_presentations()` currently accepts source/title only;
 its `render()` silently skips unknown section kinds, including `lesson`.
 Extend that builder and renderer to accept the **executed** lesson manifest and
-emit the numbered, collapsible **Vietnamese lesson** block. Package `Section`
+emit the numbered, collapsible **Vietnamese lexicon** block. Package `Section`
 objects are not wire-compatible with the host's version-1 presentation mappings.
 Preserve the host's title, link and message-partition rules when mapping them.
 `file_ipc.py` uses that builder and `render_optional` for companion publication;
@@ -33,10 +33,24 @@ both it and `store_modules/runtime_state.py` must consume the revised presentati
 **Inputs and result.** Pass original Markdown; a `Profile` resolved from the lane's
 English voice, explicit Vietnamese roster/weights, pacing and model settings;
 `learner_id` (default `liam`); shared local state/cache paths; optional injected
-`ModelCall`; and host-wrapped provider objects. Credentials stay in those objects.
+`ModelCall`; optional `greeting` (default false);
+and host-wrapped provider objects. Credentials stay in those objects.
 Use one monotonic deadline bounded by the utterance claim, including time to
 persist the result. `model="none"` still teaches the reserved closing phrase.
+English Google clips may carry `pronunciations`, a list of `{word_span: [start, end], ipa}`
+using half-open Python character offsets into that clip's text. Rendering remaps
+spans for provider chunks and counts the actual SSML bytes against request limits.
+An SSML purchase failure retries plain clips with the same lesson manifest within
+the lesson budget; a subsequent lesson failure uses the reserved English fallback.
+Each provider call still goes through the host wrapper and its attempt accounting.
 Plans contain one semantic `Clip` stream; sequencing uses the public `Voice` type.
+The host tracks the last learner message per lane and its two-hour threshold,
+then passes `greeting=True` on the first reply after that gap. The package receives
+only this flag; it owns no gap tracking. False preserves the ordinary no-greeting
+path. The existing lesson mapping also shows each record's
+`hint` as its own italic `say:` line below the literal gloss; it is never spoken.
+These are the week-two host inputs/presentation additions; no other host changes
+are introduced by week two.
 Compilation preserves source spans; rendering lowers clips to bounded provider
 requests and persists those actual clips in the executed plan.
 There is no `spend_hook` parameter. The provider contract is
@@ -68,7 +82,8 @@ class ProviderWrapper:
 
 ```python
 ledger = better_speech.Ledger.for_profile(profile)  # host-owned state destination
-plan = better_speech.compile(text, profile, ledger=ledger, model_call=model_call, deadline=deadline)
+plan = better_speech.compile(text, profile, ledger=ledger, model_call=model_call,
+                            greeting=greeting, deadline=deadline)
 rendering = better_speech.render(
     plan, providers, clip_cache, deadline=deadline,
     render_timeout_s=profile.render_timeout_s, provider_timeout_s=profile.provider_timeout_s,

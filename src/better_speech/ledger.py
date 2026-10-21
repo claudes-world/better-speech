@@ -191,6 +191,13 @@ class Ledger:
                     if deadline is not None:
                         remaining(deadline)
                     records, _ = record_exposures(records, [json.loads(raw)], now=at)
+                if lesson.record.get("category") == "greeting":
+                    records[lesson.phrase_key]["lastGreetingKey"] = lesson.phrase_key
+                    records[lesson.phrase_key]["lastGreetingOrder"] = self._execute(
+                        connection, "SELECT rowid FROM events WHERE learner_id=? AND phrase_key=? "
+                        "ORDER BY delivered_at DESC,rowid DESC LIMIT 1",
+                        (plan.learner_id, lesson.phrase_key), deadline=deadline,
+                    ).fetchone()[0]
                 self._execute(
                     connection,
                     "INSERT INTO phrases VALUES(?,?,?) ON CONFLICT(learner_id,phrase_key) "

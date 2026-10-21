@@ -1,7 +1,12 @@
 # better-speech
 
-Short Vietnamese lessons inside agents' English voice notes. Python 3.12+,
+Short Vietnamese lessons from your lexicon inside agents' English voice notes. Python 3.12+,
 AGPL-3.0. Standalone: no WorldOS dependency, database server, or model HTTP API.
+
+Week two brings a Vietnamese hello when you return after a break, pronunciation
+hints you can read alongside each lesson, and English heteronym pronunciation
+chosen in context. Greetings follow your local time and rotate between visits;
+thank-you and excuse-me phrases keep coming back for practice.
 
 Install ffmpeg on your host, then run this ten-line quickstart from the checkout:
 
@@ -22,7 +27,7 @@ Use the `id` returned by `learn` for `learned` (the sample phrase above is
 `cam-on-nha`). The example selects `model = "none"`: a closing lesson and its
 learning echo work without any model executable. Its Vietnamese roster and lead
 weights are explicit in `examples/voices.vi.json`; the library has no default
-Vietnamese roster. Google receives plain text for English; ElevenLabs receives
+Vietnamese roster. Google receives text with optional IPA pronunciation markup for English; ElevenLabs receives
 Vietnamese. Hosts must configure and authorize both providers.
 
 ```python
@@ -47,14 +52,16 @@ rendering = render(
 receipt = record_delivered(rendering.plan, delivery_id, delivered_at, ledger=ledger)
 ```
 
-`compile(text, profile, *, ledger, model_call=None, now=None, seed=None, deadline=None)` preserves
+`compile(text, profile, *, ledger, model_call=None, now=None, seed=None,
+greeting=False, deadline=None)` preserves
 the source Markdown and produces a serializable `Plan` of `Clip`s: text,
 language, provider, model, voice, rate, format and pause-after. `Plan.to_dict()` /
-`Plan.from_dict()` round-trip its semantic clips, profile/curriculum digests, lesson
+`Plan.from_dict()` round-trip its semantic clips, profile/lexicon digests, lesson
 manifest and diagnostics. The highest eligible learner phrase is reserved for
 the closing lesson: boosted first, then due, then one unseen introduction.
 Intensity 1/2/3 limits placement counts to 2/4/4, with at most two new phrases,
-three contextual connectors and one closing lesson. Enriched text over the
+three contextual connectors and one closing lesson. Openers belong at message start
+or immediately after a `#`, `##` or `###` heading; closers stay at paragraph ends. Enriched text over the
 inherited 12,000 UTF-16-unit budget becomes complete English; source is never
 truncated. Numbered lessons come only from the executed plan.
 
@@ -65,7 +72,7 @@ semantic clips to the resolved provider limit. The host
 wraps these objects to enforce its budget and record every paid attempt. Cache
 hits never call a provider. The result contains a caller-owned temporary Ogg/Opus
 path, rendition artifact identity, audio SHA-256 checksum, executed plan, diagnostic records, Markdown and
-structured title/lesson/transcript/links sections. The **Vietnamese lesson** block
+structured title/lesson/transcript/links sections. The **Vietnamese lexicon** block
 is collapsible. Move/copy the returned file to durable storage and remove its
 temporary directory after use. The CLI handles this when writing `--out`.
 
@@ -90,17 +97,40 @@ Subscription subprocesses, cache lock acquisition and ffmpeg are bounded;
 artifact hashing and presentation also share the deadline. Arbitrary injected
 callbacks must honor their timeout; the library checks again when they return.
 
+The host tracks the message gap per lane and passes `greeting=True` for the first
+reply after its threshold. The default is false. `speak plan` and `speak render`
+accept `--greeting`. Greetings follow the profile timezone, including good-night
+phrases, and confirmed deliveries rotate the next greeting for the learner.
+`anchor_floor_days` (default 7) caps anchor entries' effective due dates after the
+last hearing. `echo_rate` (default 0.75) slows the second Vietnamese occurrence;
+the lead rate and random voice selection stay as configured. Provider minimum
+speeds are applied before synthesis with a diagnostic.
+
+The Vietnamese phrase list is the **lexicon**, stored in `curriculum.vi.json`.
+Every shipped phrase includes a founder-editable English pronunciation `hint`.
+The lesson block shows it as an italic `say:` line below the literal gloss. Add or
+edit your own with `speak learn PHRASE --gloss GLOSS --hint RESPELLING`. Hints are
+visual only.
+
 Set one profile setting to choose the optional contextual placer:
 
 | `model` | Adapter | Model setting/default |
 | --- | --- | --- |
-| `none` | deterministic closing lesson only | no executable |
+| `none` | deterministic lessons and greetings | no executable |
 | `claude` (library default) | `claude -p` subscription login | `claude_model = "claude-haiku-5-5"` |
 | `codex` | `codex exec`, ChatGPT login | `codex_model = "gpt-6-luna"` |
 | `agy` | Antigravity `agy --print`, subscription login | `agy_model = "gemini-3-flash"` |
 
+English heteronyms use the same selected adapter in one separate batch, returning
+only sense IDs from the heteronym table. `heteronyms` defaults to true with a model and false with
+`model="none"`; set it explicitly to override. Google uses IPA SSML for the
+selected spans, and cache keys include these pronunciations. A missing or failed
+sense selection leaves the original English text. If SSML synthesis fails, rendering
+tries plain pronunciation with the lesson intact before the English fallback.
+Vietnamese clips retain their existing randomly selected lead and echo voices.
+
 There is no adapter fallback chain. The selected CLI may choose only offered
-curriculum IDs and boundary IDs; it cannot supply audible text. Missing login,
+lexicon entry IDs and boundary IDs; it cannot supply audible text. Missing login,
 unsupported CLI/model, malformed/late output or an empty response never removes
 the reserved closing lesson. CLI model availability depends on the installed
 subscription tools; all three adapters are tested through real subprocesses
@@ -129,7 +159,7 @@ the host to retry, never trigger a resend.
 
 The content-addressed cache defaults to
 `$XDG_CACHE_HOME/better-speech/clips`. Keys cover provider, model, voice, rate,
-output format, NFC rendered text and effective voice settings. Per-key file locks
+output format, NFC rendered text, pronunciation spans/IPA and effective voice settings. Per-key file locks
 prevent duplicate purchases on concurrent misses while available; bounded lock
 timeouts or unwritable storage bypass the cache with diagnostics. Writes use a
 checksum envelope, temporary file and `os.replace`. Cache bypass can purchase an
@@ -149,7 +179,7 @@ See the exact [WorldOS integration contract](docs/worldos-adapter.md) and
 [source provenance](docs/provenance.md).
 
 Install with `pip install 'better-speech[polyglot,google,elevenlabs]'` or use uv.
-`polyglot` is an intentionally empty convenience extra: curriculum and SQLite
+`polyglot` is an intentionally empty convenience extra: the lexicon and SQLite
 use the standard library. Provider imports are lazy; planning and learning need
 neither SDK. Tests use fake model/provider transports and real ffmpeg, with no
 paid calls. Contributions require assignment to **claudes-world**; see

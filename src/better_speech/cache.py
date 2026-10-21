@@ -98,6 +98,7 @@ def clip_identity(
     response_format: str,
     voice_settings: Mapping,
     input_mode: str = "text",
+    pronunciations=(),
 ) -> ClipIdentity:
     """Hash actual effective request inputs, with stable recursive key order.
 
@@ -122,6 +123,7 @@ def clip_identity(
             "format": response_format,
             "voice_settings": voice_settings,
             "input_mode": input_mode,
+            **({"pronunciations": pronunciations} if pronunciations else {}),
         }
     ).encode("utf-8")
     return ClipIdentity(
@@ -152,8 +154,10 @@ class ClipCache:
         from filelock import FileLock, Timeout
 
         from .budget import remaining
+        from .pronunciation import speech_input
         from .types import Diagnostic
 
+        mode, _ = speech_input(clip)
         identity = clip_identity(
             provider=clip.provider,
             model=clip.model,
@@ -162,6 +166,8 @@ class ClipCache:
             text=clip.text,
             response_format=clip.output_format,
             voice_settings=json.loads(clip.settings_json),
+            input_mode=mode,
+            pronunciations=clip.pronunciations if mode == "ssml" else (),
         )
         path = self.directory / (identity.cache_key + ".clip")
 

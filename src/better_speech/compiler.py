@@ -8,13 +8,14 @@ import re
 import time
 import unicodedata
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 from .boundaries import paragraph_boundaries
 from .budget import phase_deadline, remaining
 from .config import resolve_profile
 from .curriculum import runtime_curriculum
-from .exposure import timestamp
-from .markdown import markdown_to_speech_text
+from .exposure import anchor_floor, timestamp
+from .markdown import markdown_to_speech_structure
 from .planner import LessonPlacement, sequence_clips
 from .rewriter import parse_placements
 from .types import Diagnostic, Lesson, Plan, Profile, canonical_json, digest
@@ -49,6 +50,7 @@ def compile(
     ledger,
     now: datetime | str | None = None,
     seed: str | int | None = None,
+    greeting: bool = False,
     deadline: float | None = None,
 ) -> Plan:
     """Compile without synthesis or exposure writes; replace invalid Unicode scalars with U+FFFD."""
@@ -59,9 +61,9 @@ def compile(
     model_deadline = phase_deadline(deadline, profile.fallback_reserve_s)
     diagnostics = [Diagnostic("config", reason) for reason in profile.config_diagnostics]
     try:
-        speech = markdown_to_speech_text(text)
+        speech, openers = markdown_to_speech_structure(text)
     except Exception:
-        speech = text
+        speech, openers = text, frozenset({0})
         diagnostics.append(Diagnostic("markdown", "normalization_failed"))
     main = profile.english
     fallback, _ = sequence_clips(speech, inventory=(), placements=(), main=main, settings={})
@@ -86,6 +88,7 @@ def compile(
             raise
         rows = runtime_curriculum(profile, additions=additions)
         curriculum_hash = digest(rows)
+        records = anchor_floor(rows, records, profile.anchor_floor_days)
         if not profile.enabled or not speech.strip():
             diagnostics.append(Diagnostic("lesson", "disabled" if not profile.enabled else "empty_source"))
         else:
@@ -104,7 +107,7 @@ def compile(
                 repeat=True,
                 second_voice=profile.repeat_second_voice,
             )
-            ranked = _rank(rows, records, at)
+            ranked = _rank([r for r in rows if r.get("category") != "greeting"], records, at)
             # Reserve the top boosted/due item. On a fresh queue, introduce one unseen item.
             candidates = [r for r in ranked if (
                 not records.get(r["ledger_identity"])
@@ -115,6 +118,7 @@ def compile(
             settings = {
                 "repeat": profile.repeat,
                 "repeatSecondVoice": profile.repeat_second_voice,
+                "echo_rate": profile.echo_rate,
                 "pauseS": profile.pause_s,
                 "chunkPauseS": profile.chunk_pause_s,
                 "repeatPauseS": profile.repeat_pause_s,
@@ -125,7 +129,7 @@ def compile(
             def build(choices):
                 curated, placements = [], []
                 for row, offset, position, mode in choices:
-                    # Any curriculum phrase may be taught as the reserved closing lesson.
+                    # Any lexicon entry may be taught as the reserved closing lesson.
                     row = {**row, "lesson_type": "learning_sentence" if mode == "close" else "connector"}
                     curated.append(row)
                     placements.append(
@@ -140,7 +144,8 @@ def compile(
                         )
                     )
                 return curated, sequence_clips(
-                    speech, inventory=curated, placements=placements, main=main, settings=settings
+                    speech, inventory=curated, placements=placements, main=main, settings=settings,
+                    opener_offsets=openers
                 )
 
             reserved_rows, reserved_plan = build(chosen)
@@ -152,10 +157,34 @@ def compile(
                     reserved_rows, reserved_plan = candidate_rows, candidate_plan
                     break
                 diagnostics.append(Diagnostic("lesson", "rejected_candidate:" + candidate["id"]))
+            if greeting:
+                try:
+                    current = datetime.fromisoformat(at.replace("Z", "+00:00"))
+                    hour = current.astimezone(ZoneInfo(profile.timezone)).hour
+                    period = ("morning" if 5 <= hour < 12 else "afternoon" if 12 <= hour < 18
+                              else "evening" if 18 <= hour < 22 else "night")
+                    previous = max(
+                        ((r["lastHeard"], r.get("lastGreetingOrder", 0), r["lastGreetingKey"])
+                         for r in records.values() if r.get("lastGreetingKey")), default=("", 0, ""),
+                    )[2]
+                    greetings = [r for r in rows if r.get("category") == "greeting"
+                                 and r.get("time_of_day") in (period, "any")
+                                 and r["ledger_identity"] != previous]
+                    if greetings and len(chosen) < maximum:
+                        row = greetings[min(int(rng() * len(greetings)), len(greetings) - 1)]
+                        choices = [(row, 0, "start", "open"), *chosen]
+                        greeting_rows, greeting_plan = build(choices)
+                        if not greeting_plan[1]:
+                            chosen, reserved_rows, reserved_plan = choices, greeting_rows, greeting_plan
+                except Exception as error:
+                    diagnostics.append(Diagnostic("greeting", type(error).__name__))
             remaining(deadline)
             # Deterministic closing slot is unavailable to optional contextual selection.
-            starts, ends = paragraph_boundaries(speech)
+            _, ends = paragraph_boundaries(speech)
+            starts = openers
             slots = {f"start:{offset}": (offset, "start") for offset in starts}
+            if any(r.get("category") == "greeting" for r, *_ in chosen):
+                slots.pop("start:0", None)
             slots.update({f"end:{offset}": (offset, "end") for offset in ends if offset != len(speech)})
             offered = [
                 r
@@ -237,6 +266,10 @@ def compile(
             )
         )
         primary, selected = fallback, ()
+    from .heteronyms import apply
+
+    primary, heteronym_diagnostics = apply(primary, profile, model_call, deadline=model_deadline)
+    diagnostics.extend(heteronym_diagnostics)
     return Plan(
         digest([profile.learner_id, curriculum_hash, text, profile_hash]),
         text,
