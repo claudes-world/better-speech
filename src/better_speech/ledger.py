@@ -191,6 +191,8 @@ class Ledger:
                     if deadline is not None:
                         remaining(deadline)
                     records, _ = record_exposures(records, [json.loads(raw)], now=at)
+                if lesson.record.get("category") == "greeting":
+                    records[lesson.phrase_key]["lastGreetingKey"] = lesson.phrase_key
                 self._execute(
                     connection,
                     "INSERT INTO phrases VALUES(?,?,?) ON CONFLICT(learner_id,phrase_key) "

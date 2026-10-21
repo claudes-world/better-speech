@@ -63,6 +63,7 @@ class Profile:
     codex_model: str = "gpt-6-luna"
     agy_model: str = "gemini-3-flash"
     timezone: str = "Asia/Ho_Chi_Minh"
+    greeting_gap_hours: float = 2.0
     intensity: int = 1
     repeat: bool = True
     repeat_second_voice: bool = True

@@ -8,6 +8,7 @@ import re
 import time
 import unicodedata
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 from .boundaries import paragraph_boundaries
 from .budget import phase_deadline, remaining
@@ -49,6 +50,7 @@ def compile(
     ledger,
     now: datetime | str | None = None,
     seed: str | int | None = None,
+    last_learner_message_at: datetime | str | None = None,
     deadline: float | None = None,
 ) -> Plan:
     """Compile without synthesis or exposure writes; replace invalid Unicode scalars with U+FFFD."""
@@ -104,7 +106,7 @@ def compile(
                 repeat=True,
                 second_voice=profile.repeat_second_voice,
             )
-            ranked = _rank(rows, records, at)
+            ranked = _rank([r for r in rows if r.get("category") != "greeting"], records, at)
             # Reserve the top boosted/due item. On a fresh queue, introduce one unseen item.
             candidates = [r for r in ranked if (
                 not records.get(r["ledger_identity"])
@@ -152,10 +154,38 @@ def compile(
                     reserved_rows, reserved_plan = candidate_rows, candidate_plan
                     break
                 diagnostics.append(Diagnostic("lesson", "rejected_candidate:" + candidate["id"]))
+            if last_learner_message_at is not None:
+                try:
+                    last = timestamp(last_learner_message_at.isoformat()
+                                     if isinstance(last_learner_message_at, datetime) else last_learner_message_at)
+                    current = datetime.fromisoformat(at.replace("Z", "+00:00"))
+                    if last is None:
+                        raise ValueError("invalid greeting gap")
+                    gap = (current - datetime.fromisoformat(last.replace("Z", "+00:00"))).total_seconds()
+                    if gap >= profile.greeting_gap_hours * 3600:
+                        hour = current.astimezone(ZoneInfo(profile.timezone)).hour
+                        period = "morning" if 5 <= hour < 12 else "afternoon" if 12 <= hour < 18 else "evening"
+                        previous = max(
+                            ((r["lastHeard"], r["lastGreetingKey"]) for r in records.values()
+                             if r.get("lastGreetingKey")), default=("", ""),
+                        )[1]
+                        greetings = [r for r in rows if r.get("category") == "greeting"
+                                     and r.get("time_of_day") in (period, "any")
+                                     and r["ledger_identity"] != previous]
+                        if greetings and len(chosen) < maximum:
+                            greeting = greetings[min(int(rng() * len(greetings)), len(greetings) - 1)]
+                            choices = [(greeting, 0, "start", "open"), *chosen]
+                            greeting_rows, greeting_plan = build(choices)
+                            if not greeting_plan[1]:
+                                chosen, reserved_rows, reserved_plan = choices, greeting_rows, greeting_plan
+                except Exception as error:
+                    diagnostics.append(Diagnostic("greeting", type(error).__name__))
             remaining(deadline)
             # Deterministic closing slot is unavailable to optional contextual selection.
             starts, ends = paragraph_boundaries(speech)
             slots = {f"start:{offset}": (offset, "start") for offset in starts}
+            if any(r.get("category") == "greeting" for r, *_ in chosen):
+                slots.pop("start:0", None)
             slots.update({f"end:{offset}": (offset, "end") for offset in ends if offset != len(speech)})
             offered = [
                 r
