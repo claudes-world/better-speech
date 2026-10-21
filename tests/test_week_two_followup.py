@@ -29,6 +29,23 @@ def test_example_echo_pool_excludes_weight_one_and_keeps_variety():
     assert leads == {v.voice for v in cfg.voices}
 
 
+def test_example_echo_pool_is_uniform_without_accent_or_weight_bias():
+    cfg = load_profile("examples/profile.toml")
+    total = sum(v.weight for v in cfg.voices)
+    before = 0
+    for lead in cfg.voices:
+        eligible = [v for v in cfg.voices if v.weight > 1 and v.voice != lead.voice]
+        for index, expected in enumerate(eligible):
+            draws = iter(((before + lead.weight / 2) / total, (index + 0.5) / len(eligible)))
+            choice = choose_lesson_voices(
+                main=cfg.english, pool=cfg.voices,
+                weights={v.voice: v.weight for v in cfg.voices}, random=lambda: next(draws),
+            )
+            assert choice.lead == lead
+            assert choice.echo == expected
+        before += lead.weight
+
+
 @pytest.mark.parametrize("weight", [0, 0.5, 1])
 def test_small_echo_pool_never_reuses_low_weight_lead(weight):
     pool = (Voice("low", weight=weight), Voice("high", weight=2))
