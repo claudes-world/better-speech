@@ -22,11 +22,20 @@ from .types import Diagnostic, Lesson, Plan, Profile, canonical_json, digest
 from .voices import choose_lesson_voices
 
 
-def _rank(rows, records, now):
+def _boost_pending(row, now):
+    return not row.get("landed") and (
+        row.get("pending_learning") is True or (timestamp(row.get("boost_until")) or "") > now
+    )
+
+
+def _boosted(row, records, now, cap):
+    return _boost_pending(row, now) and records.get(row["ledger_identity"], {}).get("dailyCount", 0) < cap
+
+
+def _rank(rows, records, now, boost_daily_cap=3):
     def priority(row):
         record = records.get(row["ledger_identity"], {})
-        boost = timestamp(row.get("boost_until"))
-        boosted = bool(boost and boost > now and not row.get("landed"))
+        boosted = _boosted(row, records, now, boost_daily_cap)
         due = bool(record.get("dueAt") and record["dueAt"] <= now)
         unseen = not record
         if boosted:
@@ -39,7 +48,8 @@ def _rank(rows, records, now):
             row.get("added_at", ""),
         )
 
-    return sorted(rows, key=priority)
+    return sorted((row for row in rows if not _boost_pending(row, now)
+                   or _boosted(row, records, now, boost_daily_cap)), key=priority)
 
 
 def compile(
@@ -82,7 +92,9 @@ def compile(
         if at is None:
             raise ValueError("invalid selection time")
         try:
-            records, additions = ledger.learner_state(profile.learner_id, deadline=model_deadline)
+            records, additions = ledger.learner_state(
+                profile.learner_id, now=at, timezone=profile.timezone, deadline=model_deadline,
+            )
         except Exception:
             diagnostics.append(Diagnostic("ledger", "snapshot_unavailable"))
             raise
@@ -107,12 +119,13 @@ def compile(
                 repeat=True,
                 second_voice=profile.repeat_second_voice,
             )
-            ranked = _rank([r for r in rows if r.get("category") != "greeting"], records, at)
+            eligible_rows = _rank(rows, records, at, profile.boost_daily_cap)
+            ranked = [r for r in eligible_rows if r.get("category") != "greeting"]
             # Reserve the top boosted/due item. On a fresh queue, introduce one unseen item.
             candidates = [r for r in ranked if (
                 not records.get(r["ledger_identity"])
                 or records[r["ledger_identity"]]["dueAt"] <= at
-                or ((timestamp(r.get("boost_until")) or "") > at and not r.get("landed"))
+                or _boosted(r, records, at, profile.boost_daily_cap)
             )]
             reservation, chosen = None, []
             settings = {
@@ -167,7 +180,7 @@ def compile(
                         ((r["lastHeard"], r.get("lastGreetingOrder", 0), r["lastGreetingKey"])
                          for r in records.values() if r.get("lastGreetingKey")), default=("", 0, ""),
                     )[2]
-                    greetings = [r for r in rows if r.get("category") == "greeting"
+                    greetings = [r for r in eligible_rows if r.get("category") == "greeting"
                                  and r.get("time_of_day") in (period, "any")
                                  and r["ledger_identity"] != previous]
                     if greetings and len(chosen) < maximum:

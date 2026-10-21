@@ -105,6 +105,9 @@ phrases, and confirmed deliveries rotate the next greeting for the learner.
 last hearing. `echo_rate` (default 0.75) slows the second Vietnamese occurrence;
 the lead rate and random voice selection stay as configured. Provider minimum
 speeds are applied before synthesis with a diagnostic.
+Random echo selection excludes voices with lead weights of 1 or lower; with no
+eligible echo voice, the lesson keeps its lead without an echo. Setting
+`repeat_second_voice=false` explicitly reuses the lead.
 
 The Vietnamese phrase list is the **lexicon**, stored in `curriculum.vi.json`.
 Every shipped phrase includes a founder-editable English pronunciation `hint`.
@@ -144,9 +147,14 @@ Learner additions and exposure events live in
 Edits run in one SQLite transaction; compile reads additions and exposures from
 one snapshot. The library requires an explicit `ledger` for compile, learner
 commands and acknowledgement; the CLI resolves it from the profile. `state_dir` overrides the root.
-`learn` boosts to next midnight in the profile's IANA `timezone` (default
-`Asia/Ho_Chi_Minh`) and keeps the learning echo until `learned <key>` marks it
-landed. Neither command records a hearing. `due` lists boosted/due phrases.
+`learn` boosts until `learned <key>` marks it landed, up to `boost_daily_cap`
+confirmed deliveries per phrase per local day (default 3; 0 disables boosting).
+The cap resets at midnight in the profile's IANA `timezone` (default
+`Asia/Ho_Chi_Minh`); capped phrases step aside for ordinary rotation, including
+contextual placements. Plans and echoes do not add to the daily count. Neither
+learner command records a hearing. `due` lists eligible boosted/due phrases.
+When shipped and learner entries share NFC-normalized Vietnamese text, they
+schedule once, with the learner entry's identity, edits and landed state taking precedence.
 `--learner` overrides the profile's default `liam` for every command.
 
 Call `record_delivered(rendering.plan, delivery_id, delivered_at, ledger=ledger)` only after a

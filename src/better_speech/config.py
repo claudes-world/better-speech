@@ -77,6 +77,8 @@ def resolve_profile(profile: Profile) -> Profile:
             raise ValueError("invalid boolean profile field")
         if type(profile.intensity) is not int or profile.intensity not in (1, 2, 3):
             raise ValueError("invalid intensity")
+        if type(profile.boost_daily_cap) is not int or profile.boost_daily_cap < 0:
+            raise ValueError("invalid boost daily cap")
         if not isinstance(profile.learner_id, str) or not profile.learner_id:
             raise ValueError("invalid learner id")
         if any(not isinstance(reason, str) for reason in profile.config_diagnostics):

@@ -6,8 +6,10 @@ import json
 import sqlite3
 import time
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from datetime import time as day_time
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from filelock import FileLock
 
@@ -99,7 +101,7 @@ class Ledger:
             remaining(deadline)
         return cursor
 
-    def learner_state(self, learner_id, *, deadline=None):
+    def learner_state(self, learner_id, *, now=None, timezone=None, deadline=None):
         """Read exposure history and learner additions from one SQLite snapshot."""
         if not self.path.exists():
             return {}, []
@@ -113,6 +115,16 @@ class Ledger:
                     (learner_id,), deadline=deadline,
                 )
             }
+            if now is not None:
+                local = datetime.fromisoformat(now.replace("Z", "+00:00")).astimezone(ZoneInfo(timezone))
+                start = datetime.combine(local.date(), day_time(), local.tzinfo)
+                end = datetime.combine(local.date() + timedelta(days=1), day_time(), local.tzinfo)
+                for key, count in self._execute(
+                    connection, "SELECT phrase_key, COUNT(*) FROM events WHERE learner_id=? "
+                    "AND delivered_at>=? AND delivered_at<? GROUP BY phrase_key",
+                    (learner_id, timestamp(start.isoformat()), timestamp(end.isoformat())), deadline=deadline,
+                ):
+                    records[key]["dailyCount"] = count
             rows = self._learner_rows(connection, learner_id, deadline=deadline)
             return records, rows
         finally:

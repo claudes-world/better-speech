@@ -44,7 +44,7 @@ class ToneProvider:
 def profile(**kwargs):
     return Profile(
         model="none",
-        voices=(Voice("native-central", region="central"), Voice("native-south", region="southern")),
+        voices=(Voice("native-central", region="central", weight=2), Voice("native-south", region="southern", weight=2)),
         **kwargs,
     )
 
