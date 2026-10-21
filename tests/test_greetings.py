@@ -1,9 +1,10 @@
 from dataclasses import replace
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 import pytest
 
 from better_speech import compile
+from better_speech.cli import main
 from better_speech.ledger import Ledger, record_delivered
 from better_speech.transcript import present
 from tests.test_model_free_audio import profile
@@ -15,12 +16,11 @@ def greetings(plan):
     return [r for r in plan.lessons if r.record.get('category') == 'greeting']
 
 
-@pytest.mark.parametrize('gap,expected', [(None, 0), (1.99, 0), (2, 1), (8, 1), (-1, 0)])
+@pytest.mark.parametrize('flag,expected', [(False, 0), (True, 1)])
 @pytest.mark.parametrize('text', ['Body without a heading.', '# Heading\n\nBody.'])
-def test_greeting_gap_and_first_audible_clip(tmp_path, gap, expected, text):
+def test_greeting_flag_and_first_audible_clip(tmp_path, flag, expected, text):
     cfg = profile(timezone='America/New_York')
-    last = NOW - timedelta(hours=gap) if gap is not None else None
-    plan = compile(text, cfg, ledger=Ledger(tmp_path / 'ledger'), now=NOW, last_learner_message_at=last)
+    plan = compile(text, cfg, ledger=Ledger(tmp_path / 'ledger'), now=NOW, greeting=flag)
     assert len(greetings(plan)) == expected
     assert len(plan.lessons) == 1 + expected
     assert ''.join(c.text for c in plan.clips if c.purpose == 'source') == plan.speech_text
@@ -33,21 +33,23 @@ def test_greeting_gap_and_first_audible_clip(tmp_path, gap, expected, text):
 
 
 @pytest.mark.parametrize('zone,hour,period', [('UTC', 6, 'morning'), ('UTC', 15, 'afternoon'),
-                                           ('UTC', 21, 'evening'), ('Asia/Ho_Chi_Minh', 2, 'morning')])
+    ('UTC', 21, 'evening'), ('UTC', 23, 'night'), ('UTC', 3, 'night'), ('Asia/Ho_Chi_Minh', 2, 'morning')])
 def test_greeting_profile_timezone(tmp_path, zone, hour, period):
     now = NOW.replace(hour=hour)
-    for seed in range(12):
+    seen = set()
+    for seed in range(16):
         plan = compile('Note.', profile(timezone=zone), ledger=Ledger(tmp_path / 'ledger'), now=now,
-                       seed=seed, last_learner_message_at=(now - timedelta(hours=3)).isoformat())
+                       seed=seed, greeting=True)
         assert greetings(plan)[0].record['time_of_day'] in (period, 'any')
+        seen.add(greetings(plan)[0].record['time_of_day'])
+    assert period in seen
 
 
 def test_rotation_is_per_learner_and_delivered_only(tmp_path):
     ledger = Ledger(tmp_path / 'ledger')
     cfg = profile()
     def prepare(cfg=cfg):
-        return compile('Note.', cfg, ledger=ledger, now=NOW, seed=5,
-                       last_learner_message_at=NOW - timedelta(hours=3))
+        return compile('Note.', cfg, ledger=ledger, now=NOW, seed=5, greeting=True)
     first = prepare()
     assert greetings(prepare()) == greetings(first)
     assert not record_delivered(replace(first, executed=True), 'first', NOW, ledger=ledger).diagnostics
@@ -57,24 +59,25 @@ def test_rotation_is_per_learner_and_delivered_only(tmp_path):
     assert ledger.snapshot()[key]['lastGreetingKey'] == key
 
 
-def test_custom_gap_and_invalid_gap_input_fail_open(tmp_path):
-    cfg = profile(greeting_gap_hours=1)
-    plan = compile('Note.', cfg, ledger=Ledger(tmp_path / 'ledger'), now=NOW,
-                   last_learner_message_at=NOW - timedelta(hours=1))
-    assert greetings(plan)
-    invalid = compile('Note.', cfg, ledger=Ledger(tmp_path / 'ledger'), now=NOW,
-                      last_learner_message_at='unknown')
-    assert invalid.status == 'bilingual' and not greetings(invalid)
-    assert any(d.stage == 'greeting' for d in invalid.diagnostics)
-
-
 def test_rotation_on_equal_confirmation_timestamps(tmp_path):
     ledger = Ledger(tmp_path / 'ledger')
     previous = None
     for index in range(8):
-        plan = compile('Note.', profile(), ledger=ledger, now=NOW, seed=5,
-                       last_learner_message_at=NOW - timedelta(hours=3))
+        plan = compile('Note.', profile(), ledger=ledger, now=NOW, seed=5, greeting=True)
         key = greetings(plan)[0].phrase_key
         assert key != previous
         record_delivered(replace(plan, executed=True), f'delivery-{index}', NOW, ledger=ledger)
         previous = key
+
+
+def test_default_flag_and_cli_plan_flag(tmp_path, capsys):
+    cfg = profile()
+    assert not greetings(compile('Note.', cfg, ledger=Ledger(tmp_path / 'ledger')))
+    config = tmp_path / 'profile.toml'
+    config.write_text('model="none"\nstate_dir="state"\n[[voices]]\nvoice="native"\n')
+    source = tmp_path / 'note.md'
+    source.write_text('Note.')
+    assert main(['plan', str(source), '--profile', str(config), '--greeting']) == 0
+    import json
+    plan = json.loads(capsys.readouterr().out)
+    assert any('"category":"greeting"' in r['record_json'] for r in plan['lessons'])

@@ -50,7 +50,7 @@ def compile(
     ledger,
     now: datetime | str | None = None,
     seed: str | int | None = None,
-    last_learner_message_at: datetime | str | None = None,
+    greeting: bool = False,
     deadline: float | None = None,
 ) -> Plan:
     """Compile without synthesis or exposure writes; replace invalid Unicode scalars with U+FFFD."""
@@ -118,6 +118,7 @@ def compile(
             settings = {
                 "repeat": profile.repeat,
                 "repeatSecondVoice": profile.repeat_second_voice,
+                "echo_rate": profile.echo_rate,
                 "pauseS": profile.pause_s,
                 "chunkPauseS": profile.chunk_pause_s,
                 "repeatPauseS": profile.repeat_pause_s,
@@ -128,7 +129,7 @@ def compile(
             def build(choices):
                 curated, placements = [], []
                 for row, offset, position, mode in choices:
-                    # Any curriculum phrase may be taught as the reserved closing lesson.
+                    # Any lexicon entry may be taught as the reserved closing lesson.
                     row = {**row, "lesson_type": "learning_sentence" if mode == "close" else "connector"}
                     curated.append(row)
                     placements.append(
@@ -156,30 +157,25 @@ def compile(
                     reserved_rows, reserved_plan = candidate_rows, candidate_plan
                     break
                 diagnostics.append(Diagnostic("lesson", "rejected_candidate:" + candidate["id"]))
-            if last_learner_message_at is not None:
+            if greeting:
                 try:
-                    last = timestamp(last_learner_message_at.isoformat()
-                                     if isinstance(last_learner_message_at, datetime) else last_learner_message_at)
                     current = datetime.fromisoformat(at.replace("Z", "+00:00"))
-                    if last is None:
-                        raise ValueError("invalid greeting gap")
-                    gap = (current - datetime.fromisoformat(last.replace("Z", "+00:00"))).total_seconds()
-                    if gap >= profile.greeting_gap_hours * 3600:
-                        hour = current.astimezone(ZoneInfo(profile.timezone)).hour
-                        period = "morning" if 5 <= hour < 12 else "afternoon" if 12 <= hour < 18 else "evening"
-                        previous = max(
-                            ((r["lastHeard"], r.get("lastGreetingOrder", 0), r["lastGreetingKey"]) for r in records.values()
-                             if r.get("lastGreetingKey")), default=("", 0, ""),
-                        )[2]
-                        greetings = [r for r in rows if r.get("category") == "greeting"
-                                     and r.get("time_of_day") in (period, "any")
-                                     and r["ledger_identity"] != previous]
-                        if greetings and len(chosen) < maximum:
-                            greeting = greetings[min(int(rng() * len(greetings)), len(greetings) - 1)]
-                            choices = [(greeting, 0, "start", "open"), *chosen]
-                            greeting_rows, greeting_plan = build(choices)
-                            if not greeting_plan[1]:
-                                chosen, reserved_rows, reserved_plan = choices, greeting_rows, greeting_plan
+                    hour = current.astimezone(ZoneInfo(profile.timezone)).hour
+                    period = ("morning" if 5 <= hour < 12 else "afternoon" if 12 <= hour < 18
+                              else "evening" if 18 <= hour < 22 else "night")
+                    previous = max(
+                        ((r["lastHeard"], r.get("lastGreetingOrder", 0), r["lastGreetingKey"])
+                         for r in records.values() if r.get("lastGreetingKey")), default=("", 0, ""),
+                    )[2]
+                    greetings = [r for r in rows if r.get("category") == "greeting"
+                                 and r.get("time_of_day") in (period, "any")
+                                 and r["ledger_identity"] != previous]
+                    if greetings and len(chosen) < maximum:
+                        row = greetings[min(int(rng() * len(greetings)), len(greetings) - 1)]
+                        choices = [(row, 0, "start", "open"), *chosen]
+                        greeting_rows, greeting_plan = build(choices)
+                        if not greeting_plan[1]:
+                            chosen, reserved_rows, reserved_plan = choices, greeting_rows, greeting_plan
                 except Exception as error:
                     diagnostics.append(Diagnostic("greeting", type(error).__name__))
             remaining(deadline)

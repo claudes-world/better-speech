@@ -64,11 +64,11 @@ class Profile:
     codex_model: str = "gpt-6-luna"
     agy_model: str = "gemini-3-flash"
     timezone: str = "Asia/Ho_Chi_Minh"
-    greeting_gap_hours: float = 2.0
     anchor_floor_days: float = 7
     intensity: int = 1
     repeat: bool = True
     repeat_second_voice: bool = True
+    echo_rate: float = 0.75
     pause_s: float = 0.6
     chunk_pause_s: float = 0.4
     repeat_pause_s: float = 1.0
@@ -115,6 +115,7 @@ class Clip:
     source_start: int | None = None
     source_end: int | None = None
     pronunciations: list[dict] = field(default_factory=list)
+    echo: bool = False
 
 
 @dataclass(frozen=True)
@@ -151,7 +152,7 @@ class Plan:
         object.__setattr__(
             self,
             "executed_digest",
-            digest([[{k: v for k, v in asdict(clip).items() if k != "pronunciations" or v}
+            digest([[{k: v for k, v in asdict(clip).items() if k not in {"pronunciations", "echo"} or v}
                      for clip in self.clips], [asdict(lesson) for lesson in self.lessons]])
             if self.executed
             else None,

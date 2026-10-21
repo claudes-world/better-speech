@@ -17,6 +17,7 @@ from .chunking import lower_clip
 from .config import cache_dir
 from .executor import AudioPart
 from .pronunciation import speech_input
+from .providers.elevenlabs import ElevenLabsProvider
 from .transcript import present
 from .types import Diagnostic, Rendering, Section, digest
 
@@ -91,6 +92,11 @@ def render(
             provider = providers[clip.provider]
             if clip.language not in provider.languages or clip.output_format not in provider.formats:
                 raise ValueError("provider does not support clip language/format")
+            minimum_rate = getattr(provider, "minimum_rate",
+                                   ElevenLabsProvider.minimum_rate if clip.provider == "elevenlabs" else 0)
+            if clip.echo and clip.rate < minimum_rate:
+                clip = replace(clip, rate=minimum_rate)
+                diagnostics.append(Diagnostic("voice", "echo_rate_clamped_to_provider_minimum"))
             parts = tuple(lower_clip(clip, provider.max_request_bytes))
             if sum(len(c.pronunciations) for c in parts) != len(clip.pronunciations):
                 diagnostics.append(Diagnostic('heteronym', 'provider_limit_plain_fallback'))

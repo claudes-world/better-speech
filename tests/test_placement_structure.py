@@ -40,3 +40,14 @@ def test_body_paragraph_start_is_rejected_and_closers_remain():
     assert 'end:6' in offered and 'start:8' not in offered
     assert len(plan.lessons) == 1
     assert any(d.stage == 'model' for d in plan.diagnostics)
+
+
+@pytest.mark.parametrize('source', ['# Status', 'Intro.\n\n## Status'])
+def test_terminal_heading_opener_precedes_reserved_closing_lesson(source):
+    def select(payload, **kwargs):
+        return json.dumps({'placements': [{'phraseId': payload['inventory'][0]['id'],
+            'slotId': max((s for s in payload['slots'] if s.startswith('start:')), key=lambda s: int(s.split(':')[1]))}]})
+    plan = compile(source, replace(profile(), model='fake'), ledger=EmptyLedger(), model_call=select)
+    assert len(plan.lessons) == 2
+    assert plan.lessons[-1].id == 'di-thoi'
+    assert plan.clips[-1].phrase_key == plan.lessons[-1].phrase_key

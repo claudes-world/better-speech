@@ -65,7 +65,7 @@
     {"id": "chao-buoi-chieu", "l2": "Chào buổi chiều!", "hint": "chow [falling]-booey [dipping]-cheeuh [falling]", "l1": "Good afternoon!", "category": "greeting", "time_of_day": "afternoon"},
     {"id": "chao-buoi-toi", "l2": "Chào buổi tối!", "hint": "chow [falling]-booey [dipping]-toy [rising]", "l1": "Good evening!", "category": "greeting", "time_of_day": "evening"},
     {"id": "chao-ban", "l2": "Chào bạn!", "hint": "chow [falling]-bahn [low]", "l1": "Hello, friend!", "category": "greeting", "time_of_day": "any"},
-    {"id": "chao-anh", "l2": "Chào anh!", "hint": "chow [falling]-anh", "l1": "Hello!", "category": "greeting", "time_of_day": "any"},
-    {"id": "xin-chao", "l2": "Xin chào!", "hint": "sin-chow [falling]", "l1": "Hello!", "category": "greeting", "time_of_day": "any"}
+    {"id": "xin-chao", "l2": "Xin chào!", "hint": "sin-chow [falling]", "l1": "Hello!", "category": "greeting", "time_of_day": "any"},
+    {"id": "chuc-ngu-ngon", "l2": "Chúc ngủ ngon!", "hint": "chook [rising]-ngoo [dipping]-ngawn", "l1": "Good night!", "category": "greeting", "time_of_day": "night"}
   ]
 }

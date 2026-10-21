@@ -57,14 +57,14 @@ def resolve_profile(profile: Profile) -> Profile:
             "chunk_pause_s",
             "repeat_pause_s",
             "long_break_seconds",
-            "greeting_gap_hours",
+            "echo_rate",
             "anchor_floor_days",
         ):
             value = getattr(profile, key)
             minimum = (
                 0
                 if key
-                in {"fallback_reserve_s", "pause_s", "chunk_pause_s", "repeat_pause_s", "long_break_seconds", "greeting_gap_hours"}
+                in {"fallback_reserve_s", "pause_s", "chunk_pause_s", "repeat_pause_s", "long_break_seconds"}
                 else 1e-9
             )
             if type(value) not in (int, float) or not math.isfinite(value) or value < minimum:
