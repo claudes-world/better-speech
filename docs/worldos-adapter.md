@@ -33,7 +33,7 @@ both it and `store_modules/runtime_state.py` must consume the revised presentati
 **Inputs and result.** Pass original Markdown; a `Profile` resolved from the lane's
 English voice, explicit Vietnamese roster/weights, pacing and model settings;
 `learner_id` (default `liam`); shared local state/cache paths; optional injected
-`ModelCall`; optional `last_learner_message_at` from the host's delivery history;
+`ModelCall`; optional `greeting` (default false);
 and host-wrapped provider objects. Credentials stay in those objects.
 Use one monotonic deadline bounded by the utterance claim, including time to
 persist the result. `model="none"` still teaches the reserved closing phrase.
@@ -41,8 +41,10 @@ English Google clips may carry `pronunciations`, a list of `{word_span: [start, 
 using half-open Python character offsets into that clip's text. Rendering remaps
 spans for provider chunks and counts the actual SSML bytes against request limits.
 Plans contain one semantic `Clip` stream; sequencing uses the public `Voice` type.
-The package never infers the last learner message time. `None` preserves the
-ordinary no-greeting path. The existing lesson mapping also shows each record's
+The host tracks the last learner message per lane and its two-hour threshold,
+then passes `greeting=True` on the first reply after that gap. The package receives
+only this flag; it owns no gap tracking. False preserves the ordinary no-greeting
+path. The existing lesson mapping also shows each record's
 `hint` as its own italic `say:` line below the literal gloss; it is never spoken.
 These are the week-two host inputs/presentation additions; no other host changes
 are introduced by week two.
@@ -78,7 +80,7 @@ class ProviderWrapper:
 ```python
 ledger = better_speech.Ledger.for_profile(profile)  # host-owned state destination
 plan = better_speech.compile(text, profile, ledger=ledger, model_call=model_call,
-                            last_learner_message_at=last_learner_message_at, deadline=deadline)
+                            greeting=greeting, deadline=deadline)
 rendering = better_speech.render(
     plan, providers, clip_cache, deadline=deadline,
     render_timeout_s=profile.render_timeout_s, provider_timeout_s=profile.provider_timeout_s,

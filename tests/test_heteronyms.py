@@ -12,7 +12,7 @@ from better_speech import Plan, compile, render
 from better_speech.cache import ClipCache
 from better_speech.chunking import lower_clip
 from better_speech.config import resolve_profile
-from better_speech.heteronyms import lexicon, scan
+from better_speech.heteronyms import heteronym_table, scan
 from better_speech.pronunciation import speech_input
 from better_speech.providers.google import GoogleProvider
 from tests.test_model_free_audio import EmptyLedger, ToneProvider, profile
@@ -27,7 +27,7 @@ def answer(payload, **kwargs):
 
 
 def test_shipped_lexicon_and_detect_only_whole_words_without_sense_choice():
-    lex = lexicon()
+    lex = heteronym_table()
     assert hashlib.sha256(files('better_speech').joinpath('data/heteronyms.en.json').read_bytes()).hexdigest() == (
         '139ba2b5898c5c9520937a5b43b3dc276c84677a328aa95062b58f45ca84b5d1')
     assert '_meta' in lex and 'suppressors' in lex['_meta']
@@ -187,6 +187,7 @@ def test_pre_week_two_plan_keeps_execution_identity():
     old = plan.to_dict()
     for row in old['clips'] + old['fallback_clips']:
         row.pop('pronunciations')
+        row.pop('echo')
     previous_digest = digest([old['clips'], old['lessons']])
     old['executed_digest'] = previous_digest
     assert Plan.from_dict(old).executed_digest == previous_digest

@@ -1,7 +1,7 @@
 """English-only triage and one subscription-model sense selection, failing open.
 
 Sentence splitting and case/morphology suppression are copied in reduced form
-from the source TTS heteronym scanner; senses and IPA remain lexicon-owned.
+from the source TTS heteronym scanner; senses and IPA remain owned by the heteronym table.
 """
 
 from __future__ import annotations
@@ -16,20 +16,20 @@ from .budget import remaining
 from .types import Diagnostic
 
 
-def lexicon():
+def heteronym_table():
     return json.loads(files(__package__).joinpath('data/heteronyms.en.json').read_text(encoding='utf-8'))
 
 
-def scan(text, lex=None):
+def scan(text, table=None):
     """Whole-word candidates only; deterministic triage never chooses a sense."""
-    lex = lexicon() if lex is None else lex
+    table = heteronym_table() if table is None else table
     candidates = []
     offset = 0
     for sentence in re.split(r'(?<=[.!?])\s+', text):
         for match in re.finditer(r'\b[^\W\d_]+\b', sentence):
             word = match.group()
-            entry = lex.get(word.lower())
-            # -ing/-ed inflections are not whole lexicon words. Never splice a
+            entry = table.get(word.lower())
+            # -ing/-ed inflections are not whole words in the heteronym table. Never splice a
             # base-form IPA into them. Case suppressors apply only mid-sentence.
             if not entry or word.startswith('_'):
                 continue
@@ -55,11 +55,11 @@ def apply(clips, profile, model_call, *, deadline):
         return clips, ()
     try:
         remaining(deadline)
-        lex = lexicon()
+        table = heteronym_table()
         candidates = []
         for index, clip in enumerate(clips):
             if clip.language == 'en' and clip.provider != 'elevenlabs':
-                for candidate in scan(clip.text, lex):
+                for candidate in scan(clip.text, table):
                     candidates.append({**candidate, 'id': f'h{len(candidates)}', 'clip': index})
         if not candidates:
             return clips, ()

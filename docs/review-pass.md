@@ -28,7 +28,7 @@ Line numbers refer to the resulting tree, where each fix now lives.
 
 - The strict parser accepts only offered phrase/slot IDs; no model-authored prose
   or legacy `rest` field can enter clips. English lesson glosses come from the
-  trusted curriculum. The model-free lesson path still produces a real Opus file.
+  trusted lexicon. The model-free lesson path still produces a real Opus file.
 - The registry selects exactly one adapter. Existing tests register a fourth
   adapter and make every other adapter fail if invoked; a selected-adapter error
   preserves deterministic placement, without a fallback chain.

@@ -53,10 +53,10 @@ receipt = record_delivered(rendering.plan, delivery_id, delivered_at, ledger=led
 ```
 
 `compile(text, profile, *, ledger, model_call=None, now=None, seed=None,
-last_learner_message_at=None, deadline=None)` preserves
+greeting=False, deadline=None)` preserves
 the source Markdown and produces a serializable `Plan` of `Clip`s: text,
 language, provider, model, voice, rate, format and pause-after. `Plan.to_dict()` /
-`Plan.from_dict()` round-trip its semantic clips, profile/curriculum digests, lesson
+`Plan.from_dict()` round-trip its semantic clips, profile/lexicon digests, lesson
 manifest and diagnostics. The highest eligible learner phrase is reserved for
 the closing lesson: boosted first, then due, then one unseen introduction.
 Intensity 1/2/3 limits placement counts to 2/4/4, with at most two new phrases,
@@ -97,12 +97,16 @@ Subscription subprocesses, cache lock acquisition and ffmpeg are bounded;
 artifact hashing and presentation also share the deadline. Arbitrary injected
 callbacks must honor their timeout; the library checks again when they return.
 
-The host can pass `last_learner_message_at` (datetime or ISO timestamp) from its
-delivery history. A gap of `greeting_gap_hours` (default 2) adds one opening greeting
-in the profile timezone; an unknown or shorter gap adds none. Confirmed deliveries
-rotate the next greeting for that learner. `anchor_floor_days` (default 7) caps
-anchor phrases' effective due dates after the last hearing.
+The host tracks the message gap per lane and passes `greeting=True` for the first
+reply after its threshold. The default is false. `speak plan` and `speak render`
+accept `--greeting`. Greetings follow the profile timezone, including good-night
+phrases, and confirmed deliveries rotate the next greeting for the learner.
+`anchor_floor_days` (default 7) caps anchor entries' effective due dates after the
+last hearing. `echo_rate` (default 0.75) slows the second Vietnamese occurrence;
+the lead rate and random voice selection stay as configured. Provider minimum
+speeds are applied before synthesis with a diagnostic.
 
+The Vietnamese phrase list is the **lexicon**, stored in `curriculum.vi.json`.
 Every shipped phrase includes a founder-editable English pronunciation `hint`.
 The lesson block shows it as an italic `say:` line below the literal gloss. Add or
 edit your own with `speak learn PHRASE --gloss GLOSS --hint RESPELLING`. Hints are
@@ -112,20 +116,20 @@ Set one profile setting to choose the optional contextual placer:
 
 | `model` | Adapter | Model setting/default |
 | --- | --- | --- |
-| `none` | deterministic closing lesson only | no executable |
+| `none` | deterministic lessons and greetings | no executable |
 | `claude` (library default) | `claude -p` subscription login | `claude_model = "claude-haiku-5-5"` |
 | `codex` | `codex exec`, ChatGPT login | `codex_model = "gpt-6-luna"` |
 | `agy` | Antigravity `agy --print`, subscription login | `agy_model = "gemini-3-flash"` |
 
 English heteronyms use the same selected adapter in one separate batch, returning
-only lexicon sense IDs. `heteronyms` defaults to true with a model and false with
+only sense IDs from the heteronym table. `heteronyms` defaults to true with a model and false with
 `model="none"`; set it explicitly to override. Google uses IPA SSML for the
 selected spans, and cache keys include these pronunciations. A missing or failed
 sense selection leaves the original English text. Vietnamese clips retain their
-existing lead and echo voices.
+existing randomly selected lead and echo voices.
 
 There is no adapter fallback chain. The selected CLI may choose only offered
-curriculum IDs and boundary IDs; it cannot supply audible text. Missing login,
+lexicon entry IDs and boundary IDs; it cannot supply audible text. Missing login,
 unsupported CLI/model, malformed/late output or an empty response never removes
 the reserved closing lesson. CLI model availability depends on the installed
 subscription tools; all three adapters are tested through real subprocesses
@@ -174,7 +178,7 @@ See the exact [WorldOS integration contract](docs/worldos-adapter.md) and
 [source provenance](docs/provenance.md).
 
 Install with `pip install 'better-speech[polyglot,google,elevenlabs]'` or use uv.
-`polyglot` is an intentionally empty convenience extra: curriculum and SQLite
+`polyglot` is an intentionally empty convenience extra: the lexicon and SQLite
 use the standard library. Provider imports are lazy; planning and learning need
 neither SDK. Tests use fake model/provider transports and real ffmpeg, with no
 paid calls. Contributions require assignment to **claudes-world**; see

@@ -48,7 +48,7 @@ and has since gained three local shop phrases (`giu-tien-thua`, `xin-loi-noi-lai
 `cho-them-mot-cai-nua`), for 57 entries. That 54-phrase source has no lesson classes, 47 rows without units, and 54 aligned literal
 arrays. `curriculum.vi.metadata.json` is an explicit classification/unit metadata
 overlay. Unannotated learner phrases get one whole-phrase unit, with a one-element
-tiered list where required by the copied validator. Historical curriculum assets
+tiered list where required by the copied validator. Historical lexicon assets
 under `tests/reference/data/polyglot/` are retained outside the shipped package so their pure fixture tests retain
 the original expectations. `examples/voices.vi.json` is the founder's explicit
 11-voice locked pool, copied verbatim from
@@ -60,7 +60,7 @@ voice and stage contracts needed by those tests, with package-local imports.
 These historical tests do not claim that retired providers or defaults are
 available through the public package. `fixtures/enrichment/` contains the 19
 existing enrichment golden JSON fixtures (segments, sequences, echo, pauses,
-pacing, settings, selection, voices, SRS, curriculum, cache keys and executor).
+pacing, settings, selection, voices, SRS, lexicon, cache keys and executor).
 Their source evidence labels and hashes are preserved; filesystem evidence paths
 inside the manifest are provenance only and are not opened by the tests.
 
@@ -73,7 +73,7 @@ collapsible with the exact header **Vietnamese lesson**. Model failures preserve
 deterministic lessons. No HTTP model adapter is included.
 
 Week two adds six greeting records and founder-editable pronunciation drafts to
-the 57-phrase curriculum (63 total), with anchor flags for the thank-you and
+the 57-entry Vietnamese lexicon (63 total), with anchor flags for the thank-you and
 excuse-me family. Hints are hand-drafted English respellings; sound reference:
 [Kirby (2011), Vietnamese (Hanoi Vietnamese)](https://doi.org/10.1017/S0025100311000181).
 `data/heteronyms.en.json` is a byte-for-byte copy of
@@ -84,3 +84,10 @@ scanner's sentence splitting and morphology/case suppression to a standalone
 whole-word pass, replacing the source Flash/engine code with the existing
 subscription-only registry. `pronunciation.py` renders trusted sense IPA using
 [Google's SSML phoneme format](https://docs.cloud.google.com/text-to-speech/docs/ssml#phoneme).
+
+The host now supplies a boolean greeting flag and owns per-lane gap tracking.
+The echo uses the configured `echo_rate` (default 0.75), while lead/echo selection
+and voice weights remain unchanged. Echoes below the resolved provider's declared
+minimum rate are clamped before caching or synthesis, with a diagnostic, avoiding
+an unsupported-speed request or a second provider attempt. ElevenLabs declares
+0.7, following its [speed documentation](https://elevenlabs.io/docs/help-center/product/core-capabilities/text-to-speech/can-i-change-the-pace-of-the-voice).
