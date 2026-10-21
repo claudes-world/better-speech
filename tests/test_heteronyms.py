@@ -191,3 +191,39 @@ def test_pre_week_two_plan_keeps_execution_identity():
     previous_digest = digest([old['clips'], old['lessons']])
     old['executed_digest'] = previous_digest
     assert Plan.from_dict(old).executed_digest == previous_digest
+
+
+@pytest.mark.parametrize('failure', ['ssml_only', 'native_after_ssml', 'all_english'])
+def test_ssml_failure_retains_teaching_and_plain_failure_still_fails_open(tmp_path, failure):
+    plan = compile('We read it.', replace(profile(), model='fake'),
+                   ledger=EmptyLedger(), model_call=answer)
+    class Provider(ToneProvider):
+        def synthesize(self, c, **kwargs):
+            self.calls.append(c)
+            if c.pronunciations or (failure == 'native_after_ssml' and c.language == 'vi'):
+                raise ValueError('optional stage unavailable')
+            if failure == 'all_english' and c.language == 'en':
+                raise ValueError('English unavailable')
+            return ToneProvider().synthesize(c, **kwargs)
+    provider = Provider()
+    result = render(plan, {'google': provider, 'elevenlabs': provider}, tmp_path)
+    if failure == 'ssml_only':
+        assert result.audio_path and result.status == 'bilingual', result.diagnostics
+        assert result.plan.lessons == plan.lessons
+        assert 'Vietnamese lexicon' in result.markdown
+    elif failure == 'native_after_ssml':
+        assert result.audio_path and result.status == 'english', result.diagnostics
+        assert not result.plan.lessons and 'Vietnamese lexicon' not in result.markdown
+    else:
+        assert not result.audio_path and result.status == 'text'
+        assert not result.plan.lessons
+    assert not any(c.pronunciations for c in result.plan.clips)
+    assert ''.join(c.text for c in result.plan.clips if c.purpose == 'source') == plan.speech_text
+    assert any(d.reason == 'provider_error_plain_fallback' for d in result.diagnostics)
+    from collections import Counter
+    requests = Counter((c.text, c.provider, c.voice, c.rate, bool(c.pronunciations)) for c in provider.calls)
+    if failure == 'all_english':
+        # One SSML attempt, one plain lesson attempt, then the existing English fallback.
+        assert len(provider.calls) == 3 and max(requests.values()) == 2
+    else:
+        assert max(requests.values()) == 1  # Successful plain clips are reused by the English fallback.

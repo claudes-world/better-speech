@@ -125,8 +125,9 @@ English heteronyms use the same selected adapter in one separate batch, returnin
 only sense IDs from the heteronym table. `heteronyms` defaults to true with a model and false with
 `model="none"`; set it explicitly to override. Google uses IPA SSML for the
 selected spans, and cache keys include these pronunciations. A missing or failed
-sense selection leaves the original English text. Vietnamese clips retain their
-existing randomly selected lead and echo voices.
+sense selection leaves the original English text. If SSML synthesis fails, rendering
+tries plain pronunciation with the lesson intact before the English fallback.
+Vietnamese clips retain their existing randomly selected lead and echo voices.
 
 There is no adapter fallback chain. The selected CLI may choose only offered
 lexicon entry IDs and boundary IDs; it cannot supply audible text. Missing login,

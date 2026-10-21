@@ -90,6 +90,8 @@ def markdown_to_speech_structure(
     for raw_line in markdown.splitlines():
         line = raw_line.rstrip()
         fence = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
+        if fence and not in_code and fence.group(1)[0] == "`" and "`" in fence.group(2):
+            fence = None  # A backtick info string containing backticks is ordinary prose.
         if fence and (not in_code or (
             fence.group(1)[0] == code_marker[0] and len(fence.group(1)) >= len(code_marker)
             and not fence.group(2).strip()

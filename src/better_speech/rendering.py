@@ -69,9 +69,11 @@ def render(
     hits = 0
     artifact_dir = None
     outputs = []
+    pronunciation_failure = False
 
     def attempt(requested, budget, name):
-        nonlocal hits, artifact_dir
+        nonlocal hits, artifact_dir, pronunciation_failure
+        pronunciation_failure = False
         remaining(budget)
         # Present before purchasing clips: a corrupt optional manifest is not audible authority.
         lowered = []
@@ -127,11 +129,13 @@ def render(
                         raise ValueError("invalid provider audio")
                     return audio
 
+                pronunciation_failure = bool(clip.pronunciations)
                 audio, hit = (
                     cache.get_or_synthesize(clip, synthesize, deadline=budget, diagnostics=diagnostics)
                     if cache is not None
                     else (synthesize(), False)
                 )
+                pronunciation_failure = False
                 hits += hit
                 remaining(budget)
                 path = scratch / f"{index}.audio"
@@ -156,7 +160,14 @@ def render(
         result = attempt(candidate, lesson_deadline if candidate.lessons or any(c.pronunciations for c in candidate.clips) else deadline, "note.ogg")
     except Exception as error:
         diagnostics.append(Diagnostic("render", type(error).__name__))
-        if candidate.lessons or any(c.pronunciations for c in candidate.clips):
+        if pronunciation_failure:
+            diagnostics.append(Diagnostic("heteronym", "provider_error_plain_fallback"))
+            candidate = replace(candidate, clips=tuple(replace(c, pronunciations=[]) for c in candidate.clips))
+            try:
+                result = attempt(candidate, lesson_deadline if candidate.lessons else deadline, "plain.ogg")
+            except Exception as plain_error:
+                diagnostics.append(Diagnostic("plain_render", type(plain_error).__name__))
+        if result is None and (candidate.lessons or any(c.pronunciations for c in candidate.clips)):
             try:
                 result = attempt(english, deadline, "english.ogg")
             except Exception as fallback_error:

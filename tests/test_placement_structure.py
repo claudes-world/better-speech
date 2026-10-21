@@ -51,3 +51,17 @@ def test_terminal_heading_opener_precedes_reserved_closing_lesson(source):
     assert len(plan.lessons) == 2
     assert plan.lessons[-1].id == 'di-thoi'
     assert plan.clips[-1].phrase_key == plan.lessons[-1].phrase_key
+
+
+@pytest.mark.parametrize('fence,is_code', [('```bad`info', False), ('````bad`info', False),
+                                         ('~~~bad`info', True)])
+def test_invalid_backtick_info_keeps_prose_in_english_fallback(fence, is_code):
+    from better_speech.markdown import markdown_to_speech_structure
+    source = f'Before.\n{fence}\nKeep this spoken sentence.\n# Heading\nAfter.'
+    speech, openers = markdown_to_speech_structure(source)
+    assert ('Keep this spoken sentence.' in speech) is not is_code
+    assert ('After.' in speech) is not is_code
+    assert len(openers) == (1 if is_code else 2)
+    plan = compile(source, profile(enabled=False), ledger=EmptyLedger())
+    assert plan.source == source
+    assert ''.join(c.text for c in plan.fallback_clips) == speech

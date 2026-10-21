@@ -40,6 +40,9 @@ persist the result. `model="none"` still teaches the reserved closing phrase.
 English Google clips may carry `pronunciations`, a list of `{word_span: [start, end], ipa}`
 using half-open Python character offsets into that clip's text. Rendering remaps
 spans for provider chunks and counts the actual SSML bytes against request limits.
+An SSML purchase failure retries plain clips with the same lesson manifest within
+the lesson budget; a subsequent lesson failure uses the reserved English fallback.
+Each provider call still goes through the host wrapper and its attempt accounting.
 Plans contain one semantic `Clip` stream; sequencing uses the public `Voice` type.
 The host tracks the last learner message per lane and its two-hour threshold,
 then passes `greeting=True` on the first reply after that gap. The package receives
