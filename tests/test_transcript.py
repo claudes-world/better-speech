@@ -11,7 +11,7 @@ def test_only_executed_lesson_has_numbered_collapsible_block_and_links():
     sections, markdown = present(replace(plan, executed=True))
     assert [s.kind for s in sections] == ["title", "lesson", "transcript", "links"]
     assert sections[1].collapsible
-    assert "<summary>Vietnamese lesson</summary>\n\n1. **" in markdown
+    assert "<summary>🇻🇳 Vietnamese lesson</summary>\n\n1. **" in markdown
     assert "[Docs](<https://example.org/docs>)" in markdown
     assert plan.source in sections[2].text
 
