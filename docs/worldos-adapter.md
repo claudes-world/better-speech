@@ -24,7 +24,7 @@ consume the prepared utterance result without synthesizing it again.
 `speech_transcript.py:build_presentations()` currently accepts source/title only;
 its `render()` silently skips unknown section kinds, including `lesson`.
 Extend that builder and renderer to accept the **executed** lesson manifest and
-emit the numbered, collapsible **Vietnamese lesson** block. Package `Section`
+emit the numbered, collapsible **Vietnamese lexicon** block. Package `Section`
 objects are not wire-compatible with the host's version-1 presentation mappings.
 Preserve the host's title, link and message-partition rules when mapping them.
 `file_ipc.py` uses that builder and `render_optional` for companion publication;

@@ -69,7 +69,7 @@ The founder's parity audit
 amendments deliberately replace stale defaults: all Vietnamese uses configured
 ElevenLabs voices, English is Google plain text, no hard-coded Vietnamese pool,
 learning reservation precedes model selection, and the numbered lesson is
-collapsible with the exact header **Vietnamese lesson**. Model failures preserve
+collapsible; week two calls its phrase-list header **🇻🇳 Vietnamese lexicon**. Model failures preserve
 deterministic lessons. No HTTP model adapter is included.
 
 Week two adds six greeting records and founder-editable pronunciation drafts to

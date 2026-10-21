@@ -1,6 +1,6 @@
 # better-speech
 
-Short Vietnamese lessons inside agents' English voice notes. Python 3.12+,
+Short Vietnamese lessons from your lexicon inside agents' English voice notes. Python 3.12+,
 AGPL-3.0. Standalone: no WorldOS dependency, database server, or model HTTP API.
 
 Week two brings a Vietnamese hello when you return after a break, pronunciation
@@ -72,7 +72,7 @@ semantic clips to the resolved provider limit. The host
 wraps these objects to enforce its budget and record every paid attempt. Cache
 hits never call a provider. The result contains a caller-owned temporary Ogg/Opus
 path, rendition artifact identity, audio SHA-256 checksum, executed plan, diagnostic records, Markdown and
-structured title/lesson/transcript/links sections. The **Vietnamese lesson** block
+structured title/lesson/transcript/links sections. The **Vietnamese lexicon** block
 is collapsible. Move/copy the returned file to durable storage and remove its
 temporary directory after use. The CLI handles this when writing `--out`.
 

@@ -26,7 +26,7 @@ def answer(payload, **kwargs):
                                    for c in payload['candidates']]})
 
 
-def test_shipped_lexicon_and_detect_only_whole_words_without_sense_choice():
+def test_shipped_heteronym_table_and_detect_only_whole_words_without_sense_choice():
     lex = heteronym_table()
     assert hashlib.sha256(files('better_speech').joinpath('data/heteronyms.en.json').read_bytes()).hexdigest() == (
         '139ba2b5898c5c9520937a5b43b3dc276c84677a328aa95062b58f45ca84b5d1')
