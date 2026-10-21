@@ -168,9 +168,9 @@ def compile(
                         hour = current.astimezone(ZoneInfo(profile.timezone)).hour
                         period = "morning" if 5 <= hour < 12 else "afternoon" if 12 <= hour < 18 else "evening"
                         previous = max(
-                            ((r["lastHeard"], r["lastGreetingKey"]) for r in records.values()
-                             if r.get("lastGreetingKey")), default=("", ""),
-                        )[1]
+                            ((r["lastHeard"], r.get("lastGreetingOrder", 0), r["lastGreetingKey"]) for r in records.values()
+                             if r.get("lastGreetingKey")), default=("", 0, ""),
+                        )[2]
                         greetings = [r for r in rows if r.get("category") == "greeting"
                                      and r.get("time_of_day") in (period, "any")
                                      and r["ledger_identity"] != previous]

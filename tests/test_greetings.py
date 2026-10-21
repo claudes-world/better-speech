@@ -66,3 +66,15 @@ def test_custom_gap_and_invalid_gap_input_fail_open(tmp_path):
                       last_learner_message_at='unknown')
     assert invalid.status == 'bilingual' and not greetings(invalid)
     assert any(d.stage == 'greeting' for d in invalid.diagnostics)
+
+
+def test_rotation_on_equal_confirmation_timestamps(tmp_path):
+    ledger = Ledger(tmp_path / 'ledger')
+    previous = None
+    for index in range(8):
+        plan = compile('Note.', profile(), ledger=ledger, now=NOW, seed=5,
+                       last_learner_message_at=NOW - timedelta(hours=3))
+        key = greetings(plan)[0].phrase_key
+        assert key != previous
+        record_delivered(replace(plan, executed=True), f'delivery-{index}', NOW, ledger=ledger)
+        previous = key
