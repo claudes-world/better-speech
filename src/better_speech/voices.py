@@ -46,7 +46,7 @@ def resolve_repeat_voice(
 class LessonVoices:
     main: Voice
     lead: Voice
-    echo: Voice
+    echo: Voice | None
 
 
 def choose_lesson_voices(
@@ -63,7 +63,7 @@ def choose_lesson_voices(
     """Owner delta: weighted eligible lead, safe echo, lane-owned narrator.
 
     Explicit pool is the resolved immutable settings snapshot. No roster is built into the library; callers must configure the pool. Weights are
-    lead-selection weights; echo uniformly chooses eligible accent candidates.
+    lead-selection weights; echo uniformly chooses alternatives above 1.
     No eligible voice returns None so caller retains plain main-voice output.
     Level 2 never introduces a new accent. Caller persists selections so retry
     does not reroll. No implicit RNG or mastery policy exists here.
@@ -95,7 +95,7 @@ def choose_lesson_voices(
             lead = voice
             break
         target -= amount
-    echo = resolve_repeat_voice(
-        lead, random=random, repeat=repeat, second_voice=second_voice and level == 1, pool=eligible
-    )
-    return LessonVoices(main, lead, echo or lead)
+    echo_pool = [v for v, weight in zip(eligible, amounts) if weight > 1]
+    alternatives = [v for v in echo_pool if v.voice != lead.voice] or echo_pool
+    echo = _pick(alternatives, random) if repeat and second_voice and level == 1 and alternatives else None
+    return LessonVoices(main, lead, echo or (lead if lead in echo_pool or not second_voice or level == 2 else None))

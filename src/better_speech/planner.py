@@ -66,7 +66,7 @@ class LessonPlacement:
     offset: int
     position: str  # start or end: controls pacing slots, not model prose
     lead: Voice
-    echo: Voice
+    echo: Voice | None
     level: int = 1
     mode: str = "open"
 
@@ -234,7 +234,7 @@ def sequence_clips(
             lesson_cfg = {
                 **cfg,
                 "repeat": False
-                if placement.level == 2
+                if placement.level == 2 or (cfg["repeatSecondVoice"] and placement.echo is None)
                 else (cfg["repeat"] or record.get("pending_learning") is True),
             }
             lesson_steps = _sequence(segment, lesson_cfg, l1, l2, silence)

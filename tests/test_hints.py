@@ -12,7 +12,7 @@ from tests.test_model_free_audio import EmptyLedger, profile
 
 def test_every_record_has_short_draft_hint():
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
-    assert len(rows) == 63
+    assert len(rows) == 64
     assert all(isinstance(r['hint'], str) and 0 < len(r['hint']) < 60 for r in rows)
     assert all(r['hint'] == r['hint'].lower() for r in rows)
     metadata = files('better_speech').joinpath('data/curriculum.vi.metadata.json').read_text()

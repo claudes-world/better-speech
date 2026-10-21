@@ -3,6 +3,7 @@ model = "none"
 # Heteronyms default on with a model, off with model = "none".
 heteronyms = false
 anchor_floor_days = 7
+boost_daily_cap = 3
 codex_model = "gpt-6-luna"
 claude_model = "claude-haiku-5-5"
 agy_model = "gemini-3-flash"

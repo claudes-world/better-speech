@@ -80,15 +80,15 @@ def learned(key: str, profile: Profile = Profile(), *, ledger) -> dict:
 
 
 def due(profile: Profile = Profile(), *, ledger, now: datetime | None = None) -> list[dict]:
-    from .compiler import _rank
+    from .compiler import _boosted, _rank
 
     at = timestamp((now or datetime.now(timezone.utc)).isoformat())
-    records, additions = ledger.learner_state(profile.learner_id)
+    records, additions = ledger.learner_state(profile.learner_id, now=at, timezone=profile.timezone)
     rows = runtime_curriculum(profile, additions=additions)
     records = anchor_floor(rows, records, profile.anchor_floor_days)
     return [
         {**r, "exposure": records.get(r["ledger_identity"])}
-        for r in _rank(rows, records, at)
-        if ((timestamp(r.get("boost_until")) or "") > at and not r.get("landed"))
+        for r in _rank(rows, records, at, profile.boost_daily_cap)
+        if _boosted(r, records, at, profile.boost_daily_cap)
         or records.get(r["ledger_identity"], {}).get("dueAt", "9999") <= at
     ]

@@ -65,6 +65,7 @@ class Profile:
     agy_model: str = "gemini-3-flash"
     timezone: str = "Asia/Ho_Chi_Minh"
     anchor_floor_days: float = 7
+    boost_daily_cap: int = 3
     intensity: int = 1
     repeat: bool = True
     repeat_second_voice: bool = True

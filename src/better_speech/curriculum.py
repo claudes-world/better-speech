@@ -164,6 +164,7 @@ def runtime_curriculum(profile, *, additions=()) -> tuple[dict, ...]:
     )
     additions = deepcopy(list(additions))
     validate_inventory(additions)
+    # NFC l2 deduplicates shipped phrases; learner edits (including landed) win.
     by_key = {canonical_phrase(r["l2"]): r for r in rows}
     for row in additions:
         key = canonical_phrase(row["l2"])
