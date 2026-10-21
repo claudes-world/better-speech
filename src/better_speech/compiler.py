@@ -15,7 +15,7 @@ from .budget import phase_deadline, remaining
 from .config import resolve_profile
 from .curriculum import runtime_curriculum
 from .exposure import timestamp
-from .markdown import markdown_to_speech_text
+from .markdown import markdown_to_speech_structure
 from .planner import LessonPlacement, sequence_clips
 from .rewriter import parse_placements
 from .types import Diagnostic, Lesson, Plan, Profile, canonical_json, digest
@@ -61,9 +61,9 @@ def compile(
     model_deadline = phase_deadline(deadline, profile.fallback_reserve_s)
     diagnostics = [Diagnostic("config", reason) for reason in profile.config_diagnostics]
     try:
-        speech = markdown_to_speech_text(text)
+        speech, openers = markdown_to_speech_structure(text)
     except Exception:
-        speech = text
+        speech, openers = text, frozenset({0})
         diagnostics.append(Diagnostic("markdown", "normalization_failed"))
     main = profile.english
     fallback, _ = sequence_clips(speech, inventory=(), placements=(), main=main, settings={})
@@ -142,7 +142,8 @@ def compile(
                         )
                     )
                 return curated, sequence_clips(
-                    speech, inventory=curated, placements=placements, main=main, settings=settings
+                    speech, inventory=curated, placements=placements, main=main, settings=settings,
+                    opener_offsets=openers
                 )
 
             reserved_rows, reserved_plan = build(chosen)
@@ -182,7 +183,8 @@ def compile(
                     diagnostics.append(Diagnostic("greeting", type(error).__name__))
             remaining(deadline)
             # Deterministic closing slot is unavailable to optional contextual selection.
-            starts, ends = paragraph_boundaries(speech)
+            _, ends = paragraph_boundaries(speech)
+            starts = openers
             slots = {f"start:{offset}": (offset, "start") for offset in starts}
             if any(r.get("category") == "greeting" for r, *_ in chosen):
                 slots.pop("start:0", None)

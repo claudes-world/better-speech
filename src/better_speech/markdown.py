@@ -76,20 +76,28 @@ def _speak_bare_url(match: re.Match[str], *, humanize_links: bool) -> str:
     return f"link to {humanize_url(url)}{punctuation}"
 
 
-def markdown_to_speech_text(markdown: str, *, speak_code: bool = False, humanize_links: bool = True) -> str:
+def markdown_to_speech_structure(
+    markdown: str, *, speak_code: bool = False, humanize_links: bool = True
+) -> tuple[str, frozenset[int]]:
     """Render Markdown into stable listening text without changing its source."""
     if not markdown.strip():
-        return ""
+        return "", frozenset({0})
     output: list[str] = []
+    headings = []
     in_code = False
     code_language = ""
+    code_marker = ""
     for raw_line in markdown.splitlines():
         line = raw_line.rstrip()
-        fence = re.match(r"^\s*```\s*([^`]*)$", line)
-        if fence:
+        fence = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
+        if fence and (not in_code or (
+            fence.group(1)[0] == code_marker[0] and len(fence.group(1)) >= len(code_marker)
+            and not fence.group(2).strip()
+        )):
             if not in_code:
                 in_code = True
-                code_language = fence.group(1).strip()
+                code_marker = fence.group(1)
+                code_language = fence.group(2).strip()
                 if speak_code:
                     output.append("Code block" + (f", language {code_language}." if code_language else "."))
                 else:
@@ -104,6 +112,7 @@ def markdown_to_speech_text(markdown: str, *, speak_code: bool = False, humanize
             if speak_code and line:
                 output.append(line)
             continue
+        heading = bool(re.match(r"^ {0,3}#{1,3}(?:[ \t]+|$)", line))
         line = re.sub(r"^\s{0,3}#{1,6}\s+", "", line)
         line = re.sub(r"^\s*>\s?", "", line)
         line = re.sub(r"^\s*[-*+]\s+", "", line)
@@ -125,9 +134,19 @@ def markdown_to_speech_text(markdown: str, *, speak_code: bool = False, humanize
         line = re.sub(r"\s*\|\s*", ", ", line)
         if line.strip() and not re.fullmatch(r"[-:, ]+", line):
             output.append(line.strip())
+            if heading:
+                headings.append(len(output))
         elif output and output[-1] != "":
             output.append("")
     rendered = "\n".join(output).strip()
     if not rendered:
-        return markdown
-    return rendered
+        return markdown, frozenset({0})
+    offsets = {0, *(min(len(rendered), sum(len(s) + 1 for s in output[:i])) for i in headings)}
+    return rendered, frozenset(offsets)
+
+
+def markdown_to_speech_text(markdown: str, *, speak_code: bool = False, humanize_links: bool = True) -> str:
+    """Render listening text; the compiler also retains heading opener offsets."""
+    return markdown_to_speech_structure(
+        markdown, speak_code=speak_code, humanize_links=humanize_links
+    )[0]

@@ -98,6 +98,7 @@ def sequence_clips(
     main: Voice,
     settings: Mapping,
     protected_ranges: Sequence[tuple[int, int]] = (),
+    opener_offsets: Sequence[int] = (0,),
 ) -> tuple[tuple[Clip, ...], str | None]:
     """Frozen source/speech separation after ID/slot semantic selection.
 
@@ -122,8 +123,8 @@ def sequence_clips(
     for key in ("repeat", "repeatSecondVoice"):
         if type(cfg[key]) is not bool:
             cfg[key] = DEFAULTS[key]
-    starts, ends = paragraph_boundaries(source)
-    boundaries = starts | ends
+    _, ends = paragraph_boundaries(source)
+    starts = frozenset(opener_offsets)
 
     def source_steps(start, end):
         return [_tts(source[start:end], source[start:end], main, purpose="source",
@@ -157,7 +158,7 @@ def sequence_clips(
             if (
                 type(offset) is not int
                 or not 0 <= offset <= len(source)
-                or offset not in boundaries
+                or offset not in (starts if placement.position == "start" else ends)
                 or any(a < offset < b for a, b in protected_ranges)
             ):
                 raise ValueError("lesson is not at an authorized source boundary")

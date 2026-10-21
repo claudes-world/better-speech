@@ -62,7 +62,7 @@ def test_public_render_numbers_lessons_in_first_audible_order(tmp_path):
             return records
 
     cfg = replace(cfg, intensity=2)
-    plan = compile("First paragraph.\n\nSecond paragraph.", cfg, ledger=KnownPhrases(), model_call=select)
+    plan = compile("# First paragraph.\n\nSecond paragraph.", cfg, ledger=KnownPhrases(), model_call=select)
     provider = ToneProvider()
     result = render(plan, {"google": provider, "elevenlabs": provider}, tmp_path / "cache")
     assert result.audio_path and result.status == "bilingual", result.diagnostics

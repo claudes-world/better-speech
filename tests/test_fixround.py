@@ -278,14 +278,14 @@ def test_adjacent_placements_preserve_blank_span_without_purchasing_it(tmp_path)
     def choose(payload, **kwargs):
         return json.dumps({'placements': [
             {'phraseId': payload['inventory'][0]['id'], 'slotId': 'end:6'},
-            {'phraseId': payload['inventory'][1]['id'], 'slotId': 'start:8'},
+            {'phraseId': payload['inventory'][1]['id'], 'slotId': 'start:7'},
         ]})
 
-    plan = compile('First.\n\nSecond.', replace(profile(), model='fake'), ledger=SeenLedger(), model_call=choose)
+    plan = compile('# First.\n\nSecond.', replace(profile(), model='fake'), ledger=SeenLedger(), model_call=choose)
     provider = RejectBlank()
     result = render(plan, {'google': provider, 'elevenlabs': provider}, tmp_path)
     assert result.status == 'bilingual', result.diagnostics
-    assert any(c.text == '\n\n' for c in result.plan.clips)
+    assert any(c.text == '\n' for c in result.plan.clips)
     assert ''.join(c.text for c in result.plan.clips if c.purpose == 'source') == plan.speech_text
 
 
