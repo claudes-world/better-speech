@@ -115,6 +115,33 @@ The lesson block shows it as an italic `say:` line below the literal gloss. Add 
 edit your own with `speak learn PHRASE --gloss GLOSS --hint RESPELLING`. Hints are
 visual only.
 
+Accent: The shipped pronunciation hints use a southern Vietnamese target with broad English-speaker
+approximations; regional differences remain in the central/southern lesson voices. Initial d, gi and
+v use y, đ uses d, r keeps r, and tr stays tr without a strongly separate r. Vietnamese th uses
+plain t, like tea, never English th.
+
+Hyphens separate Vietnamese syllables: give each chunk one beat, without English stress. Eh (also e
+in closed hints such as em/dep/sem) is the vowel of bet; ay for ê is the first part of say, held
+steady without an ee offglide. Lên/mệt use the southern central-vowel cues luhn/muht. Ee is see; gì
+uses yee. Uu uses an oo-like tongue position with unrounded lips; uh is a relaxed mid vowel without
+English r; uuh holds the unrounded vowel longer.
+
+Ow always rhymes with cow, including sow and bow. Ah is father, kept short for ă and where
+specified; aw is rounded law (use the audio if cot/caught sound alike); oh is a steady rounded o. Oy
+is a broad cue for oi/ôi, not an assertion that they are identical. Uhy glides from uh toward ee;
+eeoo from ee toward oo; booy/yooy from oo toward ee; duhow from short uh toward rounded oo; teow
+from eh toward oo. Keep each glide within one beat.
+
+Ng is the end of sing, even initially: add no g or preliminary uh. Ny is the middle of canyon
+compressed into the onset. Kh is back-of-mouth friction (or the selected voice’s breathy variant),
+not plain k. Final p/t/k close without audible release or an added vowel; final ng may include lip
+closure after rounded vowels.
+
+Every non-level syllable has a tone bracket: none means ngang (level); `[rising]` is sắc;
+`[falling]` is huyền; `[dipping]` is the shared hỏi/ngã dip then rise. `[low]` is nặng’s low
+register, which may recover slightly on open/nasal-final syllables, without a compulsory glottal
+choke; `[low, clipped]` adds final-stop closure. These are broad directions, not fixed pitch tracks.
+
 Set one profile setting to choose the optional contextual placer:
 
 | `model` | Adapter | Model setting/default |
