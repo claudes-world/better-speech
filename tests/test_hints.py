@@ -45,7 +45,7 @@ def test_southern_initials_and_merged_tones():
             any(mark in unicodedata.normalize('NFD', word) for mark in ('\u0303', '\u0309'))
             for word in words
         )
-        assert row['hint'].count('[dipping]') == merged_tones, row['id']
+        assert row['hint'].count('⌄') == merged_tones, row['id']
     metadata = json.loads(files('better_speech').joinpath('data/curriculum.vi.metadata.json').read_text())
     assert metadata['_meta']['accent'] == 'southern'
 
@@ -53,21 +53,19 @@ def test_southern_initials_and_merged_tones():
 def test_every_syllable_has_its_lexical_tone_and_southern_initial():
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
     tones = {
-        '\u0301': 'rising', '\u0300': 'falling',
-        '\u0309': 'dipping', '\u0303': 'dipping', '\u0323': 'low',
+        '\u0301': '↗', '\u0300': '↘',
+        '\u0309': '⌄', '\u0303': '⌄', '\u0323': '↓',
     }
     for row in rows:
         words = re.findall(r'[^\W\d_]+', row['l2'].lower())
-        syllables = row['hint'].split('-')
+        syllables = re.split(r' - | ', row['hint'])
         assert len(words) == len(syllables), row['id']
         for word, syllable in zip(words, syllables, strict=True):
             decomposed = unicodedata.normalize('NFD', word)
             expected = next((tone for mark, tone in tones.items() if mark in decomposed), None)
-            label = re.fullmatch(r'[a-z]+(?: \[(rising|falling|dipping|low)(, clipped)?\])?', syllable)
+            label = re.fullmatch(r'[a-z]+([↗↘↓⌄])?', syllable)
             assert label is not None, (row['id'], word, syllable)
             assert label[1] == expected, (row['id'], word, syllable)
-            if label[2]:
-                assert expected == 'low' and syllable.split()[0].endswith(('p', 't', 'k'))
             plain = ''.join(char for char in decomposed if not unicodedata.combining(char))
             if plain.startswith(('d', 'gi', 'v')):
                 assert syllable.startswith('y'), (row['id'], word, syllable)
@@ -78,38 +76,38 @@ def test_every_syllable_has_its_lexical_tone_and_southern_initial():
             if plain.startswith('tr'):
                 assert syllable.startswith('tr'), row['id']
             if word == 'gì':
-                assert syllable == 'yee [falling]', row['id']
+                assert syllable == 'yee↘', row['id']
             if word == 'có':
-                assert syllable == 'kaw [rising]', row['id']
+                assert syllable == 'kaw↗', row['id']
 
 
 @pytest.mark.parametrize(('phrase_id', 'syllable'), [
-    ('da', 'yah [low]'),
-    ('khong-co-gi', 'yee [falling]'),
-    ('goi-la-gi', 'yee [falling]'),
-    ('giup-minh-voi', 'yoop [rising]'),
-    ('minh-nghi-the-nay', 'yuhy [falling]'),
+    ('da', 'yah↓'),
+    ('khong-co-gi', 'yee↘'),
+    ('goi-la-gi', 'yee↘'),
+    ('giup-minh-voi', 'yoop↗'),
+    ('minh-nghi-the-nay', 'yuhy↘'),
     ('vui-qua', 'yooy'),
-    ('tieng-viet-mot-chut', 'yeek [low, clipped]'),
-    ('mang-ve', 'yay [falling]'),
-    ('duoc-roi', 'roy [falling]'),
+    ('tieng-viet-mot-chut', 'yeek↓'),
+    ('mang-ve', 'yay↘'),
+    ('duoc-roi', 'roy↘'),
 ])
 def test_southern_pronunciation_examples(phrase_id, syllable):
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
     row = next(row for row in rows if row['id'] == phrase_id)
-    assert syllable in row['hint'].split('-')
+    assert syllable in re.split(r' - | ', row['hint'])
 
 
 @pytest.mark.parametrize(('phrase_id', 'hint'), [
-    ('xin-loi', 'sin-loy [dipping]'),
-    ('giu-tien-thua', 'khohng-kuhng [falling]-toy [rising]-lie [low]-duhow'),
-    ('san-sang-chua', 'sahng [dipping]-sahng [falling]-chuuh'),
-    ('doi-qua', 'doy [rising]-kwah [rising]'),
-    ('tin-vui-ne', 'tin-yooy-neh [falling]'),
-    ('cai-nay-bao-nhieu', 'kye [rising]-nigh [falling]-bow-nyeeoo-teeng [falling]'),
-    ('hieu-roi', 'heeoo [dipping]-roy [falling]'),
-    ('thich-qua', 'tit [rising]-kwah [rising]'),
-    ('tinh-tien', 'tin [rising]-teeng [falling]'),
+    ('xin-loi', 'sin - loy⌄'),
+    ('giu-tien-thua', 'khohng - kuhng↘ - toy↗ - lie↓ - duhow'),
+    ('san-sang-chua', 'sahng⌄ sahng↘ - chuuh'),
+    ('doi-qua', 'doy↗ - kwah↗'),
+    ('tin-vui-ne', 'tin - yooy - neh↘'),
+    ('cai-nay-bao-nhieu', 'kye↗ - nigh↘ - bow nyeeoo - teeng↘'),
+    ('hieu-roi', 'heeoo⌄ - roy↘'),
+    ('thich-qua', 'tit↗ - kwah↗'),
+    ('tinh-tien', 'tin↗ - teeng↘'),
 ])
 def test_reviewed_southern_hint_tones_and_syllables(phrase_id, hint):
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
@@ -119,7 +117,6 @@ def test_reviewed_southern_hint_tones_and_syllables(phrase_id, hint):
 def test_every_record_has_draft_hint():
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
     assert len(rows) == 88
-    # Full syllable-by-syllable tone labels need up to 121 characters.
     assert all(isinstance(r['hint'], str) and 0 < len(r['hint']) <= 121 for r in rows)
     assert all(r['hint'] == r['hint'].lower() for r in rows)
     metadata = files('better_speech').joinpath('data/curriculum.vi.metadata.json').read_text()
@@ -127,13 +124,14 @@ def test_every_record_has_draft_hint():
     assert all(r['hint'] for r in runtime_curriculum(profile()))
 
 
-def test_hint_rendering_below_literal_and_never_spoken():
+def test_hint_code_block_after_translation_and_never_spoken():
     plan = compile('Note.', profile(), ledger=EmptyLedger())
     sections, _ = present(replace(plan, executed=True))
     lines = next(s.text for s in sections if s.kind == 'lesson').splitlines()
     assert 'go' in lines[1] and '[just/let' in lines[1].replace('\\', '')
-    assert lines[2] == '   *say: dee\\-toy*'
-    assert all('dee-toy' not in clip.text for clip in plan.clips)
+    assert 'go' in lines[2]
+    assert lines[3:] == ['', '```', 'dee - toy', '```']
+    assert all('dee - toy' not in clip.text for clip in plan.clips)
 
 
 def test_cli_hint_persists_and_renders(tmp_path, capsys):
@@ -146,5 +144,17 @@ def test_cli_hint_persists_and_renders(tmp_path, capsys):
     from better_speech.config import load_profile
     cfg = load_profile(config)
     plan = compile('Note.', cfg, ledger=Ledger.for_profile(cfg))
-    assert 'say: hawk\\-nyeh' in present(replace(plan, executed=True))[1]
+    assert '\n```\nhawk-nyeh\n```' in present(replace(plan, executed=True))[1]
     assert all('hawk-nyeh' not in c.text for c in plan.clips)
+
+
+def test_arrow_hints_and_piece_spacing():
+    rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
+    for row in rows:
+        hint = row['hint']
+        assert '[' not in hint, row['id']
+        assert not re.search(r'(?<![a-z])[↗↘↓⌄]', hint), row['id']
+        assert not re.search(r'(?<! )-|-(?! )', hint), row['id']
+        assert '  ' not in hint, row['id']
+    towel = next(row for row in rows if row['id'] == 'cho-minh-mot-cai-khan-a')
+    assert towel['hint'] == 'chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓'
