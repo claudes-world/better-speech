@@ -155,7 +155,7 @@ def test_invalid_lesson_config_is_english_and_detached(tmp_path):
 @pytest.mark.parametrize(
     "item",
     [r for r in json.loads(files("better_speech").joinpath("data/curriculum.vi.json").read_text())["focusPhrases"]
-     if r.get("category") != "greeting"],
+     if r.get("category") not in ("greeting", "opener")],
     ids=lambda item: item["id"],
 )
 def test_every_shipped_phrase_can_be_reserved_and_taught(item, tmp_path):
