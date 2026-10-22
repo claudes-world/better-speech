@@ -30,7 +30,7 @@ def test_southern_hints_have_no_northern_z_syllables():
             checked.add(row['id'])
             if row['id'] not in z_word_exceptions:
                 assert not re.search(r'\bz[a-z]*', row['hint']), row['id']
-    assert {'da', 'khong-co-gi', 'giup-minh-voi', 'giu-tien-thua', 'duoc-roi'} <= checked
+    assert {'da', 'khong-co-gi', 'giup-minh-voi', 'duoc-roi'} <= checked
     assert z_word_exceptions <= checked
 
 
@@ -88,7 +88,7 @@ def test_every_syllable_has_its_lexical_tone_and_southern_initial():
     ('khong-co-gi', 'yee [falling]'),
     ('goi-la-gi', 'yee [falling]'),
     ('giup-minh-voi', 'yoop [rising]'),
-    ('giu-tien-thua', 'yuu [dipping]'),
+    ('minh-nghi-the-nay', 'yuhy [falling]'),
     ('vui-qua', 'yooy'),
     ('tieng-viet-mot-chut', 'yeek [low, clipped]'),
     ('mang-ve', 'yay [falling]'),
@@ -102,7 +102,7 @@ def test_southern_pronunciation_examples(phrase_id, syllable):
 
 @pytest.mark.parametrize(('phrase_id', 'hint'), [
     ('xin-loi', 'sin-loy [dipping]'),
-    ('giu-tien-thua', 'yuu [dipping]-teeng [falling]-tuuh [falling]-nyeh [rising]'),
+    ('giu-tien-thua', 'khohng-kuhng [falling]-toy [rising]-lie [low]-duhow'),
     ('san-sang-chua', 'sahng [dipping]-sahng [falling]-chuuh'),
     ('doi-qua', 'doy [rising]-kwah [rising]'),
     ('tin-vui-ne', 'tin-yooy-neh [falling]'),
@@ -118,9 +118,9 @@ def test_reviewed_southern_hint_tones_and_syllables(phrase_id, hint):
 
 def test_every_record_has_draft_hint():
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
-    assert len(rows) == 85
-    # Full syllable-by-syllable tone labels need up to 100 characters.
-    assert all(isinstance(r['hint'], str) and 0 < len(r['hint']) <= 100 for r in rows)
+    assert len(rows) == 88
+    # Full syllable-by-syllable tone labels need up to 121 characters.
+    assert all(isinstance(r['hint'], str) and 0 < len(r['hint']) <= 121 for r in rows)
     assert all(r['hint'] == r['hint'].lower() for r in rows)
     metadata = files('better_speech').joinpath('data/curriculum.vi.metadata.json').read_text()
     assert 'Founder-editable drafts' in metadata

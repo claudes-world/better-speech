@@ -138,7 +138,7 @@
   "cho-chut-nhe": {
     "lesson_type": "connector",
     "units": [
-      "Chờ chút nhé!"
+      "Chờ chút nha!"
     ],
     "vocabulary": [],
     "structure_pauses": []
@@ -282,7 +282,7 @@
   "them-mot": {
     "lesson_type": "learning_sentence",
     "units": [
-      "Thêm một!"
+      "Thêm một cái nữa!"
     ],
     "vocabulary": [],
     "structure_pauses": []
@@ -307,7 +307,7 @@
   "noi-cham-thoi": {
     "lesson_type": "learning_sentence",
     "units": [
-      "Nói chậm thôi."
+      "Nói chậm chút nha."
     ],
     "vocabulary": [],
     "structure_pauses": []
@@ -323,9 +323,9 @@
   "tieng-viet-mot-chut": {
     "lesson_type": "learning_sentence",
     "units": [
-      "Mình nói",
-      "tiếng Việt",
-      "một chút thôi"
+      "Mình nói được",
+      "một chút",
+      "tiếng Việt thôi"
     ],
     "vocabulary": [],
     "structure_pauses": []
