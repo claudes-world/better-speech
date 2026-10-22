@@ -27,32 +27,16 @@ DEFAULTS = {
 
 
 def _sequence(segment: Mapping, config: Mapping, l1: Callable, l2: Callable, silence: Callable) -> list:
-    """Copied open/close echo ordering; callbacks own render policy."""
+    """Speak Vietnamese, its translation, then the optional Vietnamese echo."""
     result = []
     has_l2 = bool(segment.get("l2"))
     repeat = config["repeat"]
-    mode = segment.get("mode", "open")
-    if has_l2 and segment.get("l1") and mode == "close":
-        result += [l1(segment["l1"], "translation"), silence(0.25)] + l2(1)
-        if repeat:
-            result += [
-                silence(config["repeatPauseS"]),
-                l1(
-                    segment.get("literal", segment["l1"]),
-                    "literal" if "literal" in segment else "translation",
-                ),
-                silence(0.25),
-            ]
-            result += l2(2)
-        result += [silence(0.25)]
-    elif has_l2:
+    if has_l2:
         result += l2(1)
         if segment.get("l1"):
             result += [silence(0.25), l1(segment["l1"], "translation")]
         if repeat:
             result += [silence(config["repeatPauseS"])]
-            if segment.get("literal"):
-                result += [l1(segment["literal"], "literal"), silence(0.25)]
             result += l2(2)
         result += [silence(0.25 if repeat else config["pauseS"])]
     elif segment.get("l1"):
