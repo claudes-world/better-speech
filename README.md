@@ -111,7 +111,7 @@ eligible echo voice, the lesson keeps its lead without an echo. Setting
 
 The Vietnamese phrase list is the **lexicon**, stored in `curriculum.vi.json`.
 Every shipped phrase includes a founder-editable English pronunciation `hint`.
-The lesson block shows it as an italic `say:` line below the literal gloss. Add or
+The lesson block shows it as a fenced `say:` code block after the literal gloss and translation. Add or
 edit your own with `speak learn PHRASE --gloss GLOSS --hint RESPELLING`. Hints are
 visual only.
 
@@ -120,7 +120,8 @@ approximations; regional differences remain in the central/southern lesson voice
 v use y, đ uses d, r keeps r, and tr stays tr without a strongly separate r. Vietnamese th uses
 plain t, like tea, never English th.
 
-Hyphens separate Vietnamese syllables: give each chunk one beat, without English stress. Eh (also e
+Pieces are separated by ` - `; syllables within a multi-syllable word use a single space. Give each
+syllable one beat, without English stress. Eh (also e
 in closed hints such as em/dep/sem) is the vowel of bet; ay for ê is the first part of say, held
 steady without an ee offglide. Lên/mệt use the southern central-vowel cues luhn/muht. Ee is see; gì
 uses yee. Uu uses an oo-like tongue position with unrounded lips; uh is a relaxed mid vowel without
@@ -137,10 +138,12 @@ compressed into the onset. Kh is back-of-mouth friction (or the selected voice�
 not plain k. Final p/t/k close without audible release or an added vowel; final ng may include lip
 closure after rounded vowels.
 
-Every non-level syllable has a tone bracket: none means ngang (level); `[rising]` is sắc;
-`[falling]` is huyền; `[dipping]` is the shared hỏi/ngã dip then rise. `[low]` is nặng’s low
-register, which may recover slightly on open/nasal-final syllables, without a compulsory glottal
-choke; `[low, clipped]` adds final-stop closure. These are broad directions, not fixed pitch tracks.
+Every non-level syllable has an arrow glued directly to it: no mark means ngang (level);
+`↗` is sắc (rising); `↘` is huyền (falling); `⌄` is the shared hỏi/ngã dip then rise.
+`↓` is nặng’s low register, which may recover slightly on open/nasal-final syllables, without a
+compulsory glottal choke. Low syllables ending in p/t/k also have final-stop closure; clipping is
+a reading note, not a separate mark. These are broad directions, not fixed pitch tracks. For example,
+`chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓` retains the two syllables of khăn tắm together.
 
 Set one profile setting to choose the optional contextual placer:
 

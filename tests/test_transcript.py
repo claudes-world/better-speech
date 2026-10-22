@@ -76,3 +76,111 @@ def test_public_render_numbers_lessons_in_first_audible_order(tmp_path):
     for number, phrase, line in zip((1, 2, 3), ("Không sao đâu", "Hiểu rồi", "Đi thôi"), rows):
         assert line.startswith(f"{number}. **") and phrase in line
     assert result.markdown.index(rows[0]) < result.markdown.index(rows[1]) < result.markdown.index(rows[2])
+
+
+def _three_lesson_plan():
+    import json
+
+    from better_speech.curriculum import runtime_curriculum
+    from better_speech.types import Lesson
+
+    cfg = profile()
+    rows = {row['id']: row for row in runtime_curriculum(cfg)}
+    lessons = tuple(
+        Lesson(key, rows[key]['ledger_identity'], json.dumps(rows[key]))
+        for key in ('di-thoi', 'hieu-roi', 'cho-minh-mot-cai-khan-a')
+    )
+    return replace(compile('Note.', cfg, ledger=EmptyLedger()), lessons=lessons, executed=True)
+
+
+def test_say_fences_preserve_numbered_items():
+    import re
+
+    from markdown_it import MarkdownIt
+
+    sections, _ = present(_three_lesson_plan())
+    text = next(section.text for section in sections if section.kind == 'lesson')
+    tokens = MarkdownIt().parse(text)
+    assert len([token for token in tokens if token.type == 'ordered_list_open']) == 1
+    assert len([token for token in tokens if token.type == 'list_item_open']) == 3
+    fences = [token for token in tokens if token.type == 'fence']
+    assert [token.content for token in fences] == [
+        'say: dee - toy\n', 'say: heeoo⌄ - roy↘\n',
+        'say: chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓\n',
+    ]
+    for number, item in enumerate(re.split(r'\n\n(?=\d+\. )', text.rstrip()), 1):
+        assert item.startswith(f'{number}. **')
+        before, code = item.split('\n\n', 1)
+        assert len(before.splitlines()) == 3  # phrase, literal, translation
+        assert code.startswith('   ```\n   say: ')
+        assert code.endswith('\n   ```')
+
+
+def test_host_render_preserves_say_fences_and_numbering():
+    import importlib.util
+    import json
+    from pathlib import Path
+
+    import pytest
+    from markdown_it import MarkdownIt
+
+    host_path = Path('/opt/worldos/current/.venv/lib/python3.13/site-packages/'
+                     'worldos_control_plane_app/speech_transcript.py')
+    if not host_path.is_file():
+        pytest.skip('WorldOS host speech_transcript is not installed')
+    spec = importlib.util.spec_from_file_location('host_speech_transcript', host_path)
+    host = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(host)
+    plan = _three_lesson_plan()
+    parts = host._with_lessons(
+        [{'sections': [{'kind': 'transcript', 'text': plan.source}]}], plan.to_dict()
+    )
+    assert len(parts) == 1
+    rich, plain = host.render(parts[0])
+    lesson = parts[0]['sections'][0]['text']
+    assert '   ```  \n   say: dee - toy  \n   ```' in rich
+    assert lesson in plain
+    # Parse the actual host output, including its two-space line joins and wrapper.
+    tokens = MarkdownIt('commonmark', {'html': True}).parse(rich)
+    assert len([token for token in tokens if token.type == 'ordered_list_open']) == 1
+    assert len([token for token in tokens if token.type == 'list_item_open']) == 3
+    fences = [token for token in tokens if token.type == 'fence']
+    assert [token.content.rstrip() for token in fences] == [
+        'say: dee - toy', 'say: heeoo⌄ - roy↘',
+        'say: chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓',
+    ]
+
+    row = plan.lessons[0].record
+    row['hint'] = 'dee\ntoy ```'
+    custom = replace(plan, lessons=(replace(plan.lessons[0], record_json=json.dumps(row)),) + plan.lessons[1:])
+    custom_parts = host._with_lessons(
+        [{'sections': [{'kind': 'transcript', 'text': plan.source}]}], custom.to_dict()
+    )
+    custom_rich, _ = host.render(custom_parts[0])
+    custom_tokens = MarkdownIt('commonmark', {'html': True}).parse(custom_rich)
+    assert len([token for token in custom_tokens if token.type == 'list_item_open']) == 3
+    custom_fences = [token for token in custom_tokens if token.type == 'fence']
+    assert len(custom_fences) == 3
+    assert custom_fences[0].content.rstrip() == 'say: dee toy ```'
+
+
+def test_custom_hint_newlines_backticks_and_html_stay_in_one_code_line():
+    import json
+
+    from markdown_it import MarkdownIt
+
+    plan = _three_lesson_plan()
+    row = plan.lessons[0].record
+    row['hint'] = 'dee\ntoy ``` <soft> & </details>'
+    plan = replace(plan, lessons=(replace(plan.lessons[0], record_json=json.dumps(row)),) + plan.lessons[1:])
+    sections, markdown = present(plan)
+    text = next(section.text for section in sections if section.kind == 'lesson')
+    tokens = MarkdownIt().parse(text)
+    assert len([token for token in tokens if token.type == 'list_item_open']) == 3
+    fences = [token for token in tokens if token.type == 'fence']
+    assert len(fences) == 3
+    assert fences[0].content == 'say: dee toy ``` <soft> & </details>\n'
+    rendered = MarkdownIt('commonmark', {'html': True}).render(markdown)
+    assert 'say: dee toy ``` &lt;soft&gt; &amp; &lt;/details&gt;' in rendered
+    assert '&amp;lt;' not in rendered
+    assert '<summary>Transcript</summary>' in rendered
