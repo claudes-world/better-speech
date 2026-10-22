@@ -93,7 +93,7 @@ def _three_lesson_plan():
     return replace(compile('Note.', cfg, ledger=EmptyLedger()), lessons=lessons, executed=True)
 
 
-def test_say_fences_preserve_numbered_items():
+def test_hint_fences_stand_alone_between_numbered_items():
     import re
 
     from markdown_it import MarkdownIt
@@ -101,22 +101,24 @@ def test_say_fences_preserve_numbered_items():
     sections, _ = present(_three_lesson_plan())
     text = next(section.text for section in sections if section.kind == 'lesson')
     tokens = MarkdownIt().parse(text)
-    assert len([token for token in tokens if token.type == 'ordered_list_open']) == 1
+    assert len([token for token in tokens if token.type == 'ordered_list_open']) == 3
+    assert [token.attrGet('start') for token in tokens if token.type == 'ordered_list_open'] == [None, 2, 3]
     assert len([token for token in tokens if token.type == 'list_item_open']) == 3
     fences = [token for token in tokens if token.type == 'fence']
+    assert all(token.level == 0 for token in fences)
     assert [token.content for token in fences] == [
-        'say: dee - toy\n', 'say: heeoo⌄ - roy↘\n',
-        'say: chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓\n',
+        'dee - toy\n', 'heeoo⌄ - roy↘\n',
+        'chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓\n',
     ]
     for number, item in enumerate(re.split(r'\n\n(?=\d+\. )', text.rstrip()), 1):
         assert item.startswith(f'{number}. **')
         before, code = item.split('\n\n', 1)
         assert len(before.splitlines()) == 3  # phrase, literal, translation
-        assert code.startswith('   ```\n   say: ')
-        assert code.endswith('\n   ```')
+        assert code.startswith('```\n')
+        assert code.endswith('\n```')
 
 
-def test_host_render_preserves_say_fences_and_numbering():
+def test_host_render_preserves_standalone_hint_fences_and_numbering():
     import importlib.util
     import json
     from pathlib import Path
@@ -138,16 +140,18 @@ def test_host_render_preserves_say_fences_and_numbering():
     assert len(parts) == 1
     rich, plain = host.render(parts[0])
     lesson = parts[0]['sections'][0]['text']
-    assert '   ```  \n   say: dee - toy  \n   ```' in rich
+    assert '\n```  \ndee - toy  \n```' in rich
     assert lesson in plain
     # Parse the actual host output, including its two-space line joins and wrapper.
     tokens = MarkdownIt('commonmark', {'html': True}).parse(rich)
-    assert len([token for token in tokens if token.type == 'ordered_list_open']) == 1
+    assert len([token for token in tokens if token.type == 'ordered_list_open']) == 3
+    assert [token.attrGet('start') for token in tokens if token.type == 'ordered_list_open'] == [None, 2, 3]
     assert len([token for token in tokens if token.type == 'list_item_open']) == 3
     fences = [token for token in tokens if token.type == 'fence']
+    assert all(token.level == 0 for token in fences)
     assert [token.content.rstrip() for token in fences] == [
-        'say: dee - toy', 'say: heeoo⌄ - roy↘',
-        'say: chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓',
+        'dee - toy', 'heeoo⌄ - roy↘',
+        'chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓',
     ]
 
     row = plan.lessons[0].record
@@ -161,7 +165,8 @@ def test_host_render_preserves_say_fences_and_numbering():
     assert len([token for token in custom_tokens if token.type == 'list_item_open']) == 3
     custom_fences = [token for token in custom_tokens if token.type == 'fence']
     assert len(custom_fences) == 3
-    assert custom_fences[0].content.rstrip() == 'say: dee toy ```'
+    assert all(token.level == 0 for token in custom_fences)
+    assert custom_fences[0].content.rstrip() == 'dee toy ```'
 
 
 def test_custom_hint_newlines_backticks_and_html_stay_in_one_code_line():
@@ -178,9 +183,10 @@ def test_custom_hint_newlines_backticks_and_html_stay_in_one_code_line():
     tokens = MarkdownIt().parse(text)
     assert len([token for token in tokens if token.type == 'list_item_open']) == 3
     fences = [token for token in tokens if token.type == 'fence']
+    assert all(token.level == 0 for token in fences)
     assert len(fences) == 3
-    assert fences[0].content == 'say: dee toy ``` <soft> & </details>\n'
+    assert fences[0].content == 'dee toy ``` <soft> & </details>\n'
     rendered = MarkdownIt('commonmark', {'html': True}).render(markdown)
-    assert 'say: dee toy ``` &lt;soft&gt; &amp; &lt;/details&gt;' in rendered
+    assert 'dee toy ``` &lt;soft&gt; &amp; &lt;/details&gt;' in rendered
     assert '&amp;lt;' not in rendered
     assert '<summary>Transcript</summary>' in rendered

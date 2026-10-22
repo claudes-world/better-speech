@@ -130,7 +130,7 @@ def test_hint_code_block_after_translation_and_never_spoken():
     lines = next(s.text for s in sections if s.kind == 'lesson').splitlines()
     assert 'go' in lines[1] and '[just/let' in lines[1].replace('\\', '')
     assert 'go' in lines[2]
-    assert lines[3:] == ['', '   ```', '   say: dee - toy', '   ```']
+    assert lines[3:] == ['', '```', 'dee - toy', '```']
     assert all('dee - toy' not in clip.text for clip in plan.clips)
 
 
@@ -144,7 +144,7 @@ def test_cli_hint_persists_and_renders(tmp_path, capsys):
     from better_speech.config import load_profile
     cfg = load_profile(config)
     plan = compile('Note.', cfg, ledger=Ledger.for_profile(cfg))
-    assert 'say: hawk-nyeh' in present(replace(plan, executed=True))[1]
+    assert '\n```\nhawk-nyeh\n```' in present(replace(plan, executed=True))[1]
     assert all('hawk-nyeh' not in c.text for c in plan.clips)
 
 

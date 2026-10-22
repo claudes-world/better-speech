@@ -1,4 +1,4 @@
-# WOS2-1194 round4
+# WOS2-1194 round4b
 
 Version: 0.2.5.
 
@@ -9,15 +9,19 @@ follow the existing interlinear Vietnamese word grouping and use single spaces.
 The English respellings and all other curriculum fields are preserved.
 
 Each numbered lesson now presents bold Vietnamese, literal gloss, translation,
-a blank line, and an indented fenced `say:` block. Custom hint newlines become
-spaces so the say line stays inside its numbered item. Code content stays literal; backtick runs select a longer fence as needed.
+a blank line, and a standalone fenced hint block. Fences and content start at
+column zero, with a blank line after the block. The block contains only the hint,
+without a `say:` prefix. Custom hint newlines become spaces. Code content stays
+literal; backtick runs select a longer fence as needed.
 README and metadata describe the new reading key.
 
 The optional host regression imports the installed WorldOS speech_transcript.py
 only when its path exists. It exercises `_with_lessons` and `render` with three
 lessons, then parses the actual rich output. The host's `  \n` join leaves all
-three fences intact in one ordered list with three list items. The two trailing
-spaces become harmless whitespace in code content. Shipped hints need no host changes.
+three fences intact at the top level, between explicitly numbered items 1, 2, 3.
+CommonMark parses these as three separate lists with starts 1, 2, 3; Telegram
+continues the numbering across the full-width blocks, per Liam’s reviewed
+screenshots. The two trailing spaces become harmless whitespace in code content. Shipped hints need no host changes.
 
 Validation:
 
@@ -30,7 +34,7 @@ Validation:
   in package and actual host regressions. Its HTML-entity finding was fixed for
   package Markdown by keeping code content literal; the host limitation below
   remains outside this repository.
-- `uv run pytest -q`: 875 passed after review fixes. The fresh environment needed
+- `uv run pytest -q`: 875 passed after round4b display fixes. The fresh environment needed
   `uv sync --all-extras` for the existing optional-provider tests.
 
 Constraints: the installed WorldOS host always HTML-escapes lesson text before

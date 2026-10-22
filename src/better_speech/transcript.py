@@ -98,12 +98,12 @@ def present(plan):
                 lines.append("   *" + _label(literal) + "*")
             lines.append("   " + _label(row["translation"]))
             if row.get("hint"):
-                # Keep a single say line, including for founder-authored multiline hints.
+                # Keep a single hint line, including for founder-authored multiline hints.
                 hint = " ".join(row["hint"].splitlines())
                 # Code content is literal; the Markdown renderer escapes its HTML.
                 # A longer fence keeps founder-authored backticks inside the block.
                 fence = "`" * max(3, max((len(run) + 1 for run in re.findall(r"`+", hint)), default=0))
-                lines.extend(("", "   " + fence, "   say: " + hint, "   " + fence))
+                lines.extend(("", fence, hint, fence))
             lines.append("")
         sections.append(Section("lesson", "\n".join(lines), True))
     sections.append(Section("transcript", plan.source, True))
