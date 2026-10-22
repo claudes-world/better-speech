@@ -183,10 +183,14 @@ def compile(
                         ((r["lastHeard"], r.get("lastGreetingOrder", 0), r["lastGreetingKey"])
                          for r in records.values() if r.get("lastGreetingKey")), default=("", 0, ""),
                     )[2]
-                    # Greetings keep the time-of-day gap rule; everyday openers are "any".
-                    greetings = [r for r in eligible_rows if r.get("category") in OPENER_CATEGORIES
-                                 and r.get("time_of_day", "any") in (period, "any")
-                                 and r["ledger_identity"] != previous]
+                    # Category first (50/50 greeting vs opener), then a record in that pool with
+                    # the no-repeat rotation. Greetings keep the time-of-day gap rule; openers are "any".
+                    pools = [[r for r in eligible_rows if r.get("category") == category
+                              and r.get("time_of_day", "any") in (period, "any")
+                              and r["ledger_identity"] != previous]
+                             for category in OPENER_CATEGORIES]
+                    pools = [pool for pool in pools if pool]
+                    greetings = pools[min(int(rng() * len(pools)), len(pools) - 1)] if pools else []
                     if greetings and len(chosen) < maximum:
                         row = greetings[min(int(rng() * len(greetings)), len(greetings) - 1)]
                         choices = [(row, 0, "start", "open"), *chosen]

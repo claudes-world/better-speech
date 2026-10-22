@@ -117,7 +117,7 @@ def test_opener_rotation_no_repeat_and_ledger_key(tmp_path):
     ledger = Ledger(tmp_path / 'ledger')
     previous, seen = None, set()
     for index in range(12):
-        plan = compile('Note.', profile(), ledger=ledger, now=NOW, seed=3, greeting=True)
+        plan = compile('Note.', profile(), ledger=ledger, now=NOW, seed=index, greeting=True)
         key = plan.clips[0].phrase_key
         assert key != previous
         record_delivered(replace(plan, executed=True), f'd-{index}', NOW, ledger=ledger)
@@ -125,3 +125,11 @@ def test_opener_rotation_no_repeat_and_ledger_key(tmp_path):
         previous = key
         seen.add(key)
     assert len(seen) > 2
+
+
+def test_category_is_drawn_fifty_fifty(tmp_path):
+    counts = {'greeting': 0, 'opener': 0}
+    for seed in range(400):
+        plan = compile('Note.', profile(), ledger=Ledger(tmp_path / 'ledger'), now=NOW, seed=seed, greeting=True)
+        counts[greetings(plan)[0].record['category']] += 1
+    assert 140 < counts['greeting'] < 260
