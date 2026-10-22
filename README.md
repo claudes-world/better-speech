@@ -115,6 +115,10 @@ The lesson block shows it as an italic `say:` line below the literal gloss. Add 
 edit your own with `speak learn PHRASE --gloss GLOSS --hint RESPELLING`. Hints are
 visual only.
 
+Accent: The shipped pronunciation hints follow southern/central Vietnamese,
+matching the lesson voices. Initial d, gi and v use a y sound, r keeps its r
+sound, and hỏi and ngã share the `[dipping]` tone mark.
+
 Set one profile setting to choose the optional contextual placer:
 
 | `model` | Adapter | Model setting/default |
