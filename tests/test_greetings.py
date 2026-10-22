@@ -13,7 +13,7 @@ NOW = datetime(2026, 10, 21, 14, tzinfo=timezone.utc)
 
 
 def greetings(plan):
-    return [r for r in plan.lessons if r.record.get('category') == 'greeting']
+    return [r for r in plan.lessons if r.record.get('category') in ('greeting', 'opener')]
 
 
 @pytest.mark.parametrize('flag,expected', [(False, 0), (True, 1)])
@@ -29,7 +29,7 @@ def test_greeting_flag_and_first_audible_clip(tmp_path, flag, expected, text):
         assert plan.clips[0].phrase_key == greeting.phrase_key
         assert plan.clips[0].language == 'vi'
         assert greeting.record['time_of_day'] in ('morning', 'any')
-        assert greeting.record['phrase'].rstrip('!') in present(replace(plan, executed=True))[1]
+        assert greeting.record['phrase'].rstrip('!.?') in present(replace(plan, executed=True))[1]
 
 
 @pytest.mark.parametrize('zone,hour,period', [('UTC', 6, 'morning'), ('UTC', 15, 'afternoon'),
@@ -37,7 +37,7 @@ def test_greeting_flag_and_first_audible_clip(tmp_path, flag, expected, text):
 def test_greeting_profile_timezone(tmp_path, zone, hour, period):
     now = NOW.replace(hour=hour)
     seen = set()
-    for seed in range(16):
+    for seed in range(80):
         plan = compile('Note.', profile(timezone=zone), ledger=Ledger(tmp_path / 'ledger'), now=now,
                        seed=seed, greeting=True)
         assert greetings(plan)[0].record['time_of_day'] in (period, 'any')
@@ -80,4 +80,56 @@ def test_default_flag_and_cli_plan_flag(tmp_path, capsys):
     assert main(['plan', str(source), '--profile', str(config), '--greeting']) == 0
     import json
     plan = json.loads(capsys.readouterr().out)
-    assert any('"category":"greeting"' in r['record_json'] for r in plan['lessons'])
+    assert any('"category":"greeting"' in r['record_json'] or '"category":"opener"' in r['record_json']
+               for r in plan['lessons'])
+
+
+def opener_rows():
+    from better_speech.curriculum import runtime_curriculum
+    return [r for r in runtime_curriculum(profile()) if r.get('category') == 'opener']
+
+
+def test_opener_pool_shape():
+    rows = opener_rows()
+    assert len(rows) == 20
+    assert all(r['time_of_day'] == 'any' and r['hint'] and r['l1_literal'] for r in rows)
+    assert len({r['id'] for r in rows}) == 20
+
+
+def test_openers_never_closers_or_model_offers(tmp_path):
+    for seed in range(8):
+        plan = compile('Note.', profile(), ledger=Ledger(tmp_path / 'ledger'), now=NOW, seed=seed)
+        assert all(r.record.get('category') not in ('greeting', 'opener') for r in plan.lessons)
+
+
+def test_greeting_flag_mixes_openers_and_greetings(tmp_path):
+    kinds = set()
+    for seed in range(60):
+        plan = compile('Note.', profile(), ledger=Ledger(tmp_path / 'ledger'), now=NOW, seed=seed, greeting=True)
+        row = plan.clips[0]
+        record = next(r.record for r in plan.lessons if r.phrase_key == row.phrase_key)
+        assert record['category'] in ('greeting', 'opener')
+        kinds.add(record['category'])
+    assert kinds == {'greeting', 'opener'}
+
+
+def test_opener_rotation_no_repeat_and_ledger_key(tmp_path):
+    ledger = Ledger(tmp_path / 'ledger')
+    previous, seen = None, set()
+    for index in range(12):
+        plan = compile('Note.', profile(), ledger=ledger, now=NOW, seed=index, greeting=True)
+        key = plan.clips[0].phrase_key
+        assert key != previous
+        record_delivered(replace(plan, executed=True), f'd-{index}', NOW, ledger=ledger)
+        assert ledger.snapshot()[key]['lastGreetingKey'] == key
+        previous = key
+        seen.add(key)
+    assert len(seen) > 2
+
+
+def test_category_is_drawn_fifty_fifty(tmp_path):
+    counts = {'greeting': 0, 'opener': 0}
+    for seed in range(400):
+        plan = compile('Note.', profile(), ledger=Ledger(tmp_path / 'ledger'), now=NOW, seed=seed, greeting=True)
+        counts[greetings(plan)[0].record['category']] += 1
+    assert 140 < counts['greeting'] < 260

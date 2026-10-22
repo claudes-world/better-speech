@@ -203,7 +203,7 @@ class Ledger:
                     if deadline is not None:
                         remaining(deadline)
                     records, _ = record_exposures(records, [json.loads(raw)], now=at)
-                if lesson.record.get("category") == "greeting":
+                if lesson.record.get("category") in ("greeting", "opener"):
                     records[lesson.phrase_key]["lastGreetingKey"] = lesson.phrase_key
                     records[lesson.phrase_key]["lastGreetingOrder"] = self._execute(
                         connection, "SELECT rowid FROM events WHERE learner_id=? AND phrase_key=? "

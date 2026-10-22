@@ -32,6 +32,9 @@ def _boosted(row, records, now, cap):
     return _boost_pending(row, now) and records.get(row["ledger_identity"], {}).get("dailyCount", 0) < cap
 
 
+OPENER_CATEGORIES = ("greeting", "opener")
+
+
 def _rank(rows, records, now, boost_daily_cap=3):
     def priority(row):
         record = records.get(row["ledger_identity"], {})
@@ -120,7 +123,7 @@ def compile(
                 second_voice=profile.repeat_second_voice,
             )
             eligible_rows = _rank(rows, records, at, profile.boost_daily_cap)
-            ranked = [r for r in eligible_rows if r.get("category") != "greeting"]
+            ranked = [r for r in eligible_rows if r.get("category") not in OPENER_CATEGORIES]
             # Reserve the top boosted/due item. On a fresh queue, introduce one unseen item.
             candidates = [r for r in ranked if (
                 not records.get(r["ledger_identity"])
@@ -180,9 +183,14 @@ def compile(
                         ((r["lastHeard"], r.get("lastGreetingOrder", 0), r["lastGreetingKey"])
                          for r in records.values() if r.get("lastGreetingKey")), default=("", 0, ""),
                     )[2]
-                    greetings = [r for r in eligible_rows if r.get("category") == "greeting"
-                                 and r.get("time_of_day") in (period, "any")
-                                 and r["ledger_identity"] != previous]
+                    # Category first (50/50 greeting vs opener), then a record in that pool with
+                    # the no-repeat rotation. Greetings keep the time-of-day gap rule; openers are "any".
+                    pools = [[r for r in eligible_rows if r.get("category") == category
+                              and r.get("time_of_day", "any") in (period, "any")
+                              and r["ledger_identity"] != previous]
+                             for category in OPENER_CATEGORIES]
+                    pools = [pool for pool in pools if pool]
+                    greetings = pools[min(int(rng() * len(pools)), len(pools) - 1)] if pools else []
                     if greetings and len(chosen) < maximum:
                         row = greetings[min(int(rng() * len(greetings)), len(greetings) - 1)]
                         choices = [(row, 0, "start", "open"), *chosen]
@@ -196,7 +204,7 @@ def compile(
             _, ends = paragraph_boundaries(speech)
             starts = openers
             slots = {f"start:{offset}": (offset, "start") for offset in starts}
-            if any(r.get("category") == "greeting" for r, *_ in chosen):
+            if any(r.get("category") in OPENER_CATEGORIES for r, *_ in chosen):
                 slots.pop("start:0", None)
             slots.update({f"end:{offset}": (offset, "end") for offset in ends if offset != len(speech)})
             offered = [

@@ -199,7 +199,7 @@ def test_greeting_cannot_reintroduce_a_capped_learner_phrase(tmp_path):
     ledger = Ledger(tmp_path / "ledger.db")
     now = datetime.fromisoformat("2026-10-21T12:00:00+00:00")
     row = learn("Xin chào!", "Hello!", cfg, ledger=ledger, now=now)
-    plans = (compile("Note.", cfg, ledger=ledger, now=now, greeting=True, seed=seed) for seed in range(20))
+    plans = (compile("Note.", cfg, ledger=ledger, now=now, greeting=True, seed=seed) for seed in range(400))
     first = next(plan for plan in plans if row["id"] in [lesson.id for lesson in plan.lessons])
     assert record_delivered(replace(first, executed=True), "hello", now, ledger=ledger).added == len(first.lessons)
     # Confirm another greeting so last-greeting rotation alone cannot hide Xin chào.
