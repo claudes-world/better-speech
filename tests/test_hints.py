@@ -50,15 +50,48 @@ def test_southern_initials_and_merged_tones():
     assert metadata['_meta']['accent'] == 'southern'
 
 
+def test_every_syllable_has_its_lexical_tone_and_southern_initial():
+    rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
+    tones = {
+        '\u0301': 'rising', '\u0300': 'falling',
+        '\u0309': 'dipping', '\u0303': 'dipping', '\u0323': 'low',
+    }
+    for row in rows:
+        words = re.findall(r'[^\W\d_]+', row['l2'].lower())
+        syllables = row['hint'].split('-')
+        assert len(words) == len(syllables), row['id']
+        for word, syllable in zip(words, syllables, strict=True):
+            decomposed = unicodedata.normalize('NFD', word)
+            expected = next((tone for mark, tone in tones.items() if mark in decomposed), None)
+            label = re.fullmatch(r'[a-z]+(?: \[(rising|falling|dipping|low)(, clipped)?\])?', syllable)
+            assert label is not None, (row['id'], word, syllable)
+            assert label[1] == expected, (row['id'], word, syllable)
+            if label[2]:
+                assert expected == 'low' and syllable.split()[0].endswith(('p', 't', 'k'))
+            plain = ''.join(char for char in decomposed if not unicodedata.combining(char))
+            if plain.startswith(('d', 'gi', 'v')):
+                assert syllable.startswith('y'), (row['id'], word, syllable)
+            if plain.startswith('đ'):
+                assert syllable.startswith('d'), (row['id'], word, syllable)
+            if plain.startswith('th'):
+                assert syllable.startswith('t') and not syllable.startswith('th'), row['id']
+            if plain.startswith('tr'):
+                assert syllable.startswith('tr'), row['id']
+            if word == 'gì':
+                assert syllable == 'yee [falling]', row['id']
+            if word == 'có':
+                assert syllable == 'kaw [rising]', row['id']
+
+
 @pytest.mark.parametrize(('phrase_id', 'syllable'), [
     ('da', 'yah [low]'),
-    ('khong-co-gi', 'yeay [falling]'),
-    ('goi-la-gi', 'yeay [falling]'),
+    ('khong-co-gi', 'yee [falling]'),
+    ('goi-la-gi', 'yee [falling]'),
     ('giup-minh-voi', 'yoop [rising]'),
-    ('giu-tien-thua', 'yuh [dipping]'),
+    ('giu-tien-thua', 'yuu [dipping]'),
     ('vui-qua', 'yooy'),
-    ('tieng-viet-mot-chut', 'yeek [low]'),
-    ('mang-ve', 'yeh [falling]'),
+    ('tieng-viet-mot-chut', 'yeek [low, clipped]'),
+    ('mang-ve', 'yay [falling]'),
     ('duoc-roi', 'roy [falling]'),
 ])
 def test_southern_pronunciation_examples(phrase_id, syllable):
@@ -69,24 +102,25 @@ def test_southern_pronunciation_examples(phrase_id, syllable):
 
 @pytest.mark.parametrize(('phrase_id', 'hint'), [
     ('xin-loi', 'sin-loy [dipping]'),
-    ('giu-tien-thua', 'yuh [dipping]-teeyen-thuuh [falling]-nyeh'),
-    ('san-sang-chua', 'sahn [dipping]-sahng [falling]-chuuh'),
+    ('giu-tien-thua', 'yuu [dipping]-teeng [falling]-tuuh [falling]-nyeh [rising]'),
+    ('san-sang-chua', 'sahng [dipping]-sahng [falling]-chuuh'),
     ('doi-qua', 'doy [rising]-kwah [rising]'),
     ('tin-vui-ne', 'tin-yooy-neh [falling]'),
-    ('cai-nay-bao-nhieu', 'kye [rising]-nigh [falling]-bow-nyeeyoo-teeyen'),
-    ('hieu-roi', 'heeyoo [dipping]-roy [falling]'),
-    ('thich-qua', 'thik [rising]-kwah [rising]'),
-    ('tinh-tien', 'tin [rising]-teeyen [falling]'),
+    ('cai-nay-bao-nhieu', 'kye [rising]-nigh [falling]-bow-nyeeoo-teeng [falling]'),
+    ('hieu-roi', 'heeoo [dipping]-roy [falling]'),
+    ('thich-qua', 'tit [rising]-kwah [rising]'),
+    ('tinh-tien', 'tin [rising]-teeng [falling]'),
 ])
 def test_reviewed_southern_hint_tones_and_syllables(phrase_id, hint):
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
     assert next(row for row in rows if row['id'] == phrase_id)['hint'] == hint
 
 
-def test_every_record_has_short_draft_hint():
+def test_every_record_has_draft_hint():
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
     assert len(rows) == 85
-    assert all(isinstance(r['hint'], str) and 0 < len(r['hint']) < 60 for r in rows)
+    # Full syllable-by-syllable tone labels need up to 100 characters.
+    assert all(isinstance(r['hint'], str) and 0 < len(r['hint']) <= 100 for r in rows)
     assert all(r['hint'] == r['hint'].lower() for r in rows)
     metadata = files('better_speech').joinpath('data/curriculum.vi.metadata.json').read_text()
     assert 'Founder-editable drafts' in metadata
@@ -98,8 +132,8 @@ def test_hint_rendering_below_literal_and_never_spoken():
     sections, _ = present(replace(plan, executed=True))
     lines = next(s.text for s in sections if s.kind == 'lesson').splitlines()
     assert 'go' in lines[1] and '[just/let' in lines[1].replace('\\', '')
-    assert lines[2] == '   *say: dee\\-thoy*'
-    assert all('dee-thoy' not in clip.text for clip in plan.clips)
+    assert lines[2] == '   *say: dee\\-toy*'
+    assert all('dee-toy' not in clip.text for clip in plan.clips)
 
 
 def test_cli_hint_persists_and_renders(tmp_path, capsys):
