@@ -63,7 +63,7 @@ def test_every_syllable_has_its_lexical_tone_and_southern_initial():
         for word, syllable in zip(words, syllables, strict=True):
             decomposed = unicodedata.normalize('NFD', word)
             expected = next((tone for mark, tone in tones.items() if mark in decomposed), None)
-            label = re.fullmatch(r'[a-z]+([↗↘↓⌄])?', syllable)
+            label = re.fullmatch(r'[a-z]+(?:-[a-z]+)*([↗↘↓⌄])?', syllable)
             assert label is not None, (row['id'], word, syllable)
             assert label[1] == expected, (row['id'], word, syllable)
             plain = ''.join(char for char in decomposed if not unicodedata.combining(char))
@@ -72,7 +72,7 @@ def test_every_syllable_has_its_lexical_tone_and_southern_initial():
             if plain.startswith('đ'):
                 assert syllable.startswith('d'), (row['id'], word, syllable)
             if plain.startswith('th'):
-                assert syllable.startswith('t') and not syllable.startswith('th'), row['id']
+                assert syllable.startswith('th'), row['id']
             if plain.startswith('tr'):
                 assert syllable.startswith('tr'), row['id']
             if word == 'gì':
@@ -88,8 +88,8 @@ def test_every_syllable_has_its_lexical_tone_and_southern_initial():
     ('giup-minh-voi', 'yoop↗'),
     ('minh-nghi-the-nay', 'yuhy↘'),
     ('vui-qua', 'yooy'),
-    ('tieng-viet-mot-chut', 'yeek↓'),
-    ('mang-ve', 'yay↘'),
+    ('tieng-viet-mot-chut', 'yeeyet↓'),
+    ('mang-ve', 'yeh↘'),
     ('duoc-roi', 'roy↘'),
 ])
 def test_southern_pronunciation_examples(phrase_id, syllable):
@@ -100,14 +100,14 @@ def test_southern_pronunciation_examples(phrase_id, syllable):
 
 @pytest.mark.parametrize(('phrase_id', 'hint'), [
     ('xin-loi', 'sin - loy⌄'),
-    ('giu-tien-thua', 'khohng - kuhng↘ - toy↗ - lie↓ - duhow'),
-    ('san-sang-chua', 'sahng⌄ sahng↘ - chuuh'),
-    ('doi-qua', 'doy↗ - kwah↗'),
+    ('giu-tien-thua', 'khohng - kuhng↘ - thoy↗ - lie↓ - doh'),
+    ('san-sang-chua', 'sahng⌄ sahng↘ - chuah'),
+    ('doi-qua', 'daw-ee↗ - wah↗'),
     ('tin-vui-ne', 'tin - yooy - neh↘'),
-    ('cai-nay-bao-nhieu', 'kye↗ - nigh↘ - bow nyeeoo - teeng↘'),
-    ('hieu-roi', 'heeoo⌄ - roy↘'),
-    ('thich-qua', 'tit↗ - kwah↗'),
-    ('tinh-tien', 'tin↗ - teeng↘'),
+    ('cai-nay-bao-nhieu', 'kye↗ - nigh↘ - bow nyee-uh-oo - teeyen↘'),
+    ('hieu-roi', 'hee-uh-oo⌄ - roy↘'),
+    ('thich-qua', 'thit↗ - wah↗'),
+    ('tinh-tien', 'tin↗ - teeyen↘'),
 ])
 def test_reviewed_southern_hint_tones_and_syllables(phrase_id, hint):
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
@@ -130,8 +130,8 @@ def test_hint_code_block_after_translation_and_never_spoken():
     lines = next(s.text for s in sections if s.kind == 'lesson').splitlines()
     assert 'go' in lines[1] and '[just/let' in lines[1].replace('\\', '')
     assert 'go' in lines[2]
-    assert lines[3:] == ['', '```', 'dee - toy', '```']
-    assert all('dee - toy' not in clip.text for clip in plan.clips)
+    assert lines[3:] == ['', '```', 'dee - thoy', '```']
+    assert all('dee - thoy' not in clip.text for clip in plan.clips)
 
 
 def test_cli_hint_persists_and_renders(tmp_path, capsys):
@@ -154,7 +154,22 @@ def test_arrow_hints_and_piece_spacing():
         hint = row['hint']
         assert '[' not in hint, row['id']
         assert not re.search(r'(?<![a-z])[↗↘↓⌄]', hint), row['id']
-        assert not re.search(r'(?<! )-|-(?! )', hint), row['id']
+        assert not re.search(r'(?<! )- | -(?! )', hint), row['id']
         assert '  ' not in hint, row['id']
     towel = next(row for row in rows if row['id'] == 'cho-minh-mot-cai-khan-a')
     assert towel['hint'] == 'chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓'
+
+
+def test_every_shipped_syllable_matches_alphabet_guide_fixture():
+    from pathlib import Path
+
+    expected = json.loads((Path(__file__).parent / 'fixtures/alphabet_guide_hints.json').read_text())
+    rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
+    checked = set()
+    for row in rows:
+        words = re.findall(r'[^\W\d_]+', row['l2'].lower())
+        syllables = row['hint'].replace(' - ', ' ').split()
+        for word, hint in zip(words, syllables, strict=True):
+            assert hint == expected[word], (row['id'], word, hint)
+            checked.add(word)
+    assert checked == expected.keys()

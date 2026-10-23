@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "better-speech"
-version = "0.2.7"
+version = "0.2.8"
 description = "Vietnamese lessons inside agent voice notes"
 readme = "README.md"
 requires-python = ">=3.12"
