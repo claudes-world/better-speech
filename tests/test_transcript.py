@@ -107,7 +107,7 @@ def test_hint_fences_stand_alone_between_numbered_items():
     fences = [token for token in tokens if token.type == 'fence']
     assert all(token.level == 0 for token in fences)
     assert [token.content for token in fences] == [
-        'dee - toy\n', 'heeoo⌄ - roy↘\n',
+        'dee - thoy\n', 'hee-uh-oo⌄ - roy↘\n',
         'chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓\n',
     ]
     for number, item in enumerate(re.split(r'\n\n(?=\d+\. )', text.rstrip()), 1):
@@ -140,7 +140,7 @@ def test_host_render_preserves_standalone_hint_fences_and_numbering():
     assert len(parts) == 1
     rich, plain = host.render(parts[0])
     lesson = parts[0]['sections'][0]['text']
-    assert '\n```  \ndee - toy  \n```' in rich
+    assert '\n```  \ndee - thoy  \n```' in rich
     assert lesson in plain
     # Parse the actual host output, including its two-space line joins and wrapper.
     tokens = MarkdownIt('commonmark', {'html': True}).parse(rich)
@@ -150,7 +150,7 @@ def test_host_render_preserves_standalone_hint_fences_and_numbering():
     fences = [token for token in tokens if token.type == 'fence']
     assert all(token.level == 0 for token in fences)
     assert [token.content.rstrip() for token in fences] == [
-        'dee - toy', 'heeoo⌄ - roy↘',
+        'dee - thoy', 'hee-uh-oo⌄ - roy↘',
         'chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓',
     ]
 
