@@ -269,3 +269,30 @@ def test_planner_rejects_inner_bookend(offset, position, mode):
         placements=[LessonPlacement(row['id'], offset, position, cfg.voices[0], None, mode=mode)],
         main=cfg.english, settings={})
     assert error
+
+
+@pytest.mark.parametrize('first_seed,first_greeting,second_seed,second_greeting,prefix', [
+    (2, False, 5, True, 'lastClosing'), (1, True, 2, False, 'lastGreeting'),
+])
+def test_bookend_preserves_other_role_history(tmp_path, first_seed, first_greeting,
+                                              second_seed, second_greeting, prefix):
+    ledger = Ledger(tmp_path / 'ledger')
+    first = compile('Note.', profile(), ledger=ledger, now='2026-10-24T12:00:00Z',
+                    seed=first_seed, greeting=first_greeting)
+    bookend = next(r for r in first.lessons if r.id == 'di-thoi')
+    record_delivered(replace(first, executed=True), 'role-1', '2026-10-24T12:00:00Z', ledger=ledger)
+    before = ledger.snapshot()[bookend.phrase_key]
+    second = next(plan for seed in range(second_seed, second_seed + 20)
+                  if any(r.id == 'di-thoi' for r in (plan := compile(
+                      'Note.', profile(), ledger=ledger, now='2026-10-24T12:01:00Z',
+                      seed=seed, greeting=second_greeting)).lessons))
+    other = next(r for r in second.lessons if r.id == 'di-thoi')
+    assert bookend.record['lesson_type'] != other.record['lesson_type']
+    record_delivered(replace(second, executed=True), 'role-2', '2026-10-24T12:01:00Z', ledger=ledger)
+    after = ledger.snapshot()[bookend.phrase_key]
+    for suffix in ('Key', 'At', 'Order'):
+        assert after[prefix + suffix] == before[prefix + suffix]
+    if prefix == 'lastClosing':
+        for seed in range(20):
+            third = compile('Note.', profile(), ledger=ledger, now='2026-10-24T12:02:00Z', seed=seed)
+            assert all(r.id != 'di-thoi' for r in closings(third))
