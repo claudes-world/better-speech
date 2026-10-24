@@ -33,6 +33,7 @@ def _boosted(row, records, now, cap):
 
 
 OPENER_CATEGORIES = ("greeting", "opener")
+BOOKEND_CATEGORIES = (*OPENER_CATEGORIES, "closing")
 
 
 def _rank(rows, records, now, boost_daily_cap=3):
@@ -124,6 +125,13 @@ def compile(
             )
             eligible_rows = _rank(rows, records, at, profile.boost_daily_cap)
             ranked = [r for r in eligible_rows if r.get("category") not in OPENER_CATEGORIES]
+            previous_closing = max(
+                ((r["lastHeard"], r.get("lastClosingOrder", 0), r["lastClosingKey"])
+                 for r in records.values() if r.get("lastClosingKey")), default=("", 0, ""),
+            )[2]
+            closings = [r for r in eligible_rows if r.get("category") == "closing"]
+            rotating_closings = [r for r in closings if r["ledger_identity"] != previous_closing] or closings
+            ranked = [r for r in ranked if r.get("category") != "closing" or r in rotating_closings]
             # Reserve the top boosted/due item. On a fresh queue, introduce one unseen item.
             candidates = [r for r in ranked if (
                 not records.get(r["ledger_identity"])
@@ -191,7 +199,7 @@ def compile(
                              for category in OPENER_CATEGORIES]
                     pools = [pool for pool in pools if pool]
                     greetings = pools[min(int(rng() * len(pools)), len(pools) - 1)] if pools else []
-                    if greetings and len(chosen) < maximum:
+                    if greetings:
                         row = greetings[min(int(rng() * len(greetings)), len(greetings) - 1)]
                         choices = [(row, 0, "start", "open"), *chosen]
                         greeting_rows, greeting_plan = build(choices)
@@ -199,6 +207,16 @@ def compile(
                             chosen, reserved_rows, reserved_plan = choices, greeting_rows, greeting_plan
                 except Exception as error:
                     diagnostics.append(Diagnostic("greeting", type(error).__name__))
+            if rotating_closings and not any(r.get("category") == "closing" for r, *_ in chosen):
+                row = rotating_closings[min(int(rng() * len(rotating_closings)), len(rotating_closings) - 1)]
+                choices = [*chosen, (row, len(speech), "end", "close")]
+                closing_rows, closing_plan = build(choices)
+                if not closing_plan[1]:
+                    chosen, reserved_rows, reserved_plan = choices, closing_rows, closing_plan
+
+            def counted():
+                return [choice for choice in chosen if choice[0].get("category") not in BOOKEND_CATEGORIES]
+
             remaining(deadline)
             # Deterministic closing slot is unavailable to optional contextual selection.
             _, ends = paragraph_boundaries(speech)
@@ -211,9 +229,10 @@ def compile(
                 r
                 for r in ranked
                 if r["lesson_type"] == "connector"
+                and r.get("category") != "closing"
                 and (not reservation or r["ledger_identity"] != reservation["ledger_identity"])
             ]
-            if profile.model != "none" and offered and slots and len(chosen) < maximum:
+            if profile.model != "none" and offered and slots and len(counted()) < maximum:
                 try:
                     timeout = min(profile.model_timeout_s, remaining(model_deadline))
                     if model_call is None:
@@ -242,7 +261,7 @@ def compile(
                     if any(p.phrase_id not in by_id or p.slot_id not in slots for p in proposals):
                         raise ValueError("unoffered placement")
                     used, occupied = {r["ledger_identity"] for r, *_ in chosen}, set()
-                    new_count = sum(r["ledger_identity"] not in records for r, *_ in chosen)
+                    new_count = sum(r["ledger_identity"] not in records for r, *_ in counted())
                     for proposal in proposals:
                         row = by_id[proposal.phrase_id]
                         key = row["ledger_identity"]
@@ -250,8 +269,8 @@ def compile(
                         if (
                             key in used
                             or proposal.slot_id in occupied
-                            or len(chosen) >= maximum
-                            or sum(choice[3] == "open" for choice in chosen) >= 3
+                            or len(counted()) >= maximum
+                            or sum(choice[3] == "open" for choice in counted()) >= 3
                             or (unseen and new_count >= 2)
                         ):
                             continue

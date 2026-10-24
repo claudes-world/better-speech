@@ -60,7 +60,7 @@ def test_no_eligible_echo_preserves_lead_without_a_low_weight_repeat():
     cfg = replace(profile(), voices=(Voice("low", weight=1),))
     plan = compile("Note.", cfg, ledger=EmptyLedger())
     assert plan.lessons
-    assert [c.voice for c in plan.clips if c.language == "vi"] == ["low"]
+    assert [c.voice for c in plan.clips if c.language == "vi"] == ["low"] * len(plan.lessons)
     assert not any(c.echo for c in plan.clips)
 
 
@@ -96,8 +96,8 @@ def test_existing_landed_learner_bill_phrase_wins_without_duplicate_scheduling(t
                     for r in rows}, additions
 
     plan = compile("Note.", cfg, ledger=DueBill(), now="2026-10-21T12:00:00Z")
-    assert [lesson.id for lesson in plan.lessons] == ["learn-80c0c3193294e6c5"]
-    assert [c.phrase_key for c in plan.clips if c.language == "vi"] == [phrase]
+    assert [lesson.id for lesson in plan.lessons if lesson.record.get("category") != "closing"] == ["learn-80c0c3193294e6c5"]
+    assert [c.phrase_key for c in plan.clips if c.language == "vi" and c.phrase_key == phrase] == [phrase]
 
 
 @pytest.mark.parametrize("zone,start,midnight", [
@@ -116,13 +116,13 @@ def test_boost_caps_confirmed_deliveries_resets_at_local_midnight_and_ends_when_
         # Replanning or acknowledging an unexecuted plan never consumes the cap.
         for _ in range(2):
             plan = compile("Note.", cfg, ledger=ledger, now=now)
-            assert [lesson.id for lesson in plan.lessons] == [row["id"]]
+            assert [lesson.id for lesson in plan.lessons if lesson.record.get("category") != "closing"] == [row["id"]]
             assert record_delivered(plan, "unexecuted", now, ledger=ledger).added == 0
         executed = replace(plan, executed=True)
-        assert sum(c.echo for c in executed.clips) == 1
+        assert sum(c.echo for c in executed.clips if c.phrase_key == row["l2"]) == 1
         for expected in (1, 0):
             receipt = record_delivered(executed, str(index), now, ledger=ledger)
-            assert receipt.added == expected and not receipt.diagnostics
+            assert receipt.added == expected * len(executed.lessons) and not receipt.diagnostics
     # Reloading the ledger retains the count; echoes and replays counted once.
     ledger = Ledger(ledger.path)
     fourth = compile("Note.", cfg, ledger=ledger, now=now)
@@ -131,9 +131,9 @@ def test_boost_caps_confirmed_deliveries_resets_at_local_midnight_and_ends_when_
     before_midnight = compile("Note.", cfg, ledger=ledger, now=next_day - timedelta(milliseconds=1))
     assert row["id"] not in [lesson.id for lesson in before_midnight.lessons]
     tomorrow = compile("Note.", cfg, ledger=ledger, now=next_day)
-    assert [lesson.id for lesson in tomorrow.lessons] == [row["id"]]
+    assert [lesson.id for lesson in tomorrow.lessons if lesson.record.get("category") != "closing"] == [row["id"]]
     assert row["id"] in [r["id"] for r in due(cfg, ledger=ledger, now=next_day)]
-    assert record_delivered(replace(tomorrow, executed=True), "tomorrow", next_day, ledger=ledger).added == 1
+    assert record_delivered(replace(tomorrow, executed=True), "tomorrow", next_day, ledger=ledger).added == len(tomorrow.lessons)
     learned(row["id"], cfg, ledger=ledger)
     landed = compile("Note.", cfg, ledger=ledger, now=next_day)
     assert landed.lessons and row["id"] not in [lesson.id for lesson in landed.lessons]
@@ -155,7 +155,7 @@ def test_configurable_cap_and_contextual_selection_cannot_bypass_it(tmp_path, ca
     for index in range(cap):
         plan = compile("First.\n\nSecond.", cfg, ledger=ledger, now=now, model_call=choose)
         assert row["id"] in [lesson.id for lesson in plan.lessons]
-        assert record_delivered(replace(plan, executed=True), str(index), now, ledger=ledger).added == 1
+        assert record_delivered(replace(plan, executed=True), str(index), now, ledger=ledger).added == len(plan.lessons)
     offered.clear()
     after = compile("First.\n\nSecond.", cfg, ledger=ledger, now=now, model_call=choose)
     assert offered and row["id"] not in offered
@@ -170,7 +170,7 @@ def test_daily_count_is_per_phrase_per_learner_and_replays_chronologically(tmp_p
     plan = replace(compile("Note.", cfg, ledger=ledger, now=now), executed=True)
     # An acknowledgement for yesterday arrives after today's confirmed hearing.
     for name, at in [("today", now), ("yesterday", now - timedelta(days=1))]:
-        assert record_delivered(plan, name, at, ledger=ledger).added == 1
+        assert record_delivered(plan, name, at, ledger=ledger).added == len(plan.lessons)
     other = replace(cfg, learner_id="other")
     same = learn("Học nữa.", "Learn more.", other, ledger=ledger, now=now)
     assert compile("Note.", other, ledger=ledger, now=now).lessons[0].id == same["id"]

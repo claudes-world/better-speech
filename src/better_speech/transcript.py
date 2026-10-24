@@ -84,9 +84,12 @@ def present(plan):
     sections = [Section("title", derive_title(plan.source))]
     if plan.executed and plan.lessons:
         lines = []
-        for number, lesson in enumerate(plan.lessons, 1):
+        number = 0
+        for lesson in plan.lessons:
             row = lesson.record
-            lines.append(f"{number}. **{_label(_grouped_phrase(row['phrase'], row.get('units')))}**")
+            number += row.get("category") != "closing"
+            label = "" if row.get("category") == "closing" else f"{number}. "
+            lines.append(f"{label}**{_label(_grouped_phrase(row['phrase'], row.get('units')))}**")
             try:
                 aligned = grouped_literal(row)
             except Exception:

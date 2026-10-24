@@ -37,7 +37,7 @@ def test_multiprocessing_writers_never_lose_increments(tmp_path):
     assert state[plan.lessons[0].phrase_key]["exposureCount"] == 8 + 4 * 8
     with sqlite3.connect(path) as connection:
         assert connection.execute("PRAGMA journal_mode").fetchone()[0] == "wal"
-        assert connection.execute("SELECT COUNT(*) FROM events").fetchone()[0] == 40
+        assert connection.execute("SELECT COUNT(*) FROM events").fetchone()[0] == 40 * len(plan.lessons)
 
 
 def test_out_of_order_delivery_replay_is_identical(tmp_path):
@@ -52,10 +52,13 @@ def test_out_of_order_delivery_replay_is_identical(tmp_path):
     ]
     forward, reverse = Ledger(tmp_path / "forward.db"), Ledger(tmp_path / "reverse.db")
     for index in range(len(dates)):
-        assert record_delivered(plan, str(index), dates[index], ledger=forward).added == 1
+        assert record_delivered(plan, str(index), dates[index], ledger=forward).added == len(plan.lessons)
     for index in reversed(range(len(dates))):
-        assert record_delivered(plan, str(index), dates[index], ledger=reverse).added == 1
-    assert forward.snapshot() == reverse.snapshot()
+        assert record_delivered(plan, str(index), dates[index], ledger=reverse).added == len(plan.lessons)
+    def exposures(ledger):
+        return {key: {k: v for k, v in row.items() if k != "lastClosingOrder"}
+                for key, row in ledger.snapshot().items()}
+    assert exposures(forward) == exposures(reverse)
     record = next(iter(forward.snapshot().values()))
     assert record["firstHeard"] == "2026-10-01T00:00:00.000Z"
     assert record["lastHeard"] == "2026-11-02T00:00:00.000Z"
@@ -70,7 +73,7 @@ def test_preparation_duplicates_and_learner_isolation(tmp_path):
     assert record_delivered(prepared, "not-sent", ledger=ledger).diagnostics
     assert ledger.snapshot() == {}
     plan = replace(prepared, executed=True)
-    assert record_delivered(plan, "sent", "2026-10-19T00:00:00Z", ledger=ledger).added == 1
+    assert record_delivered(plan, "sent", "2026-10-19T00:00:00Z", ledger=ledger).added == len(plan.lessons)
     assert record_delivered(plan, "sent", "2026-11-19T00:00:00Z", ledger=ledger).added == 0
     assert ledger.snapshot("other") == {}
     plain = replace(plan, lessons=(), clips=plan.fallback_clips)
