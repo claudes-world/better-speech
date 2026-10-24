@@ -129,10 +129,10 @@ def test_hint_code_block_after_translation_and_never_spoken():
     plan = compile('Note.', profile(), ledger=EmptyLedger())
     sections, _ = present(replace(plan, executed=True))
     lines = next(s.text for s in sections if s.kind == 'lesson').splitlines()
-    assert 'go' in lines[1] and '[just/let' in lines[1].replace('\\', '')
-    assert 'go' in lines[2]
-    assert lines[3:7] == ['', '```', 'dee - thoy', '```']
-    assert all('dee - thoy' not in clip.text for clip in plan.clips)
+    assert 'eat' in lines[1] and '[just/let' in lines[1].replace('\\', '')
+    assert 'eat' in lines[2]
+    assert lines[3:7] == ['', '```', 'ahng - thoy', '```']
+    assert all('ahng - thoy' not in clip.text for clip in plan.clips)
 
 
 def test_cli_hint_persists_and_renders(tmp_path, capsys):

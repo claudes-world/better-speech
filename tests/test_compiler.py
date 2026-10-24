@@ -27,7 +27,7 @@ def test_empty_model_response_keeps_highest_boosted_phrase(tmp_path):
 
     plan = compile("First paragraph.\n\nSecond paragraph.", cfg, model_call=model, now=NOW, ledger=Ledger.for_profile(cfg))
     assert calls
-    assert [v.id for v in plan.lessons if v.record.get("category") != "closing"] == [item["id"]]
+    assert [v.id for v in plan.lessons if v.record.get("category") not in ("closing", "bookend")] == [item["id"]]
     assert sum(c.language == "vi" and c.phrase_key == item["l2"] for c in plan.clips) == 2
 
 
@@ -42,7 +42,7 @@ def test_empty_model_response_keeps_highest_boosted_phrase(tmp_path):
 def test_bad_model_output_keeps_deterministic_lesson(tmp_path, answer):
     cfg = replace(profile(state_dir=str(tmp_path)), model="claude")
     plan = compile("Original source.", cfg, model_call=lambda *a, **k: answer, now=NOW, ledger=Ledger.for_profile(cfg))
-    assert plan.status == "bilingual" and len(plan.lessons) == 2
+    assert plan.status == "bilingual" and len([r for r in plan.lessons if r.record.get("category") not in ("closing", "bookend")]) == 1
     assert any(d.stage == "model" for d in plan.diagnostics)
     assert "".join(c.text for c in plan.clips if c.purpose == "source") == plan.speech_text
 
@@ -62,7 +62,7 @@ def test_fourth_adapter_registration_without_compiler_changes(tmp_path, monkeypa
     monkeypatch.setattr("better_speech.models.REGISTRY", dict(REGISTRY))
     register_model("fourth", FakeAdapter)
     plan = compile("The update is ready.", replace(profile(state_dir=str(tmp_path)), model="fourth"), now=NOW, ledger=Ledger.for_profile(replace(profile(state_dir=str(tmp_path)), model="fourth")))
-    assert calls and len(plan.lessons) == 3, plan.diagnostics
+    assert calls and len([r for r in plan.lessons if r.record.get("category") not in ("closing", "bookend")]) == 2, plan.diagnostics
 
 
 def test_failed_adapter_does_not_try_another(tmp_path, monkeypatch):
@@ -80,7 +80,7 @@ def test_failed_adapter_does_not_try_another(tmp_path, monkeypatch):
     )
     result = compile("An update.", replace(profile(state_dir=str(tmp_path)), model="codex"), now=NOW, ledger=Ledger.for_profile(replace(profile(state_dir=str(tmp_path)), model="codex")))
     assert calls == ["codex"]
-    assert len(result.lessons) == 2
+    assert len([r for r in result.lessons if r.record.get("category") not in ("closing", "bookend")]) == 1
 
 
 def test_identity_exact_contract_and_json_round_trip(tmp_path):
@@ -155,7 +155,7 @@ def test_invalid_lesson_config_is_english_and_detached(tmp_path):
 @pytest.mark.parametrize(
     "item",
     [r for r in json.loads(files("better_speech").joinpath("data/curriculum.vi.json").read_text())["focusPhrases"]
-     if r.get("category") not in ("greeting", "opener")],
+     if r.get("category") not in ("greeting", "opener", "closing", "bookend")],
     ids=lambda item: item["id"],
 )
 def test_every_shipped_phrase_can_be_reserved_and_taught(item, tmp_path):
@@ -174,7 +174,7 @@ def test_every_shipped_phrase_can_be_reserved_and_taught(item, tmp_path):
 
     plan = compile("Original source.", cfg, ledger=DueOnly(), now=NOW)
     assert plan.status == "bilingual", plan.diagnostics
-    assert [lesson.id for lesson in plan.lessons if lesson.record.get("category") != "closing"
+    assert [lesson.id for lesson in plan.lessons if lesson.record.get("category") not in ("closing", "bookend")
             or item.get("category") == "closing"] == [item["id"]]
     assert all(c.provider == "elevenlabs" for c in plan.clips if c.language == "vi")
     assert "".join(c.text for c in plan.clips if c.purpose == "source") == plan.speech_text

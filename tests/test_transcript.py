@@ -34,7 +34,7 @@ def test_public_render_numbers_lessons_in_first_audible_order(tmp_path):
     cfg = replace(profile(state_dir=str(tmp_path / "state")), model="claude")
 
     def select(payload, *, timeout):
-        # Reservation is the closing di-thoi lesson. Proposals arrive in reverse
+        # Reservation is the closing an-thoi lesson. Proposals arrive in reverse
         # playback order; repeating an ID must not duplicate its manifest entry.
         middle = next(slot for slot in payload["slots"] if slot.startswith("start:") and slot != "start:0")
         return json.dumps(
@@ -66,14 +66,14 @@ def test_public_render_numbers_lessons_in_first_audible_order(tmp_path):
     provider = ToneProvider()
     result = render(plan, {"google": provider, "elevenlabs": provider}, tmp_path / "cache")
     assert result.audio_path and result.status == "bilingual", result.diagnostics
-    expected = ["khong-sao-dau", "hieu-roi", "di-thoi"]
-    assert [lesson.id for lesson in result.plan.lessons if lesson.record.get("category") != "closing"] == expected
+    expected = ["khong-sao-dau", "hieu-roi", "an-thoi"]
+    assert [lesson.id for lesson in result.plan.lessons if lesson.record.get("category") not in ("closing", "bookend")] == expected
     audible_keys = list(dict.fromkeys(c.phrase_key for c in provider.calls if c.phrase_key))
     assert [lesson.phrase_key for lesson in result.plan.lessons] == audible_keys
     lesson_block = next(section.text for section in result.sections if section.kind == "lesson")
     rows = [line for line in lesson_block.splitlines() if line[:1].isdigit()]
     assert len(rows) == 3
-    for number, phrase, line in zip((1, 2, 3), ("Không sao đâu", "Hiểu rồi", "Đi thôi"), rows):
+    for number, phrase, line in zip((1, 2, 3), ("Không sao đâu", "Hiểu rồi", "Ăn thôi"), rows):
         assert line.startswith(f"{number}. **") and phrase in line
     assert result.markdown.index(rows[0]) < result.markdown.index(rows[1]) < result.markdown.index(rows[2])
 
@@ -88,7 +88,7 @@ def _three_lesson_plan():
     rows = {row['id']: row for row in runtime_curriculum(cfg)}
     lessons = tuple(
         Lesson(key, rows[key]['ledger_identity'], json.dumps(rows[key]))
-        for key in ('di-thoi', 'hieu-roi', 'cho-minh-mot-cai-khan-a')
+        for key in ('an-thoi', 'hieu-roi', 'cho-minh-mot-cai-khan-a')
     )
     return replace(compile('Note.', cfg, ledger=EmptyLedger()), lessons=lessons, executed=True)
 
@@ -107,7 +107,7 @@ def test_hint_fences_stand_alone_between_numbered_items():
     fences = [token for token in tokens if token.type == 'fence']
     assert all(token.level == 0 for token in fences)
     assert [token.content for token in fences] == [
-        'dee - thoy\n', 'hee-uh-oo⌄ - roy↘\n',
+        'ahng - thoy\n', 'hee-uh-oo⌄ - roy↘\n',
         'chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓\n',
     ]
     for number, item in enumerate(re.split(r'\n\n(?=\d+\. )', text.rstrip()), 1):
@@ -140,7 +140,7 @@ def test_host_render_preserves_standalone_hint_fences_and_numbering():
     assert len(parts) == 1
     rich, plain = host.render(parts[0])
     lesson = parts[0]['sections'][0]['text']
-    assert '\n```  \ndee - thoy  \n```' in rich
+    assert '\n```  \nahng - thoy  \n```' in rich
     assert lesson in plain
     # Parse the actual host output, including its two-space line joins and wrapper.
     tokens = MarkdownIt('commonmark', {'html': True}).parse(rich)
@@ -150,7 +150,7 @@ def test_host_render_preserves_standalone_hint_fences_and_numbering():
     fences = [token for token in tokens if token.type == 'fence']
     assert all(token.level == 0 for token in fences)
     assert [token.content.rstrip() for token in fences] == [
-        'dee - thoy', 'hee-uh-oo⌄ - roy↘',
+        'ahng - thoy', 'hee-uh-oo⌄ - roy↘',
         'chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓',
     ]
 

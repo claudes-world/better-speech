@@ -32,7 +32,7 @@ def _boosted(row, records, now, cap):
     return _boost_pending(row, now) and records.get(row["ledger_identity"], {}).get("dailyCount", 0) < cap
 
 
-OPENER_CATEGORIES = ("greeting", "opener")
+OPENER_CATEGORIES = ("greeting", "opener", "bookend")
 BOOKEND_CATEGORIES = (*OPENER_CATEGORIES, "closing")
 
 
@@ -124,14 +124,13 @@ def compile(
                 second_voice=profile.repeat_second_voice,
             )
             eligible_rows = _rank(rows, records, at, profile.boost_daily_cap)
-            ranked = [r for r in eligible_rows if r.get("category") not in OPENER_CATEGORIES]
+            ranked = [r for r in eligible_rows if r.get("category") not in BOOKEND_CATEGORIES]
             previous_closing = max(
-                ((r["lastHeard"], r.get("lastClosingOrder", 0), r["lastClosingKey"])
+                ((r.get("lastClosingAt", r["lastHeard"]), r.get("lastClosingOrder", 0), r["lastClosingKey"])
                  for r in records.values() if r.get("lastClosingKey")), default=("", 0, ""),
             )[2]
-            closings = [r for r in eligible_rows if r.get("category") == "closing"]
+            closings = [r for r in eligible_rows if r.get("category") in ("closing", "bookend")]
             rotating_closings = [r for r in closings if r["ledger_identity"] != previous_closing] or closings
-            ranked = [r for r in ranked if r.get("category") != "closing" or r in rotating_closings]
             # Reserve the top boosted/due item. On a fresh queue, introduce one unseen item.
             candidates = [r for r in ranked if (
                 not records.get(r["ledger_identity"])
@@ -188,10 +187,10 @@ def compile(
                     period = ("morning" if 5 <= hour < 12 else "afternoon" if 12 <= hour < 18
                               else "evening" if 18 <= hour < 22 else "night")
                     previous = max(
-                        ((r["lastHeard"], r.get("lastGreetingOrder", 0), r["lastGreetingKey"])
+                        ((r.get("lastGreetingAt", r["lastHeard"]), r.get("lastGreetingOrder", 0), r["lastGreetingKey"])
                          for r in records.values() if r.get("lastGreetingKey")), default=("", 0, ""),
                     )[2]
-                    # Category first (50/50 greeting vs opener), then a record in that pool with
+                    # Category first, then a record in that pool with
                     # the no-repeat rotation. Greetings keep the time-of-day gap rule; openers are "any".
                     pools = [[r for r in eligible_rows if r.get("category") == category
                               and r.get("time_of_day", "any") in (period, "any")
@@ -207,7 +206,8 @@ def compile(
                             chosen, reserved_rows, reserved_plan = choices, greeting_rows, greeting_plan
                 except Exception as error:
                     diagnostics.append(Diagnostic("greeting", type(error).__name__))
-            if rotating_closings and not any(r.get("category") == "closing" for r, *_ in chosen):
+            rotating_closings = [r for r in rotating_closings if not any(r["id"] == c[0]["id"] for c in chosen)]
+            if rng() < 0.5 and rotating_closings:
                 row = rotating_closings[min(int(rng() * len(rotating_closings)), len(rotating_closings) - 1)]
                 choices = [*chosen, (row, len(speech), "end", "close")]
                 closing_rows, closing_plan = build(choices)
@@ -222,7 +222,7 @@ def compile(
             _, ends = paragraph_boundaries(speech)
             starts = openers
             slots = {f"start:{offset}": (offset, "start") for offset in starts}
-            if any(r.get("category") in OPENER_CATEGORIES for r, *_ in chosen):
+            if any(r.get("category") in OPENER_CATEGORIES and mode == "open" for r, _, _, mode in chosen):
                 slots.pop("start:0", None)
             slots.update({f"end:{offset}": (offset, "end") for offset in ends if offset != len(speech)})
             offered = [

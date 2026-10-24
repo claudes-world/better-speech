@@ -183,7 +183,7 @@ else:
     monkeypatch.setenv("PATH", str(tools))
     cfg = replace(profile(state_dir=str(tmp_path / "state")), model=adapter)
     plan = compile("Original source.", cfg, ledger=EmptyLedger())
-    assert len(plan.lessons) == (2 if malicious else 3), plan.diagnostics
+    assert len([r for r in plan.lessons if r.record.get("category") not in ("closing", "bookend")]) == (1 if malicious else 2), plan.diagnostics
     assert "".join(c.text for c in plan.clips if c.purpose == "source") == "Original source."
     assert all("MODEL_AUTHORED_INTRUSION" not in c.text for c in plan.clips)
     if malicious:

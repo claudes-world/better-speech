@@ -96,7 +96,7 @@ def test_existing_landed_learner_bill_phrase_wins_without_duplicate_scheduling(t
                     for r in rows}, additions
 
     plan = compile("Note.", cfg, ledger=DueBill(), now="2026-10-21T12:00:00Z")
-    assert [lesson.id for lesson in plan.lessons if lesson.record.get("category") != "closing"] == ["learn-80c0c3193294e6c5"]
+    assert [lesson.id for lesson in plan.lessons if lesson.record.get("category") not in ("closing", "bookend")] == ["learn-80c0c3193294e6c5"]
     assert [c.phrase_key for c in plan.clips if c.language == "vi" and c.phrase_key == phrase] == [phrase]
 
 
@@ -116,7 +116,7 @@ def test_boost_caps_confirmed_deliveries_resets_at_local_midnight_and_ends_when_
         # Replanning or acknowledging an unexecuted plan never consumes the cap.
         for _ in range(2):
             plan = compile("Note.", cfg, ledger=ledger, now=now)
-            assert [lesson.id for lesson in plan.lessons if lesson.record.get("category") != "closing"] == [row["id"]]
+            assert [lesson.id for lesson in plan.lessons if lesson.record.get("category") not in ("closing", "bookend")] == [row["id"]]
             assert record_delivered(plan, "unexecuted", now, ledger=ledger).added == 0
         executed = replace(plan, executed=True)
         assert sum(c.echo for c in executed.clips if c.phrase_key == row["l2"]) == 1
@@ -131,7 +131,7 @@ def test_boost_caps_confirmed_deliveries_resets_at_local_midnight_and_ends_when_
     before_midnight = compile("Note.", cfg, ledger=ledger, now=next_day - timedelta(milliseconds=1))
     assert row["id"] not in [lesson.id for lesson in before_midnight.lessons]
     tomorrow = compile("Note.", cfg, ledger=ledger, now=next_day)
-    assert [lesson.id for lesson in tomorrow.lessons if lesson.record.get("category") != "closing"] == [row["id"]]
+    assert [lesson.id for lesson in tomorrow.lessons if lesson.record.get("category") not in ("closing", "bookend")] == [row["id"]]
     assert row["id"] in [r["id"] for r in due(cfg, ledger=ledger, now=next_day)]
     assert record_delivered(replace(tomorrow, executed=True), "tomorrow", next_day, ledger=ledger).added == len(tomorrow.lessons)
     learned(row["id"], cfg, ledger=ledger)

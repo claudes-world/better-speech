@@ -128,7 +128,7 @@ def sequence_clips(
         entries = {entry["id"]: entry for entry in inventory}
         if len(entries) != len(inventory):
             raise ValueError("duplicate curriculum id")
-        if sum(entries[p.lesson_id].get("category") not in ("greeting", "opener", "closing")
+        if sum(entries[p.lesson_id].get("category") not in ("greeting", "opener", "closing", "bookend")
                for p in placements if p.lesson_id in entries) > 4:
             raise ValueError("too many lesson placements")
         steps: list[Clip] = []
@@ -171,12 +171,16 @@ def sequence_clips(
             if kind not in counts:
                 raise ValueError("unclassified lesson")
             category = record.get("category")
-            if category in ("greeting", "opener", "closing"):
-                bookend = "closing" if category == "closing" else "opener"
+            if category in ("greeting", "opener", "closing", "bookend"):
+                bookend = "closing" if category == "closing" or (category == "bookend" and placement.mode == "close") else "opener"
                 bookends[bookend] += 1
                 if bookends[bookend] > 1:
                     raise ValueError("duplicate message bookend")
-                if category == "closing" and (
+                if category == "bookend" and bookend == "opener" and (
+                    offset != 0 or placement.position != "start" or placement.mode != "open"
+                ):
+                    raise ValueError("bookend phrase must open or close the message")
+                if bookend == "closing" and (
                     offset != len(source) or placement.position != "end" or placement.mode != "close"
                 ):
                     raise ValueError("closing phrase must close the message")

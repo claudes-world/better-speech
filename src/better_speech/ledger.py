@@ -190,6 +190,11 @@ class Ledger:
                 if not changed:
                     continue
                 added += 1
+                previous = self._execute(
+                    connection, "SELECT record_json FROM phrases WHERE learner_id=? AND phrase_key=?",
+                    (plan.learner_id, lesson.phrase_key), deadline=deadline,
+                ).fetchone()
+                previous = json.loads(previous[0]) if previous else {}
                 records = {}
                 # Late acknowledgements replay the complete chronological history.
                 # Arrival order cannot advance or freeze the interval differently.
@@ -203,14 +208,21 @@ class Ledger:
                     if deadline is not None:
                         remaining(deadline)
                     records, _ = record_exposures(records, [json.loads(raw)], now=at)
-                if lesson.record.get("category") in ("greeting", "opener", "closing"):
-                    prefix = "lastClosing" if lesson.record["category"] == "closing" else "lastGreeting"
-                    records[lesson.phrase_key][prefix + "Key"] = lesson.phrase_key
-                    records[lesson.phrase_key][prefix + "Order"] = self._execute(
-                        connection, "SELECT rowid FROM events WHERE learner_id=? AND phrase_key=? "
-                        "ORDER BY delivered_at DESC,rowid DESC LIMIT 1",
-                        (plan.learner_id, lesson.phrase_key), deadline=deadline,
+                records[lesson.phrase_key].update({
+                    key: value for key, value in previous.items()
+                    if key.startswith(("lastGreeting", "lastClosing"))
+                })
+                if lesson.record.get("category") in ("greeting", "opener", "closing", "bookend"):
+                    prefix = "lastClosing" if lesson.record["category"] == "closing" or (lesson.record["category"] == "bookend" and lesson.record["lesson_type"] == "learning_sentence") else "lastGreeting"
+                    order = self._execute(
+                        connection, "SELECT rowid FROM events WHERE learner_id=? AND phrase_key=? AND delivery_id=?",
+                        (plan.learner_id, lesson.phrase_key, delivery_id), deadline=deadline,
                     ).fetchone()[0]
+                    if (instant, order) >= (previous.get(prefix + "At", previous.get("lastHeard", "") if previous.get(prefix + "Key") else ""),
+                                            previous.get(prefix + "Order", 0)):
+                        records[lesson.phrase_key].update({
+                            prefix + "Key": lesson.phrase_key, prefix + "At": instant, prefix + "Order": order,
+                        })
                 self._execute(
                     connection,
                     "INSERT INTO phrases VALUES(?,?,?) ON CONFLICT(learner_id,phrase_key) "

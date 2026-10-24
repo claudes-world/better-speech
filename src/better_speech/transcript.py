@@ -87,8 +87,8 @@ def present(plan):
         number = 0
         for lesson in plan.lessons:
             row = lesson.record
-            number += row.get("category") != "closing"
-            label = "" if row.get("category") == "closing" else f"{number}. "
+            number += row.get("category") not in ("closing", "bookend")
+            label = "" if row.get("category") in ("closing", "bookend") else f"{number}. "
             lines.append(f"{label}**{_label(_grouped_phrase(row['phrase'], row.get('units')))}**")
             try:
                 aligned = grouped_literal(row)

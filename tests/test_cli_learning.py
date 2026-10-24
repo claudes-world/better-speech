@@ -43,7 +43,7 @@ def test_boost_next_local_midnight_in_profile_zone(tmp_path, zone, instant, expe
 def test_existing_sample_phrase_can_be_learned_and_reloaded(tmp_path):
     cfg = profile(state_dir=str(tmp_path))
     instant = datetime(2026, 10, 19, 12, tzinfo=timezone.utc)
-    row = learn("Cảm ơn nha!", "Thanks!", cfg, now=instant, ledger=Ledger.for_profile(cfg))
+    row = learn("Ăn thôi!", "Let’s eat!", cfg, now=instant, ledger=Ledger.for_profile(cfg))
     result = compile("The update is ready.", cfg, now=instant, ledger=Ledger.for_profile(cfg))
     assert result.status == "bilingual", result.diagnostics
     assert result.lessons[0].id == row["id"]
