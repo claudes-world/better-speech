@@ -101,8 +101,8 @@ The host tracks the message gap per lane and passes `greeting=True` for the firs
 reply after its threshold. The default is false. `speak plan` and `speak render`
 accept `--greeting`. Greetings follow the profile timezone, including good-night
 phrases, and confirmed deliveries rotate the next greeting for the learner.
-The `closing` category is placed only at message end, at most one per message,
-rotating like greetings; it is selected independently of the greeting flag.
+The `closing` category ends about half of the messages, at most one per message,
+rotating like greetings. The `bookend` category may open or close a message, never in the middle.
 `anchor_floor_days` (default 7) caps anchor entries' effective due dates after the
 last hearing. `echo_rate` (default 0.75) slows the second Vietnamese occurrence;
 the lead rate and random voice selection stay as configured. Provider minimum

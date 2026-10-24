@@ -203,9 +203,10 @@ class Ledger:
                     if deadline is not None:
                         remaining(deadline)
                     records, _ = record_exposures(records, [json.loads(raw)], now=at)
-                if lesson.record.get("category") in ("greeting", "opener", "closing"):
-                    prefix = "lastClosing" if lesson.record["category"] == "closing" else "lastGreeting"
+                if lesson.record.get("category") in ("greeting", "opener", "closing", "bookend"):
+                    prefix = "lastClosing" if lesson.record["category"] == "closing" or (lesson.record["category"] == "bookend" and lesson.record["lesson_type"] == "learning_sentence") else "lastGreeting"
                     records[lesson.phrase_key][prefix + "Key"] = lesson.phrase_key
+                    records[lesson.phrase_key][prefix + "At"] = at
                     records[lesson.phrase_key][prefix + "Order"] = self._execute(
                         connection, "SELECT rowid FROM events WHERE learner_id=? AND phrase_key=? "
                         "ORDER BY delivered_at DESC,rowid DESC LIMIT 1",

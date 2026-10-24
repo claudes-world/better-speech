@@ -11,7 +11,7 @@ def test_echo_rate_changes_only_second_occurrence(settings):
     plan = compile('Note.', profile(**settings), ledger=EmptyLedger(), greeting=True)
     lead = [c for c in plan.clips if c.language == 'vi' and not c.echo]
     echoes = [c for c in plan.clips if c.language == 'vi' and c.echo]
-    assert len(lead) == len(echoes) == 3
+    assert len(lead) == len(echoes) == len(plan.lessons)
     assert all(c.rate == 0.9 for c in lead)
     assert all(c.rate == settings.get('echo_rate', 0.75) for c in echoes)
     assert all(c.rate == 1.05 for c in plan.clips if c.language == 'en')
