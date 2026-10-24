@@ -316,7 +316,7 @@ def test_four_contextual_connectors_keep_three_lessons(intensity):
         ]})
 
     plan = compile('First.\n\nSecond.\n\nThird.', replace(profile(intensity=intensity), model='fake'),
-                   ledger=SeenLedger(), model_call=choose)
+                   ledger=SeenLedger(), model_call=choose, seed=0)
     assert plan.status == 'bilingual' and len(plan.lessons) == 4
 
 def test_artifact_identity_requires_insert_once_custody_and_checksum(tmp_path):

@@ -53,8 +53,8 @@ def test_southern_initials_and_merged_tones():
 def test_every_syllable_has_its_lexical_tone_and_southern_initial():
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
     tones = {
-        '\u0301': '↗', '\u0300': '↘',
-        '\u0309': '⌄', '\u0303': '⌄', '\u0323': '↓',
+        '\u0301': '↑', '\u0300': '↓',
+        '\u0309': '⌄', '\u0303': '⌄', '\u0323': '•',
     }
     for row in rows:
         words = re.findall(r'[^\W\d_]+', row['l2'].lower())
@@ -63,7 +63,7 @@ def test_every_syllable_has_its_lexical_tone_and_southern_initial():
         for word, syllable in zip(words, syllables, strict=True):
             decomposed = unicodedata.normalize('NFD', word)
             expected = next((tone for mark, tone in tones.items() if mark in decomposed), None)
-            label = re.fullmatch(r'[a-z]+(?:-[a-z]+)*([↗↘↓⌄])?', syllable)
+            label = re.fullmatch(r'[a-z]+(?:-[a-z]+)*([↑↓•⌄])?', syllable)
             assert label is not None, (row['id'], word, syllable)
             assert label[1] == expected, (row['id'], word, syllable)
             plain = ''.join(char for char in decomposed if not unicodedata.combining(char))
@@ -76,21 +76,21 @@ def test_every_syllable_has_its_lexical_tone_and_southern_initial():
             if plain.startswith('tr'):
                 assert syllable.startswith('tr'), row['id']
             if word == 'gì':
-                assert syllable == 'yee↘', row['id']
+                assert syllable == 'yee↓', row['id']
             if word == 'có':
-                assert syllable == 'kaw↗', row['id']
+                assert syllable == 'kaw↑', row['id']
 
 
 @pytest.mark.parametrize(('phrase_id', 'syllable'), [
-    ('da', 'yah↓'),
-    ('khong-co-gi', 'yee↘'),
-    ('goi-la-gi', 'yee↘'),
-    ('giup-minh-voi', 'yoop↗'),
-    ('minh-nghi-the-nay', 'yuhy↘'),
+    ('da', 'yah•'),
+    ('khong-co-gi', 'yee↓'),
+    ('goi-la-gi', 'yee↓'),
+    ('giup-minh-voi', 'yoop↑'),
+    ('minh-nghi-the-nay', 'yuhy↓'),
     ('vui-qua', 'yooy'),
-    ('tieng-viet-mot-chut', 'yeeyet↓'),
-    ('mang-ve', 'yeh↘'),
-    ('duoc-roi', 'roy↘'),
+    ('tieng-viet-mot-chut', 'yeeyet•'),
+    ('mang-ve', 'yeh↓'),
+    ('duoc-roi', 'roy↓'),
 ])
 def test_southern_pronunciation_examples(phrase_id, syllable):
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
@@ -100,15 +100,15 @@ def test_southern_pronunciation_examples(phrase_id, syllable):
 
 @pytest.mark.parametrize(('phrase_id', 'hint'), [
     ('xin-loi', 'sin - loy⌄'),
-    ('cam-on-nhieu-nha', 'kahm⌄ uhng - nyee-uh-oo↘ - nya'),
-    ('giu-tien-thua', 'khohng - kuhng↘ - thoy↗ - lie↓ - doh'),
-    ('san-sang-chua', 'sahng⌄ sahng↘ - chuah'),
-    ('doi-qua', 'daw-ee↗ - wah↗'),
-    ('tin-vui-ne', 'tin - yooy - neh↘'),
-    ('cai-nay-bao-nhieu', 'kye↗ - nigh↘ - bow nyee-uh-oo - teeyen↘'),
-    ('hieu-roi', 'hee-uh-oo⌄ - roy↘'),
-    ('thich-qua', 'thit↗ - wah↗'),
-    ('tinh-tien', 'tin↗ - teeyen↘'),
+    ('cam-on-nhieu-nha', 'kahm⌄ uhng - nyee-uh-oo↓ - nya'),
+    ('giu-tien-thua', 'khohng - kuhng↓ - thoy↑ - lie• - doh'),
+    ('san-sang-chua', 'sahng⌄ sahng↓ - chuah'),
+    ('doi-qua', 'daw-ee↑ - wah↑'),
+    ('tin-vui-ne', 'tin - yooy - neh↓'),
+    ('cai-nay-bao-nhieu', 'kye↑ - nigh↓ - bow nyee-uh-oo - teeyen↓'),
+    ('hieu-roi', 'hee-uh-oo⌄ - roy↓'),
+    ('thich-qua', 'thit↑ - wah↑'),
+    ('tinh-tien', 'tin↑ - teeyen↓'),
 ])
 def test_reviewed_southern_hint_tones_and_syllables(phrase_id, hint):
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
@@ -154,11 +154,11 @@ def test_arrow_hints_and_piece_spacing():
     for row in rows:
         hint = row['hint']
         assert '[' not in hint, row['id']
-        assert not re.search(r'(?<![a-z])[↗↘↓⌄]', hint), row['id']
+        assert not re.search(r'(?<![a-z])[↑↓•⌄]', hint), row['id']
         assert not re.search(r'(?<! )- | -(?! )', hint), row['id']
         assert '  ' not in hint, row['id']
     towel = next(row for row in rows if row['id'] == 'cho-minh-mot-cai-khan-a')
-    assert towel['hint'] == 'chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓'
+    assert towel['hint'] == 'chaw - min↓ - mohk• - kye↑ - khahng tahm↑ - ah•'
 
 
 def test_every_shipped_syllable_matches_alphabet_guide_fixture():
