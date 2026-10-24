@@ -165,7 +165,7 @@ def test_plan_has_no_operational_authority_and_delivery_uses_explicit_store(tmp_
     assert all(field not in encoded for field in ('profile_json', 'state_dir', 'timeout_s', 'private-model'))
     ledger = Ledger(tmp_path / 'explicit.db')
     restored = Plan.from_dict(replace(plan, executed=True).to_dict())
-    assert record_delivered(restored, 'send', NOW, ledger=ledger).added == 1
+    assert record_delivered(restored, 'send', NOW, ledger=ledger).added == len(restored.lessons)
     assert not (tmp_path / 'unused').exists()
     tampered = {**plan.to_dict(), 'profile_json': json.dumps({'state_dir': str(tmp_path / 'injected')})}
     with pytest.raises(TypeError):
@@ -317,7 +317,7 @@ def test_four_contextual_connectors_keep_three_lessons(intensity):
 
     plan = compile('First.\n\nSecond.\n\nThird.', replace(profile(intensity=intensity), model='fake'),
                    ledger=SeenLedger(), model_call=choose)
-    assert plan.status == 'bilingual' and len(plan.lessons) == 3
+    assert plan.status == 'bilingual' and len(plan.lessons) == 4
 
 def test_artifact_identity_requires_insert_once_custody_and_checksum(tmp_path):
     from better_speech import render

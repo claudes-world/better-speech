@@ -67,7 +67,7 @@ def test_public_render_numbers_lessons_in_first_audible_order(tmp_path):
     result = render(plan, {"google": provider, "elevenlabs": provider}, tmp_path / "cache")
     assert result.audio_path and result.status == "bilingual", result.diagnostics
     expected = ["khong-sao-dau", "hieu-roi", "di-thoi"]
-    assert [lesson.id for lesson in result.plan.lessons] == expected
+    assert [lesson.id for lesson in result.plan.lessons if lesson.record.get("category") != "closing"] == expected
     audible_keys = list(dict.fromkeys(c.phrase_key for c in provider.calls if c.phrase_key))
     assert [lesson.phrase_key for lesson in result.plan.lessons] == audible_keys
     lesson_block = next(section.text for section in result.sections if section.kind == "lesson")

@@ -183,7 +183,7 @@ else:
     monkeypatch.setenv("PATH", str(tools))
     cfg = replace(profile(state_dir=str(tmp_path / "state")), model=adapter)
     plan = compile("Original source.", cfg, ledger=EmptyLedger())
-    assert len(plan.lessons) == (1 if malicious else 2), plan.diagnostics
+    assert len(plan.lessons) == (2 if malicious else 3), plan.diagnostics
     assert "".join(c.text for c in plan.clips if c.purpose == "source") == "Original source."
     assert all("MODEL_AUTHORED_INTRUSION" not in c.text for c in plan.clips)
     if malicious:
@@ -202,14 +202,14 @@ def test_ledger_lock_wait_obeys_single_deadline_and_rolls_back(tmp_path):
         blocker.rollback()
     assert receipt.diagnostics and elapsed < 0.5
     assert ledger.snapshot() == {}
-    assert record_delivered(plan, "blocked", ledger=ledger).added == 1
+    assert record_delivered(plan, "blocked", ledger=ledger).added == len(plan.lessons)
 
 
 def test_replay_deadline_rolls_back_new_event_and_projection(tmp_path, monkeypatch):
     plan = replace(compile("Source.", profile(), ledger=EmptyLedger()), executed=True)
     ledger = Ledger(tmp_path / "ledger.db")
     for index in range(8):
-        assert record_delivered(plan, str(index), "2026-10-19T00:00:00Z", ledger=ledger).added == 1
+        assert record_delivered(plan, str(index), "2026-10-19T00:00:00Z", ledger=ledger).added == len(plan.lessons)
     before = ledger.snapshot()
     from better_speech.ledger import record_exposures
 
@@ -224,7 +224,7 @@ def test_replay_deadline_rolls_back_new_event_and_projection(tmp_path, monkeypat
         assert receipt.diagnostics and time.monotonic() - started < 0.3
     assert ledger.snapshot() == before
     with sqlite3.connect(ledger.path) as db:
-        assert db.execute("SELECT count(*) FROM events").fetchone()[0] == 8
+        assert db.execute("SELECT count(*) FROM events").fetchone()[0] == 8 * len(plan.lessons)
 
 
 def test_artifact_hashing_shares_lesson_deadline_and_reserves_english(tmp_path, monkeypatch):

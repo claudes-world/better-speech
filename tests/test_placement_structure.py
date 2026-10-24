@@ -23,7 +23,7 @@ def test_offered_and_executed_opener_slots(source, starts):
                                           'slotId': f'start:{max(starts)}'}]})
     plan = compile(source, replace(profile(), model='fake'), ledger=EmptyLedger(), model_call=select)
     assert {int(s.split(':')[1]) for s in captured[0]['slots'] if s.startswith('start:')} == starts
-    assert len(plan.lessons) == 2, plan.diagnostics
+    assert len(plan.lessons) == 3, plan.diagnostics
     assert ''.join(c.text for c in plan.clips if c.purpose == 'source') == plan.speech_text
     opener = plan.lessons[0]
     index = next(i for i, c in enumerate(plan.clips) if c.phrase_key == opener.phrase_key)
@@ -38,7 +38,7 @@ def test_body_paragraph_start_is_rejected_and_closers_remain():
     plan = compile('First.\n\nSecond.', replace(profile(), model='fake'),
                    ledger=EmptyLedger(), model_call=select)
     assert 'end:6' in offered and 'start:8' not in offered
-    assert len(plan.lessons) == 1
+    assert len(plan.lessons) == 2
     assert any(d.stage == 'model' for d in plan.diagnostics)
 
 
@@ -48,8 +48,9 @@ def test_terminal_heading_opener_precedes_reserved_closing_lesson(source):
         return json.dumps({'placements': [{'phraseId': payload['inventory'][0]['id'],
             'slotId': max((s for s in payload['slots'] if s.startswith('start:')), key=lambda s: int(s.split(':')[1]))}]})
     plan = compile(source, replace(profile(), model='fake'), ledger=EmptyLedger(), model_call=select)
-    assert len(plan.lessons) == 2
-    assert plan.lessons[-1].id == 'di-thoi'
+    assert len(plan.lessons) == 3
+    assert plan.lessons[-2].id == 'di-thoi'
+    assert plan.lessons[-1].record['category'] == 'closing'
     assert plan.clips[-1].phrase_key == plan.lessons[-1].phrase_key
 
 

@@ -128,12 +128,14 @@ def sequence_clips(
         entries = {entry["id"]: entry for entry in inventory}
         if len(entries) != len(inventory):
             raise ValueError("duplicate curriculum id")
-        if len(placements) > 4:
+        if sum(entries[p.lesson_id].get("category") not in ("greeting", "opener", "closing")
+               for p in placements if p.lesson_id in entries) > 4:
             raise ValueError("too many lesson placements")
         steps: list[Clip] = []
         seen: set[str] = set()
         counts = {"connector": 0, "learning_sentence": 0}
         cursor = 0
+        bookends = {"opener": 0, "closing": 0}
         for placement in sorted(placements, key=lambda p: (p.offset, p.mode == "close")):
             if placement.lesson_id not in entries:
                 continue  # unknown ID drops only this placement
@@ -168,7 +170,18 @@ def sequence_clips(
             kind = record["lesson_type"]
             if kind not in counts:
                 raise ValueError("unclassified lesson")
-            counts[kind] += 1
+            category = record.get("category")
+            if category in ("greeting", "opener", "closing"):
+                bookend = "closing" if category == "closing" else "opener"
+                bookends[bookend] += 1
+                if bookends[bookend] > 1:
+                    raise ValueError("duplicate message bookend")
+                if category == "closing" and (
+                    offset != len(source) or placement.position != "end" or placement.mode != "close"
+                ):
+                    raise ValueError("closing phrase must close the message")
+            else:
+                counts[kind] += 1
             if counts["connector"] > 3 or counts["learning_sentence"] > 1:
                 raise ValueError("lesson class cap exceeded")
             if kind == "learning_sentence" and (offset != len(source) or placement.position != "end"):

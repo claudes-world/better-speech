@@ -27,8 +27,8 @@ def test_empty_model_response_keeps_highest_boosted_phrase(tmp_path):
 
     plan = compile("First paragraph.\n\nSecond paragraph.", cfg, model_call=model, now=NOW, ledger=Ledger.for_profile(cfg))
     assert calls
-    assert [v.id for v in plan.lessons] == [item["id"]]
-    assert sum(c.language == "vi" for c in plan.clips) == 2
+    assert [v.id for v in plan.lessons if v.record.get("category") != "closing"] == [item["id"]]
+    assert sum(c.language == "vi" and c.phrase_key == item["l2"] for c in plan.clips) == 2
 
 
 @pytest.mark.parametrize(
@@ -42,7 +42,7 @@ def test_empty_model_response_keeps_highest_boosted_phrase(tmp_path):
 def test_bad_model_output_keeps_deterministic_lesson(tmp_path, answer):
     cfg = replace(profile(state_dir=str(tmp_path)), model="claude")
     plan = compile("Original source.", cfg, model_call=lambda *a, **k: answer, now=NOW, ledger=Ledger.for_profile(cfg))
-    assert plan.status == "bilingual" and len(plan.lessons) == 1
+    assert plan.status == "bilingual" and len(plan.lessons) == 2
     assert any(d.stage == "model" for d in plan.diagnostics)
     assert "".join(c.text for c in plan.clips if c.purpose == "source") == plan.speech_text
 
@@ -62,7 +62,7 @@ def test_fourth_adapter_registration_without_compiler_changes(tmp_path, monkeypa
     monkeypatch.setattr("better_speech.models.REGISTRY", dict(REGISTRY))
     register_model("fourth", FakeAdapter)
     plan = compile("The update is ready.", replace(profile(state_dir=str(tmp_path)), model="fourth"), now=NOW, ledger=Ledger.for_profile(replace(profile(state_dir=str(tmp_path)), model="fourth")))
-    assert calls and len(plan.lessons) == 2, plan.diagnostics
+    assert calls and len(plan.lessons) == 3, plan.diagnostics
 
 
 def test_failed_adapter_does_not_try_another(tmp_path, monkeypatch):
@@ -80,7 +80,7 @@ def test_failed_adapter_does_not_try_another(tmp_path, monkeypatch):
     )
     result = compile("An update.", replace(profile(state_dir=str(tmp_path)), model="codex"), now=NOW, ledger=Ledger.for_profile(replace(profile(state_dir=str(tmp_path)), model="codex")))
     assert calls == ["codex"]
-    assert len(result.lessons) == 1
+    assert len(result.lessons) == 2
 
 
 def test_identity_exact_contract_and_json_round_trip(tmp_path):
@@ -102,7 +102,7 @@ def test_learning_echo_survives_boost_expiry_until_landed(tmp_path):
     row = learn("Cảm ơn.", "Thanks.", cfg, now=NOW, ledger=Ledger.for_profile(cfg))
     assert row["boost_until"] == "2026-10-19T17:00:00.000Z"
     plan = compile("Source.", cfg, now=NOW, ledger=Ledger.for_profile(cfg))
-    assert sum(c.language == "vi" for c in plan.clips) == 2
+    assert sum(c.language == "vi" and c.phrase_key == row["l2"] for c in plan.clips) == 2
     learned(row["id"], cfg, ledger=Ledger.for_profile(cfg))
 
     # Another unseen phrase can win after the boost is cleared; explicitly due it below.
@@ -115,7 +115,7 @@ def test_learning_echo_survives_boost_expiry_until_landed(tmp_path):
 
     landed = compile("Source.", cfg, ledger=DueLedger(), now=NOW)
     assert landed.lessons[0].id == row["id"]
-    assert sum(c.language == "vi" for c in landed.clips) == 1
+    assert sum(c.language == "vi" and c.phrase_key == row["l2"] for c in landed.clips) == 1
 
 
 def test_due_learner_phrase_reserved_over_fresh_sample(tmp_path):
@@ -174,6 +174,7 @@ def test_every_shipped_phrase_can_be_reserved_and_taught(item, tmp_path):
 
     plan = compile("Original source.", cfg, ledger=DueOnly(), now=NOW)
     assert plan.status == "bilingual", plan.diagnostics
-    assert [lesson.id for lesson in plan.lessons] == [item["id"]]
+    assert [lesson.id for lesson in plan.lessons if lesson.record.get("category") != "closing"
+            or item.get("category") == "closing"] == [item["id"]]
     assert all(c.provider == "elevenlabs" for c in plan.clips if c.language == "vi")
     assert "".join(c.text for c in plan.clips if c.purpose == "source") == plan.speech_text

@@ -100,6 +100,7 @@ def test_southern_pronunciation_examples(phrase_id, syllable):
 
 @pytest.mark.parametrize(('phrase_id', 'hint'), [
     ('xin-loi', 'sin - loy⌄'),
+    ('cam-on-nhieu-nha', 'kahm⌄ uhng - nyee-uh-oo↘ - nya'),
     ('giu-tien-thua', 'khohng - kuhng↘ - thoy↗ - lie↓ - doh'),
     ('san-sang-chua', 'sahng⌄ sahng↘ - chuah'),
     ('doi-qua', 'daw-ee↗ - wah↗'),
@@ -116,7 +117,7 @@ def test_reviewed_southern_hint_tones_and_syllables(phrase_id, hint):
 
 def test_every_record_has_draft_hint():
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
-    assert len(rows) == 90
+    assert len(rows) == 91
     assert all(isinstance(r['hint'], str) and 0 < len(r['hint']) <= 121 for r in rows)
     assert all(r['hint'] == r['hint'].lower() for r in rows)
     metadata = files('better_speech').joinpath('data/curriculum.vi.metadata.json').read_text()
@@ -130,7 +131,7 @@ def test_hint_code_block_after_translation_and_never_spoken():
     lines = next(s.text for s in sections if s.kind == 'lesson').splitlines()
     assert 'go' in lines[1] and '[just/let' in lines[1].replace('\\', '')
     assert 'go' in lines[2]
-    assert lines[3:] == ['', '```', 'dee - thoy', '```']
+    assert lines[3:7] == ['', '```', 'dee - thoy', '```']
     assert all('dee - thoy' not in clip.text for clip in plan.clips)
 
 
