@@ -141,12 +141,12 @@ compressed into the onset. Kh is back-of-mouth friction (or the selected voice�
 not plain k. Final p/t/k close without audible release or an added vowel; final ng may include lip
 closure after rounded vowels.
 
-Every non-level syllable has an arrow glued directly to it: no mark means ngang (level);
-`↗` is sắc (rising); `↘` is huyền (falling); `⌄` is the shared hỏi/ngã dip then rise.
-`↓` is nặng’s low register, which may recover slightly on open/nasal-final syllables, without a
+Every non-level syllable has a tone mark glued directly to it: no mark means ngang (level);
+`↑` is sắc (rising); `↓` is huyền (falling); `⌄` is the shared hỏi/ngã dip then rise.
+`•` is nặng’s low heavy register, which may recover slightly on open/nasal-final syllables, without a
 compulsory glottal choke. Low syllables ending in p/t/k also have final-stop closure; clipping is
 a reading note, not a separate mark. These are broad directions, not fixed pitch tracks. For example,
-`chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓` retains the two syllables of khăn tắm together.
+`chaw - min↓ - mohk• - kye↑ - khahng tahm↑ - ah•` retains the two syllables of khăn tắm together.
 
 Set one profile setting to choose the optional contextual placer:
 

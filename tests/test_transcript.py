@@ -107,8 +107,8 @@ def test_hint_fences_stand_alone_between_numbered_items():
     fences = [token for token in tokens if token.type == 'fence']
     assert all(token.level == 0 for token in fences)
     assert [token.content for token in fences] == [
-        'ahng - thoy\n', 'hee-uh-oo⌄ - roy↘\n',
-        'chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓\n',
+        'ahng - thoy\n', 'hee-uh-oo⌄ - roy↓\n',
+        'chaw - min↓ - mohk• - kye↑ - khahng tahm↑ - ah•\n',
     ]
     for number, item in enumerate(re.split(r'\n\n(?=\d+\. )', text.rstrip()), 1):
         assert item.startswith(f'{number}. **')
@@ -150,8 +150,8 @@ def test_host_render_preserves_standalone_hint_fences_and_numbering():
     fences = [token for token in tokens if token.type == 'fence']
     assert all(token.level == 0 for token in fences)
     assert [token.content.rstrip() for token in fences] == [
-        'ahng - thoy', 'hee-uh-oo⌄ - roy↘',
-        'chaw - min↘ - mohk↓ - kye↗ - khahng tahm↗ - ah↓',
+        'ahng - thoy', 'hee-uh-oo⌄ - roy↓',
+        'chaw - min↓ - mohk• - kye↑ - khahng tahm↑ - ah•',
     ]
 
     row = plan.lessons[0].record
