@@ -116,7 +116,7 @@ def test_reviewed_southern_hint_tones_and_syllables(phrase_id, hint):
 
 def test_every_record_has_draft_hint():
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
-    assert len(rows) == 89
+    assert len(rows) == 90
     assert all(isinstance(r['hint'], str) and 0 < len(r['hint']) <= 121 for r in rows)
     assert all(r['hint'] == r['hint'].lower() for r in rows)
     metadata = files('better_speech').joinpath('data/curriculum.vi.metadata.json').read_text()
