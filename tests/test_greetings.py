@@ -282,10 +282,11 @@ def test_bookend_preserves_other_role_history(tmp_path, first_seed, first_greeti
     bookend = next(r for r in first.lessons if r.id == 'di-thoi')
     record_delivered(replace(first, executed=True), 'role-1', '2026-10-24T12:00:00Z', ledger=ledger)
     before = ledger.snapshot()[bookend.phrase_key]
-    second = next(plan for seed in range(second_seed, second_seed + 20)
-                  if any(r.id == 'di-thoi' for r in (plan := compile(
-                      'Note.', profile(), ledger=ledger, now='2026-10-24T12:01:00Z',
-                      seed=seed, greeting=second_greeting)).lessons))
+    for seed in range(second_seed, second_seed + 20):
+        second = compile('Note.', profile(), ledger=ledger, now='2026-10-24T12:01:00Z',
+                         seed=seed, greeting=second_greeting)
+        if any(r.id == 'di-thoi' for r in second.lessons):
+            break
     other = next(r for r in second.lessons if r.id == 'di-thoi')
     assert bookend.record['lesson_type'] != other.record['lesson_type']
     record_delivered(replace(second, executed=True), 'role-2', '2026-10-24T12:01:00Z', ledger=ledger)
