@@ -103,6 +103,11 @@ accept `--greeting`. Greetings follow the profile timezone, including good-night
 phrases, and confirmed deliveries rotate the next greeting for the learner.
 The `closing` category ends about half of the messages, at most one per message,
 rotating like greetings. The `bookend` category may open or close a message, never in the middle.
+`closer_chance` (default 0.5, 0 to 1) sets how often a closer is tried.
+`paragraph_start_lessons` and `paragraph_end_lessons` (default true) offer or withhold
+the model's paragraph-start and paragraph-end slots. `end_lesson` (default true) set to
+false skips the reserved end-of-message learning sentence. At their defaults these four
+fields stay out of the profile digest, so plan identities do not change.
 `anchor_floor_days` (default 7) caps anchor entries' effective due dates after the
 last hearing. `echo_rate` (default 0.75) slows the second Vietnamese occurrence;
 the lead rate and random voice selection stay as configured. Provider minimum
