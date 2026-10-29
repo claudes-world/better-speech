@@ -76,6 +76,8 @@ class Profile:
     long_break_seconds: float = 0
     # Lane controls; defaults reproduce the pre-0.2.13 behaviour.
     closer_chance: float = 0.5
+    # 0.2.14: chance that a requested greeting/opener is placed (greeting=True).
+    opener_chance: float = 1.0
     paragraph_start_lessons: bool = True
     paragraph_end_lessons: bool = True
     end_lesson: bool = True

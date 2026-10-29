@@ -81,6 +81,9 @@ def resolve_profile(profile: Profile) -> Profile:
         chance = profile.closer_chance
         if type(chance) not in (int, float) or not math.isfinite(chance) or not 0 <= chance <= 1:
             raise ValueError("invalid closer chance")
+        chance = profile.opener_chance
+        if type(chance) not in (int, float) or not math.isfinite(chance) or not 0 <= chance <= 1:
+            raise ValueError("invalid opener chance")
         if type(profile.intensity) is not int or profile.intensity not in (1, 2, 3):
             raise ValueError("invalid intensity")
         if type(profile.boost_daily_cap) is not int or profile.boost_daily_cap < 0:
