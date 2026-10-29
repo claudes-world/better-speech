@@ -72,9 +72,15 @@ def resolve_profile(profile: Profile) -> Profile:
         if not isinstance(profile.pacing, dict):
             raise ValueError("pacing must be an object")
         if any(
-            type(getattr(profile, key)) is not bool for key in ("enabled", "repeat", "repeat_second_voice", "heteronyms")
+            type(getattr(profile, key)) is not bool for key in (
+                "enabled", "repeat", "repeat_second_voice", "heteronyms",
+                "paragraph_start_lessons", "paragraph_end_lessons", "end_lesson",
+            )
         ):
             raise ValueError("invalid boolean profile field")
+        chance = profile.closer_chance
+        if type(chance) not in (int, float) or not math.isfinite(chance) or not 0 <= chance <= 1:
+            raise ValueError("invalid closer chance")
         if type(profile.intensity) is not int or profile.intensity not in (1, 2, 3):
             raise ValueError("invalid intensity")
         if type(profile.boost_daily_cap) is not int or profile.boost_daily_cap < 0:

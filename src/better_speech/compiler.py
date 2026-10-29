@@ -34,6 +34,14 @@ def _boosted(row, records, now, cap):
 
 OPENER_CATEGORIES = ("greeting", "opener", "bookend")
 BOOKEND_CATEGORIES = (*OPENER_CATEGORIES, "closing")
+# Lane controls added in 0.2.13. At their defaults they stay out of the profile
+# digest, so plan identities and clip cache keys for unchanged lanes stay stable.
+_LANE_CONTROL_DEFAULTS = {
+    "closer_chance": 0.5,
+    "paragraph_start_lessons": True,
+    "paragraph_end_lessons": True,
+    "end_lesson": True,
+}
 
 
 def _rank(rows, records, now, boost_daily_cap=3):
@@ -85,7 +93,8 @@ def compile(
     semantic_profile = {key: value for key, value in profile.to_dict().items()
                         if key not in {"state_dir", "curriculum_path", "model", "claude_model",
                                        "codex_model", "agy_model", "config_diagnostics"}
-                        and not key.endswith("_timeout_s") and key != "fallback_reserve_s"}
+                        and not key.endswith("_timeout_s") and key != "fallback_reserve_s"
+                        and not (key in _LANE_CONTROL_DEFAULTS and value == _LANE_CONTROL_DEFAULTS[key])}
     profile_hash = digest(semantic_profile)
     rows, selected, primary = (), (), fallback
     curriculum_hash = digest(rows)
@@ -172,7 +181,7 @@ def compile(
                 )
 
             reserved_rows, reserved_plan = build(chosen)
-            for candidate in candidates:
+            for candidate in candidates if profile.end_lesson else ():
                 choices = [(candidate, len(speech), "end", "close")]
                 candidate_rows, candidate_plan = build(choices)
                 if any(c.purpose == "lesson" for c in candidate_plan[0]):
@@ -207,7 +216,7 @@ def compile(
                 except Exception as error:
                     diagnostics.append(Diagnostic("greeting", type(error).__name__))
             rotating_closings = [r for r in rotating_closings if not any(r["id"] == c[0]["id"] for c in chosen)]
-            if rng() < 0.5 and rotating_closings:
+            if rng() < profile.closer_chance and rotating_closings:
                 row = rotating_closings[min(int(rng() * len(rotating_closings)), len(rotating_closings) - 1)]
                 choices = [*chosen, (row, len(speech), "end", "close")]
                 closing_rows, closing_plan = build(choices)
@@ -221,10 +230,11 @@ def compile(
             # Deterministic closing slot is unavailable to optional contextual selection.
             _, ends = paragraph_boundaries(speech)
             starts = openers
-            slots = {f"start:{offset}": (offset, "start") for offset in starts}
+            slots = {f"start:{offset}": (offset, "start") for offset in starts} if profile.paragraph_start_lessons else {}
             if any(r.get("category") in OPENER_CATEGORIES and mode == "open" for r, _, _, mode in chosen):
                 slots.pop("start:0", None)
-            slots.update({f"end:{offset}": (offset, "end") for offset in ends if offset != len(speech)})
+            if profile.paragraph_end_lessons:
+                slots.update({f"end:{offset}": (offset, "end") for offset in ends if offset != len(speech)})
             offered = [
                 r
                 for r in ranked

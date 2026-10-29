@@ -74,6 +74,11 @@ class Profile:
     chunk_pause_s: float = 0.4
     repeat_pause_s: float = 1.0
     long_break_seconds: float = 0
+    # Lane controls; defaults reproduce the pre-0.2.13 behaviour.
+    closer_chance: float = 0.5
+    paragraph_start_lessons: bool = True
+    paragraph_end_lessons: bool = True
+    end_lesson: bool = True
     pacing: dict = field(default_factory=dict)
     curriculum_path: str | None = None
     state_dir: str | None = None
