@@ -108,6 +108,9 @@ rotating like greetings. The `bookend` category may open or close a message, nev
 the model's paragraph-start and paragraph-end slots. `end_lesson` (default true) set to
 false skips the reserved end-of-message learning sentence. At their defaults these four
 fields stay out of the profile digest, so plan identities do not change.
+`opener_chance` (default 1.0, 0 to 1) is the chance that a requested greeting
+(`greeting=True` / `--greeting`) is placed; at 1.0 no extra random draw is made and it
+stays out of the digest too.
 `anchor_floor_days` (default 7) caps anchor entries' effective due dates after the
 last hearing. `echo_rate` (default 0.75) slows the second Vietnamese occurrence;
 the lead rate and random voice selection stay as configured. Provider minimum

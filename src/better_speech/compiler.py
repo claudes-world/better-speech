@@ -38,6 +38,7 @@ BOOKEND_CATEGORIES = (*OPENER_CATEGORIES, "closing")
 # digest, so plan identities and clip cache keys for unchanged lanes stay stable.
 _LANE_CONTROL_DEFAULTS = {
     "closer_chance": 0.5,
+    "opener_chance": 1.0,
     "paragraph_start_lessons": True,
     "paragraph_end_lessons": True,
     "end_lesson": True,
@@ -189,7 +190,8 @@ def compile(
                     reserved_rows, reserved_plan = candidate_rows, candidate_plan
                     break
                 diagnostics.append(Diagnostic("lesson", "rejected_candidate:" + candidate["id"]))
-            if greeting:
+            # Draw only below 1.0 so lanes at the default keep today's random sequence.
+            if greeting and (profile.opener_chance >= 1 or rng() < profile.opener_chance):
                 try:
                     current = datetime.fromisoformat(at.replace("Z", "+00:00"))
                     hour = current.astimezone(ZoneInfo(profile.timezone)).hour
