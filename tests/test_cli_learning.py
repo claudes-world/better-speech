@@ -94,7 +94,7 @@ def test_cli_render_prints_executed_transcript(config, tmp_path, monkeypatch, ca
         == 0
     )
     markdown = capsys.readouterr().out
-    assert "<summary>🇻🇳 Vietnamese lexicon</summary>" in markdown and "Links" in markdown
+    assert "<summary>🇻🇳 Vietnamese lesson</summary>" in markdown and "Links" in markdown
     assert "1. **" in markdown
     assert output.read_bytes().startswith(b"OggS")
     assert not (tmp_path / "state/ledger.sqlite3").exists()

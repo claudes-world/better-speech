@@ -119,7 +119,7 @@ def present(plan):
             rendered.append("# " + _label(section.text))
         elif section.kind == "lesson":
             rendered.append(
-                "<details>\n<summary>🇻🇳 Vietnamese lexicon</summary>\n\n" + section.text + "\n\n</details>"
+                "<details>\n<summary>🇻🇳 Vietnamese lesson</summary>\n\n" + section.text + "\n\n</details>"
             )
         elif section.kind == "transcript":
             rendered.append(

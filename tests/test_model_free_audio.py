@@ -64,7 +64,7 @@ def test_bilingual_ogg_with_no_model_executable(tmp_path, monkeypatch):
     assert result.audio_path and result.audio_path.read_bytes().startswith(b"OggS"), result.diagnostics
     assert result.plan.executed and result.plan.lessons
     assert [s.kind for s in result.sections] == ["title", "lesson", "transcript"]
-    assert "<summary>🇻🇳 Vietnamese lexicon</summary>" in result.markdown
+    assert "<summary>🇻🇳 Vietnamese lesson</summary>" in result.markdown
     assert "1. **" in result.markdown
     first_count = len(provider.calls)
     again = render(plan, {"google": provider, "elevenlabs": provider}, tmp_path / "cache")
