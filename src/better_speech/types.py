@@ -180,7 +180,13 @@ class Plan:
         )
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        data = asdict(self)
+        # Omit cached-only defaults so plans stay readable by pre-0.2.18 releases.
+        for row in data["clips"] + data["fallback_clips"]:
+            for key in ("cached_only", "substitute_json"):
+                if not row[key]:
+                    del row[key]
+        return data
 
     @classmethod
     def from_dict(cls, value: dict) -> Plan:

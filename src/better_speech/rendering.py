@@ -106,12 +106,14 @@ def render(
 
         # Present before purchasing clips: a corrupt optional manifest is not audible authority.
         lowered = []
+        cached_audio = {}  # Bytes read at the check, so a later eviction cannot drop the lesson.
         for clip in requested.clips:
             parts = lower(clip)
+            audio = cache.lookup(parts[0]) if clip.cached_only and cache is not None and len(parts) == 1 else None
+            if audio is not None:
+                cached_audio[len(lowered)] = audio
             # Cached-only voices are never purchased: a miss speaks the planned substitute.
-            if clip.cached_only and not (
-                cache is not None and len(parts) == 1 and cache.lookup(parts[0]) is not None
-            ):
+            elif clip.cached_only:
                 if not clip.substitute_json:
                     raise ValueError("cached-only clip unavailable")
                 diagnostics.append(Diagnostic("voice", "cached_only_substituted"))
@@ -144,10 +146,8 @@ def render(
                     return audio
 
                 pronunciation_failure = bool(clip.pronunciations)
-                if clip.cached_only:
-                    audio, hit = cache.lookup(clip), True
-                    if audio is None:  # Evicted after the check: still never purchase.
-                        raise ValueError("cached-only clip unavailable")
+                if index in cached_audio:
+                    audio, hit = cached_audio[index], True
                 else:
                     audio, hit = (
                         cache.get_or_synthesize(clip, synthesize, deadline=budget, diagnostics=diagnostics)

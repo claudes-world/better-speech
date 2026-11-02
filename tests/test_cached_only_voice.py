@@ -105,3 +105,38 @@ def test_voices_file_cached_only_list(tmp_path):
     (tmp_path / "profile.toml").write_text('model = "none"\nvoices_file = "pool.json"\n')
     voices = {v.voice: v for v in load_profile(tmp_path / "profile.toml").voices}
     assert voices["vanca"].cached_only and not voices["native"].cached_only
+
+
+def test_cached_clip_evicted_after_check_still_plays(tmp_path, monkeypatch):
+    plan = plan_with("vanca")
+    cache = ClipCache(tmp_path / "cache")
+    for clip in plan.clips:
+        if clip.cached_only:
+            cache.get_or_synthesize(
+                replace(clip, text=unicodedata.normalize("NFC", clip.text)),
+                lambda: tone(660), deadline=time.monotonic() + 30, diagnostics=[],
+            )
+    lookup = ClipCache.lookup
+    calls = []
+
+    def once(self, clip):  # Second read of any key behaves as evicted.
+        key = self.path(clip)
+        if key in calls:
+            return None
+        calls.append(key)
+        return lookup(self, clip)
+
+    monkeypatch.setattr(ClipCache, "lookup", once)
+    provider, table = providers()
+    result = render(plan, table, cache)
+    assert result.plan.status == "bilingual", result.diagnostics
+    assert any(c.voice == "vanca" for c in result.plan.clips)
+    assert not any(c.voice == "vanca" for c in provider.calls)
+
+
+def test_default_plan_dict_omits_new_clip_fields():
+    plan = compile("Note.", profile(POOL[1:]), ledger=EmptyLedger())
+    rows = plan.to_dict()["clips"] + plan.to_dict()["fallback_clips"]
+    assert rows and all("cached_only" not in r and "substitute_json" not in r for r in rows)
+    cached = plan_with("vanca").to_dict()["clips"]
+    assert any(r.get("cached_only") for r in cached)
