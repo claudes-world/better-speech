@@ -45,6 +45,21 @@ _LANE_CONTROL_DEFAULTS = {
 }
 
 
+def _unmarked(rows, profile):
+    """Drop marks that cannot change this lane's audio, so marking a phrase leaves the curriculum
+    digest, RNG seed and plans of lanes that ignore recall marks exactly as before.
+
+    `recall` counts only where the profile honours it (Profile.recall, 0.2.18 PR A);
+    `learner_phrase: false` (a mark-only row) ranks exactly like an absent key.
+    """
+    honour_recall = getattr(profile, "recall", False) is True
+    return tuple(
+        {k: v for k, v in row.items() if not (k == "recall" and not honour_recall)
+         and not (k == "learner_phrase" and v is False)}
+        for row in rows
+    )
+
+
 def _rank(rows, records, now, boost_daily_cap=3):
     def priority(row):
         record = records.get(row["ledger_identity"], {})
@@ -113,7 +128,7 @@ def compile(
         except Exception:
             diagnostics.append(Diagnostic("ledger", "snapshot_unavailable"))
             raise
-        rows = runtime_curriculum(profile, additions=additions)
+        rows = _unmarked(runtime_curriculum(profile, additions=additions), profile)
         curriculum_hash = digest(rows)
         records = anchor_floor(rows, records, profile.anchor_floor_days)
         if not profile.enabled or not speech.strip():

@@ -148,8 +148,8 @@ class Ledger:
             before = {row["id"] for row in rows}
             result = edit(rows)
             validate_inventory(rows)
-            # A row whose id an edit replaced (a mark-only row adopting a renamed shipped id)
-            # is removed, so one phrase never keeps two stored rows.
+            # A row the edit removed or re-identified (a cleared mark-only row, or one adopting a
+            # renamed shipped id) is deleted, so one phrase never keeps a stale stored row.
             for stale in sorted(before - {row["id"] for row in rows}):
                 self._execute(connection, "DELETE FROM learner_phrases WHERE learner_id=? AND phrase_id=?",
                               (learner_id, stale), deadline=deadline)

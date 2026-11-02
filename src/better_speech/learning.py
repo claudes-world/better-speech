@@ -114,7 +114,7 @@ def _mark(key, profile, ledger, change):
 
     A shipped phrase gets a mark-only row (id, l2, l1, learner_phrase=false, the mark), so it
     keeps its schedule and later shipped fixes to its hint, units or metadata still apply.
-    A change that leaves an unstored phrase unchanged writes nothing.
+    Clearing its last mark deletes the row.
     """
     profile = _writable(profile)
 
@@ -127,13 +127,12 @@ def _mark(key, profile, ledger, change):
         row = _stored(rows, existing)
         if row is None:
             row = {"id": existing["id"], "l2": existing["l2"], "l1": existing["l1"], "learner_phrase": False}
-            before = dict(row)
-            change(row)
-            if row == before:
-                return {**existing, **row}
             rows.append(row)
-        else:
-            change(row)
+        change(row)
+        if row.get("learner_phrase") is False and set(row) <= {"id", "l2", "l1", "learner_phrase"}:
+            # No marks left: drop the stub (edit_phrases deletes it) so the phrase is as never marked.
+            rows.remove(row)
+            return {k: v for k, v in existing.items() if k not in ("recall", "retired", "learner_phrase")}
         return dict(row)
 
     return ledger.edit_phrases(profile.learner_id, edit)

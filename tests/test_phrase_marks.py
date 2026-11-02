@@ -47,7 +47,8 @@ def test_mode_round_trip_on_shipped_phrase_keeps_its_schedule(cfg):
     at = "2026-10-21T14:00:00.000Z"
     assert _rank([runtime[row["id"]], other, mine], {}, at) == [mine, runtime[row["id"]], other]
     assert not runtime[row["id"]]["learner_phrase"]
-    assert set_mode(row["ledger_identity"], "learning", cfg, ledger=ledger(cfg))["learner_phrase"] is False
+    assert "recall" not in set_mode(row["ledger_identity"], "learning", cfg, ledger=ledger(cfg))
+    assert ledger(cfg).learner_state(cfg.learner_id)[1] == []  # last mark cleared: stub deleted
     assert {p["id"]: p for p in phrases(cfg, ledger=ledger(cfg))}[row["id"]]["mode"] == "learning"
     with pytest.raises(ValueError):
         set_mode(row["id"], "fast", cfg, ledger=ledger(cfg))
@@ -221,3 +222,23 @@ def test_learn_re_adds_a_marked_phrase_that_stopped_shipping(tmp_path):
     [listed] = phrases(cfg, ledger=ledger(cfg))
     assert (listed["translation"], listed["learner_phrase"]) == ("Coffee again.", True)
     assert [r["id"] for r in ledger(cfg).learner_state(cfg.learner_id)[1]] == [row["id"]]
+
+
+def test_marks_leave_plans_of_lanes_that_ignore_recall_unchanged(cfg, tmp_path):
+    plain = profile(state_dir=str(tmp_path / "plain"))
+    for row in runtime_curriculum(cfg):
+        set_mode(row["id"], "recall", cfg, ledger=ledger(cfg))
+    other = shipped(cfg, 2)
+    retire(other["id"], cfg, ledger=ledger(cfg))
+    restore(other["id"], cfg, ledger=ledger(cfg))
+    assert getattr(cfg, "recall", False) is False
+    for seed in (None, *range(5)):  # None: the RNG is seeded from the plan identity
+        for greeting in (False, True):
+            marked = compile("Source.\n\nMore.", cfg, ledger=ledger(cfg), now=NOW, seed=seed, greeting=greeting)
+            unmarked = compile("Source.\n\nMore.", plain, ledger=ledger(plain), now=NOW, seed=seed,
+                               greeting=greeting)
+            assert marked.to_dict() == unmarked.to_dict()
+    # Round trips back to a never-marked ledger.
+    for row in runtime_curriculum(cfg):
+        set_mode(row["id"], "learning", cfg, ledger=ledger(cfg))
+    assert ledger(cfg).learner_state(cfg.learner_id)[1] == []
