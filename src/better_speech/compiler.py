@@ -42,7 +42,7 @@ _LANE_CONTROL_DEFAULTS = {
     "paragraph_start_lessons": True,
     "paragraph_end_lessons": True,
     "end_lesson": True,
-    # 0.2.18 polyglot cue voice and recall mode.
+    # 0.2.19 polyglot cue voice and recall mode.
     "cue": None,
     "recall": False,
     "recall_pause_s": RECALL_PAUSE_S,

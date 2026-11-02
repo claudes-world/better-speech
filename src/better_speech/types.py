@@ -90,7 +90,7 @@ class Profile:
     paragraph_start_lessons: bool = True
     paragraph_end_lessons: bool = True
     end_lesson: bool = True
-    # 0.2.18 polyglot: English cue voice (None = the narrator reads the English); recall
+    # 0.2.19 polyglot: English cue voice (None = the narrator reads the English); recall
     # marks honoured on this lane (PLAN §6 audio.polyglot_recall, off until rollout); the
     # thinking pause before a recall item's Vietnamese. At defaults they stay out of the digest.
     cue: Voice | None = None
@@ -109,7 +109,7 @@ class Profile:
     def to_dict(self) -> dict:
         data = json.loads(canonical_json(asdict(self)))
         # Omit the default so profile digests (and plan identities) stay stable.
-        for voice in (data["english"], *data["voices"]):
+        for voice in (data["english"], *data["voices"], *([data["cue"]] if data["cue"] else [])):
             if not voice["cached_only"]:
                 del voice["cached_only"]
         return data

@@ -1,4 +1,4 @@
-"""0.2.18 polyglot cue voice and recall mode (PLAN.md section 4)."""
+"""0.2.19 polyglot cue voice and recall mode (PLAN.md section 4)."""
 
 import json
 from dataclasses import replace
@@ -170,3 +170,7 @@ def test_malformed_cue_object_drops_only_the_cue():
 
     loaded = resolve_profile(Profile.from_dict({**profile().to_dict(), "cue": {"voice": "x", "bogus": 1}}))
     assert loaded.enabled and loaded.cue is None and "invalid_cue_voice" in loaded.config_diagnostics
+
+
+def test_cue_voice_omits_the_cached_only_default_from_the_profile_dict():
+    assert "cached_only" not in replace(profile(), cue=CUE).to_dict()["cue"]
