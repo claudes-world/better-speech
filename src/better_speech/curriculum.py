@@ -177,9 +177,13 @@ def runtime_curriculum(profile, *, additions=()) -> tuple[dict, ...]:
     by_key = {canonical_phrase(r["l2"]): r for r in rows}
     for row in additions:
         key = canonical_phrase(row["l2"])
-        if row.get("learner_phrase") is False and key not in by_key:
-            continue  # marks for a shipped phrase that no longer ships
-        # Mode/retire marks on a shipped phrase store learner_phrase=false to keep its schedule.
+        if row.get("learner_phrase") is False:
+            # A mark-only row (mode/retire on a shipped phrase) keeps the shipped schedule tier.
+            # It contributes only its marks: the shipped id, l2 and l1 win so later fixes apply,
+            # and marks for a phrase that no longer ships are ignored.
+            if key not in by_key:
+                continue
+            row = {k: v for k, v in row.items() if k not in ("id", "l2", "l1")}
         row.setdefault("learner_phrase", True)
         by_key[key] = {**by_key.get(key, {}), **row}
     result = []

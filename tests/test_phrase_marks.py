@@ -108,9 +108,13 @@ def test_shipped_fixes_still_apply_to_marked_phrases_and_dropped_phrases_leave_n
     cfg = profile(state_dir=str(tmp_path), curriculum_path=str(path))
     set_mode("coffee", "recall", cfg, ledger=ledger(cfg))
     retire("coffee", cfg, ledger=ledger(cfg))
-    path.write_text(json.dumps({"focusPhrases": [dict(base, hint="chaw meeng kah feh")]}))
+    fixed = dict(base, id="coffee-v2", l1="A coffee for me, please.", hint="chaw meeng kah feh")
+    path.write_text(json.dumps({"focusPhrases": [fixed]}))
     [row] = runtime_curriculum(cfg, additions=ledger(cfg).learner_state(cfg.learner_id)[1])
-    assert (row["hint"], row["recall"], row["retired"]) == ("chaw meeng kah feh", True, True)
+    assert (row["id"], row["l1"], row["translation"], row["hint"], row["recall"], row["retired"]) == (
+        "coffee-v2", "A coffee for me, please.", "A coffee for me, please.", "chaw meeng kah feh", True, True)
+    assert restore("coffee-v2", cfg, ledger=ledger(cfg))["recall"] is True
+    assert len(ledger(cfg).learner_state(cfg.learner_id)[1]) == 1
     path.write_text(json.dumps({"focusPhrases": [dict(base, id="coffee2", l2="Cho tôi cà phê.",
                                                       units=["Cho tôi", "cà phê"])]}))
     assert [r["id"] for r in runtime_curriculum(cfg, additions=ledger(cfg).learner_state(cfg.learner_id)[1])] == [
@@ -129,11 +133,28 @@ def test_retired_greetings_and_closings_are_never_placed(cfg):
         assert not hidden & {lesson.phrase_key for lesson in plan.lessons}
 
 
-def test_marks_survive_learned(cfg):
+def test_marks_survive_learned_and_learned_ranks_the_same_marked_or_not(cfg, tmp_path):
     row = shipped(cfg)
     set_mode(row["id"], "recall", cfg, ledger=ledger(cfg))
     stored = learned(row["id"], cfg, ledger=ledger(cfg))
-    assert stored["recall"] is True and stored["landed"] is True
+    assert stored["recall"] is True and stored["landed"] is True and "learner_phrase" not in stored
+    plain = profile(state_dir=str(tmp_path / "plain"))
+    learned(row["id"], plain, ledger=ledger(plain))
+    runtime = {r["id"]: r for r in runtime_curriculum(cfg, additions=ledger(cfg).learner_state(cfg.learner_id)[1])}
+    unmarked = {r["id"]: r for r in runtime_curriculum(plain, additions=ledger(plain).learner_state("liam")[1])}
+    assert {k: v for k, v in runtime[row["id"]].items() if k != "recall"} == unmarked[row["id"]]
+    assert {p["id"]: p for p in phrases(cfg, ledger=ledger(cfg))}[row["id"]]["landed"] is True
+
+
+def test_legacy_rows_stay_learner_phrases_and_keys_are_nfc(cfg):
+    import unicodedata
+
+    row = shipped(cfg)
+    legacy = {k: v for k, v in row.items() if k != "ledger_identity"}
+    [merged] = [r for r in runtime_curriculum(cfg, additions=[legacy]) if r["id"] == row["id"]]
+    assert merged["learner_phrase"] is True
+    decomposed = " " + unicodedata.normalize("NFD", row["ledger_identity"]) + " "
+    assert set_mode(decomposed, "recall", cfg, ledger=ledger(cfg))["id"] == row["id"]
 
 
 def test_unmarked_learner_has_no_rows_and_unchanged_plans(cfg, tmp_path):

@@ -20,6 +20,21 @@ def _writable(profile):
     return profile
 
 
+def _own(row, existing):
+    """Turn a mark-only row into a full learner row, exactly as an unmarked shipped phrase is
+    copied by `learn`/`learned`; its marks are kept."""
+    if row.get("learner_phrase") is False and existing:
+        marks = {k: v for k, v in row.items() if k not in ("id", "l2", "l1", "learner_phrase")}
+        row.clear()
+        row.update({k: v for k, v in existing.items() if k != "learner_phrase"}, **marks)
+
+
+def _stored(rows, existing):
+    """The learner's stored row for a runtime phrase, matched by id or NFC l2."""
+    phrase = canonical_phrase(existing["l2"])
+    return next((r for r in rows if r["id"] == existing["id"] or canonical_phrase(r["l2"]) == phrase), None)
+
+
 def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, now: datetime | None = None, hint: str | None = None, literal: str | None = None) -> dict:
     profile = _writable(profile)
     if not vietnamese.strip() or not gloss.strip():
@@ -39,9 +54,8 @@ def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, 
         existing = next((r for r in runtime_curriculum(profile, additions=rows)
                          if canonical_phrase(r["l2"]) == phrase), None)
         row = next((r for r in rows if canonical_phrase(r["l2"]) == phrase), None)
-        if row is not None and row.get("learner_phrase") is False and existing:
-            # A mark-only row (mode/retire) becomes a full learner row before the edit.
-            row.update({**existing, **row})
+        if row is not None:
+            _own(row, existing)
         if row is None:
             row = dict(existing) if existing else {
                 "id": "learn-" + hashlib.sha256(phrase.encode()).hexdigest()[:16],
@@ -58,10 +72,8 @@ def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, 
             row["hint"] = format_hint(hint)
         if literal is not None:
             row["literal"] = literal.strip()
-        # Adding or editing a phrase makes it the learner's own again and un-retires it.
+        # Adding or editing a phrase un-retires it.
         row.pop("retired", None)
-        if row.get("learner_phrase") is False:
-            del row["learner_phrase"]
         # Validate the actual merged record, including existing unit/pacing metadata.
         paced = compile_lesson({**row, "phrase": phrase}, profile=DEFAULT)
         if len(paced.rendered.encode("utf-16-le")) // 2 > 4000:
@@ -79,10 +91,11 @@ def learned(key: str, profile: Profile = Profile(), *, ledger) -> dict:
                          if r["id"] == key or r["ledger_identity"] == key), None)
         if existing is None:
             raise ValueError("unknown phrase key")
-        row = next((r for r in rows if r["id"] == existing["id"]), None)
+        row = _stored(rows, existing)
         if row is None:
             row = dict(existing)
             rows.append(row)
+        _own(row, existing)
         row.update(landed=True, pending_learning=False, boost_until=None)
         return dict(row)
 
@@ -104,11 +117,12 @@ def _mark(key, profile, ledger, change):
     profile = _writable(profile)
 
     def edit(rows):
+        identity = canonical_phrase(key.strip())
         existing = next((r for r in runtime_curriculum(profile, additions=rows)
-                         if r["id"] == key or r["ledger_identity"] == key), None)
+                         if r["id"] == key or r["ledger_identity"] == identity), None)
         if existing is None:
             raise ValueError("unknown phrase key")
-        row = next((r for r in rows if r["id"] == existing["id"]), None)
+        row = _stored(rows, existing)
         if row is None:
             row = {"id": existing["id"], "l2": existing["l2"], "l1": existing["l1"], "learner_phrase": False}
             before = dict(row)
