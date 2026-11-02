@@ -33,15 +33,19 @@ def shipped(cfg, index=0):
 def test_mode_round_trip_on_shipped_phrase_keeps_its_schedule(cfg):
     row = shipped(cfg)
     stored = set_mode(row["id"], "recall", cfg, ledger=ledger(cfg))
-    assert stored == {**row, "learner_phrase": False, "recall": True}
+    assert stored == {"id": row["id"], "l2": row["l2"], "l1": row["l1"], "learner_phrase": False, "recall": True}
     listed = {p["id"]: p for p in phrases(cfg, ledger=ledger(cfg))}
     assert listed[row["id"]]["mode"] == "recall" and listed[row["id"]]["learner_phrase"] is False
     runtime = {r["id"]: r for r in runtime_curriculum(cfg, additions=ledger(cfg).learner_state(cfg.learner_id)[1])}
     # The override keeps every shipped field (hint, units, category) and adds only the mark.
     assert {k: v for k, v in runtime[row["id"]].items() if k not in ("recall", "learner_phrase")} == {
         k: v for k, v in row.items() if k != "learner_phrase"}
-    # Same priority tier as an unmarked shipped phrase.
-    assert _rank([runtime[row["id"]]], {}, "2026-10-21T14:00:00.000Z") == [runtime[row["id"]]]
+    # Same priority tier as an unmarked shipped phrase: an unseen learner phrase still ranks first,
+    # and the marked phrase keeps its curriculum position among shipped phrases.
+    other = shipped(cfg, 1)
+    mine = dict(other, id="mine", l2="Học nhé.", phrase="Học nhé.", ledger_identity="học nhé.", learner_phrase=True)
+    at = "2026-10-21T14:00:00.000Z"
+    assert _rank([runtime[row["id"]], other, mine], {}, at) == [mine, runtime[row["id"]], other]
     assert not runtime[row["id"]]["learner_phrase"]
     assert set_mode(row["ledger_identity"], "learning", cfg, ledger=ledger(cfg))["learner_phrase"] is False
     assert {p["id"]: p for p in phrases(cfg, ledger=ledger(cfg))}[row["id"]]["mode"] == "learning"
@@ -89,6 +93,42 @@ def test_retired_phrase_leaves_ranking_due_and_compile_but_keeps_history(cfg):
     assert ledger(cfg).learner_state(cfg.learner_id)[0][heard.phrase_key] == records[heard.phrase_key]
 
 
+def test_noop_marks_write_nothing(cfg):
+    row = shipped(cfg)
+    assert set_mode(row["id"], "learning", cfg, ledger=ledger(cfg))["id"] == row["id"]
+    assert restore(row["id"], cfg, ledger=ledger(cfg))["id"] == row["id"]
+    assert ledger(cfg).learner_state(cfg.learner_id)[1] == []
+
+
+def test_shipped_fixes_still_apply_to_marked_phrases_and_dropped_phrases_leave_no_orphan(tmp_path):
+    path = tmp_path / "curriculum.json"
+    base = {"id": "coffee", "l2": "Cho mình cà phê.", "l1": "Coffee, please.", "units": ["Cho mình", "cà phê"],
+            "lesson_type": "connector", "hint": "chaw ming kah feh"}
+    path.write_text(json.dumps({"focusPhrases": [base]}))
+    cfg = profile(state_dir=str(tmp_path), curriculum_path=str(path))
+    set_mode("coffee", "recall", cfg, ledger=ledger(cfg))
+    retire("coffee", cfg, ledger=ledger(cfg))
+    path.write_text(json.dumps({"focusPhrases": [dict(base, hint="chaw meeng kah feh")]}))
+    [row] = runtime_curriculum(cfg, additions=ledger(cfg).learner_state(cfg.learner_id)[1])
+    assert (row["hint"], row["recall"], row["retired"]) == ("chaw meeng kah feh", True, True)
+    path.write_text(json.dumps({"focusPhrases": [dict(base, id="coffee2", l2="Cho tôi cà phê.",
+                                                      units=["Cho tôi", "cà phê"])]}))
+    assert [r["id"] for r in runtime_curriculum(cfg, additions=ledger(cfg).learner_state(cfg.learner_id)[1])] == [
+        "coffee2"]
+
+
+def test_retired_greetings_and_closings_are_never_placed(cfg):
+    bookends = [r for r in runtime_curriculum(cfg) if r.get("category") in ("greeting", "opener", "bookend", "closing")]
+    assert bookends
+    for row in bookends:
+        retire(row["id"], cfg, ledger=ledger(cfg))
+    hidden = {r["ledger_identity"] for r in bookends}
+    for seed in range(20):
+        plan = compile("Source.", replace(cfg, closer_chance=1.0), ledger=ledger(cfg), now=NOW, seed=seed,
+                       greeting=True)
+        assert not hidden & {lesson.phrase_key for lesson in plan.lessons}
+
+
 def test_marks_survive_learned(cfg):
     row = shipped(cfg)
     set_mode(row["id"], "recall", cfg, ledger=ledger(cfg))
@@ -114,11 +154,14 @@ def test_cli_phrases_mode_retire_restore(tmp_path, capsys):
     key = next(p["id"] for p in listed if p["category"] is None)
     assert main(["mode", key, "recall", *args]) == 0
     assert json.loads(capsys.readouterr().out)["recall"] is True
+    identity = next(p["ledger_identity"] for p in listed if p["id"] == key)
+    assert main(["mode", identity, "learning", *args]) == 0
+    assert "recall" not in json.loads(capsys.readouterr().out)
     assert main(["retire", key, *args]) == 0
     assert json.loads(capsys.readouterr().out)["retired"] is True
     assert main(["phrases", "--retired", *args]) == 0
     assert [p["id"] for p in json.loads(capsys.readouterr().out)] == [key]
-    assert main(["restore", key, *args]) == 0
+    assert main(["restore", identity, *args]) == 0
     assert "retired" not in json.loads(capsys.readouterr().out)
     assert main(["phrases", "--active", *args]) == 0
     assert len(json.loads(capsys.readouterr().out)) == len(listed)

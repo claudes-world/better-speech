@@ -177,6 +177,8 @@ def runtime_curriculum(profile, *, additions=()) -> tuple[dict, ...]:
     by_key = {canonical_phrase(r["l2"]): r for r in rows}
     for row in additions:
         key = canonical_phrase(row["l2"])
+        if row.get("learner_phrase") is False and key not in by_key:
+            continue  # marks for a shipped phrase that no longer ships
         # Mode/retire marks on a shipped phrase store learner_phrase=false to keep its schedule.
         row.setdefault("learner_phrase", True)
         by_key[key] = {**by_key.get(key, {}), **row}

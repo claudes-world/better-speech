@@ -39,6 +39,9 @@ def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, 
         existing = next((r for r in runtime_curriculum(profile, additions=rows)
                          if canonical_phrase(r["l2"]) == phrase), None)
         row = next((r for r in rows if canonical_phrase(r["l2"]) == phrase), None)
+        if row is not None and row.get("learner_phrase") is False and existing:
+            # A mark-only row (mode/retire) becomes a full learner row before the edit.
+            row.update({**existing, **row})
         if row is None:
             row = dict(existing) if existing else {
                 "id": "learn-" + hashlib.sha256(phrase.encode()).hexdigest()[:16],
@@ -92,8 +95,12 @@ MODES = ("learning", "recall")
 
 
 def _mark(key, profile, ledger, change):
-    """Edit one phrase's marks. A shipped phrase is copied into the learner's rows (as `learned`
-    does) with learner_phrase=false so its schedule is unchanged; `events` history is never touched."""
+    """Edit one phrase's marks; `events` history is never touched.
+
+    A shipped phrase gets a mark-only row (id, l2, l1, learner_phrase=false, the mark), so it
+    keeps its schedule and later shipped fixes to its hint, units or metadata still apply.
+    A change that leaves an unstored phrase unchanged writes nothing.
+    """
     profile = _writable(profile)
 
     def edit(rows):
@@ -103,9 +110,14 @@ def _mark(key, profile, ledger, change):
             raise ValueError("unknown phrase key")
         row = next((r for r in rows if r["id"] == existing["id"]), None)
         if row is None:
-            row = {**existing, "learner_phrase": False}
+            row = {"id": existing["id"], "l2": existing["l2"], "l1": existing["l1"], "learner_phrase": False}
+            before = dict(row)
+            change(row)
+            if row == before:
+                return {**existing, **row}
             rows.append(row)
-        change(row)
+        else:
+            change(row)
         return dict(row)
 
     return ledger.edit_phrases(profile.learner_id, edit)
@@ -136,7 +148,7 @@ def phrases(profile: Profile = Profile(), *, ledger, retired: bool | None = None
     return [
         {"id": r["id"], "ledger_identity": r["ledger_identity"], "phrase": r["phrase"],
          "translation": r["translation"], "category": r.get("category"),
-         "learner_phrase": r.get("learner_phrase") is True,
+         "learner_phrase": r.get("learner_phrase") is True, "landed": r.get("landed") is True,
          "mode": "recall" if r.get("recall") is True else "learning", "retired": r.get("retired") is True}
         for r in runtime_curriculum(profile, additions=additions)
         if retired is None or (r.get("retired") is True) == retired
