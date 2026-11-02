@@ -140,3 +140,25 @@ def test_default_plan_dict_omits_new_clip_fields():
     assert rows and all("cached_only" not in r and "substitute_json" not in r for r in rows)
     cached = plan_with("vanca").to_dict()["clips"]
     assert any(r.get("cached_only") for r in cached)
+
+
+def test_voices_file_non_list_cached_only_is_ignored_without_diagnostic(tmp_path):
+    from better_speech.config import load_profile
+
+    for bad in ("vanca", {"vanca": True}, [1]):
+        (tmp_path / "pool.json").write_text(json.dumps({"weights": {"vanca": 4, "native": 2}, "cached_only": bad}))
+        (tmp_path / "profile.toml").write_text('model = "none"\nvoices_file = "pool.json"\n')
+        loaded = load_profile(tmp_path / "profile.toml")
+        assert {v.voice for v in loaded.voices} == {"vanca", "native"}
+        assert not any(v.cached_only for v in loaded.voices) and not loaded.config_diagnostics
+
+
+def test_plan_from_dict_drops_unknown_keys():
+    from better_speech.types import Plan
+
+    baseline = plan_with("vanca").to_dict()
+    data = json.loads(json.dumps(baseline))
+    data["future_plan_field"] = 1
+    for row in data["clips"] + data["fallback_clips"] + data["lessons"] + data["diagnostics"]:
+        row["future_field"] = "x"
+    assert Plan.from_dict(data) == Plan.from_dict(baseline)

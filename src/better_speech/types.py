@@ -197,12 +197,17 @@ class Plan:
 
     @classmethod
     def _from_v1(cls, value: dict) -> Plan:
-        data = dict(value)
-        data["clips"] = tuple(Clip(**v) for v in data["clips"])
-        data["fallback_clips"] = tuple(Clip(**v) for v in data["fallback_clips"])
-        data["lessons"] = tuple(Lesson(**v) for v in data.get("lessons", ()))
-        data["diagnostics"] = tuple(Diagnostic(**v) for v in data.get("diagnostics", ()))
+        # Unknown keys are dropped so a plan written by a newer release stays readable.
+        data = _known(cls, value)
+        data["clips"] = tuple(Clip(**_known(Clip, v)) for v in data["clips"])
+        data["fallback_clips"] = tuple(Clip(**_known(Clip, v)) for v in data["fallback_clips"])
+        data["lessons"] = tuple(Lesson(**_known(Lesson, v)) for v in data.get("lessons", ()))
+        data["diagnostics"] = tuple(Diagnostic(**_known(Diagnostic, v)) for v in data.get("diagnostics", ()))
         return cls(**data)
+
+
+def _known(cls, value: dict) -> dict:
+    return {k: v for k, v in value.items() if k in cls.__dataclass_fields__}
 
 
 @dataclass(frozen=True)

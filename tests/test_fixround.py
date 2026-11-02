@@ -168,8 +168,8 @@ def test_plan_has_no_operational_authority_and_delivery_uses_explicit_store(tmp_
     assert record_delivered(restored, 'send', NOW, ledger=ledger).added == len(restored.lessons)
     assert not (tmp_path / 'unused').exists()
     tampered = {**plan.to_dict(), 'profile_json': json.dumps({'state_dir': str(tmp_path / 'injected')})}
-    with pytest.raises(TypeError):
-        Plan.from_dict(tampered)
+    restored = Plan.from_dict(tampered)  # Unknown keys are dropped, never honoured.
+    assert not hasattr(restored, 'profile_json') and restored == Plan.from_dict(plan.to_dict())
     assert not (tmp_path / 'injected').exists()
 
 
