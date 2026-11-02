@@ -1,4 +1,4 @@
-"""0.2.18 per-phrase marks: recall mode, retire and restore (PLAN.md sections 2 and 7B)."""
+"""0.2.19 per-phrase marks: recall mode, retire and restore (PLAN.md sections 2 and 7B)."""
 
 import json
 from dataclasses import replace

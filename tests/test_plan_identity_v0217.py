@@ -14,7 +14,7 @@ TEXTS = (
     "The build passed.\n\nThe deploy is next.\n\nI will report back.",
     "# Status\n\nAll green.\n\n- one\n- two\n\n[Docs](https://example.org).",
 )
-# Pinned from better-speech v0.2.17 (5608d83).
+# Pinned from better-speech v0.2.17 (5608d83); v0.2.18 (3a5fe97) reproduces both digests.
 BASELINE_DEFAULT = "fb56c56ddeeb3b3e743cde854b7ededd0c5bdd52b647a13de5d06fb7a1734f6e"
 BASELINE_INTENSE = "90d1779688ce6008ca5559e0e8355be6fff316a125675db1184130796088ace1"
 

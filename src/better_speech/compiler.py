@@ -49,7 +49,7 @@ def _unmarked(rows, profile):
     """Drop marks that cannot change this lane's audio, so marking a phrase leaves the curriculum
     digest, RNG seed and plans of lanes that ignore recall marks exactly as before.
 
-    `recall` counts only where the profile honours it (Profile.recall, 0.2.18 PR A);
+    `recall` counts only where the profile honours it (Profile.recall, 0.2.19 PR A);
     `learner_phrase: false` (a mark-only row) ranks exactly like an absent key.
     """
     honour_recall = getattr(profile, "recall", False) is True
