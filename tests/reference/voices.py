@@ -20,7 +20,7 @@ class VoiceRef:
     region: str | None = None
 
 
-# Exact V1 polyglot-speak.ts inventory/order, not current owner eligibility.
+# V1 polyglot-speak.ts inventory/order minus the removed near-silent ElevenLabs voice; not current owner eligibility.
 VOICE_POOL = (
     VoiceRef("elevenlabs", "uN2lv5lSgnxa1hcYRElP", "central"),
     VoiceRef("elevenlabs", "9FhIljxdGFirnCpAoUES", "central"),
