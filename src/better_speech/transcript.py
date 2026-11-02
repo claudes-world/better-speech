@@ -96,6 +96,8 @@ def present(plan):
             literal = aligned if aligned else row.get("literal", "")
             if isinstance(literal, (list, tuple)):
                 literal = " ".join(literal)
+            if not isinstance(literal, str):
+                literal = ""  # e.g. an explicit null literal renders no literal line
             # Literal glosses read as plain words: no em-dash or unit separators.
             literal = " ".join(_DASH.sub(" ", literal).split())
             item[0] += "  "

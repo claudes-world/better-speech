@@ -211,7 +211,7 @@ def test_item_layout_orders_translation_pronunciation_literal_without_stray_blan
 
     rows = (
         {"phrase": "Xin chào", "translation": "Hello", "hint": "sin chow", "literal": "ask — hello"},
-        {"phrase": "Cảm ơn", "translation": "Thanks"},
+        {"phrase": "Cảm ơn", "translation": "Thanks", "literal": None},
         {"phrase": "Cảm ơn", "translation": "Thanks", "hint": "kahm⌄ uhng"},
         {"phrase": "Đi thôi", "translation": "Let us go", "category": "closing", "literal": "go — let's"},
     )
