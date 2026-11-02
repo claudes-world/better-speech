@@ -7,7 +7,7 @@ from datetime import datetime, time, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from .config import resolve_profile
-from .curriculum import canonical_phrase, runtime_curriculum
+from .curriculum import canonical_phrase, format_hint, runtime_curriculum
 from .exposure import anchor_floor, timestamp
 from .pacing import DEFAULT, compile_lesson
 from .types import Profile
@@ -51,7 +51,8 @@ def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, 
             boost_until=timestamp(midnight.isoformat()), added_at=timestamp(instant.isoformat()),
         )
         if hint is not None:
-            row["hint"] = hint.strip()
+            # Stored as space-separated words with " / " breath breaks; legacy " - " becomes a space.
+            row["hint"] = format_hint(hint)
         if literal is not None:
             row["literal"] = literal.strip()
         # Validate the actual merged record, including existing unit/pacing metadata.

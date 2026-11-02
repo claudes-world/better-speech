@@ -47,7 +47,8 @@ def test_existing_sample_phrase_can_be_learned_and_reloaded(tmp_path):
     result = compile("The update is ready.", cfg, now=instant, ledger=Ledger.for_profile(cfg))
     assert result.status == "bilingual", result.diagnostics
     assert result.lessons[0].id == row["id"]
-    assert sum(c.language == "vi" for c in result.clips) == 2
+    # The learned phrase is spoken twice; an optional closer depends on the curriculum-seeded draw.
+    assert sum(c.language == "vi" and c.text == "Ăn thôi!" for c in result.clips) == 2
     assert Ledger.for_profile(cfg).learner_state(cfg.learner_id)[1]
 
 

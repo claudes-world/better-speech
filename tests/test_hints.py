@@ -58,7 +58,7 @@ def test_every_syllable_has_its_lexical_tone_and_southern_initial():
     }
     for row in rows:
         words = re.findall(r'[^\W\d_]+', row['l2'].lower())
-        syllables = re.split(r' - | ', row['hint'])
+        syllables = row['hint'].replace(' / ', ' ').split()
         assert len(words) == len(syllables), row['id']
         for word, syllable in zip(words, syllables, strict=True):
             decomposed = unicodedata.normalize('NFD', word)
@@ -95,20 +95,20 @@ def test_every_syllable_has_its_lexical_tone_and_southern_initial():
 def test_southern_pronunciation_examples(phrase_id, syllable):
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
     row = next(row for row in rows if row['id'] == phrase_id)
-    assert syllable in re.split(r' - | ', row['hint'])
+    assert syllable in row['hint'].replace(' / ', ' ').split()
 
 
 @pytest.mark.parametrize(('phrase_id', 'hint'), [
-    ('xin-loi', 'sin - loy⌄'),
-    ('cam-on-nhieu-nha', 'kahm⌄ uhng - nyee-uh-oo↓ - nya'),
-    ('giu-tien-thua', 'khohng - kuhng↓ - thoy↑ - lie• - doh'),
-    ('san-sang-chua', 'sahng⌄ sahng↓ - chuah'),
-    ('doi-qua', 'daw-ee↑ - wah↑'),
-    ('tin-vui-ne', 'tin - yooy - neh↓'),
-    ('cai-nay-bao-nhieu', 'kye↑ - nigh↓ - bow nyee-uh-oo - teeyen↓'),
-    ('hieu-roi', 'hee-uh-oo⌄ - roy↓'),
-    ('thich-qua', 'thit↑ - wah↑'),
-    ('tinh-tien', 'tin↑ - teeyen↓'),
+    ('xin-loi', 'sin loy⌄'),
+    ('cam-on-nhieu-nha', 'kahm⌄ uhng nyee-uh-oo↓ nya'),
+    ('giu-tien-thua', 'khohng kuhng↓ / thoy↑ lie• doh'),
+    ('san-sang-chua', 'sahng⌄ sahng↓ chuah'),
+    ('doi-qua', 'daw-ee↑ wah↑'),
+    ('tin-vui-ne', 'tin yooy neh↓'),
+    ('cai-nay-bao-nhieu', 'kye↑ nigh↓ / bow nyee-uh-oo teeyen↓'),
+    ('hieu-roi', 'hee-uh-oo⌄ roy↓'),
+    ('thich-qua', 'thit↑ wah↑'),
+    ('tinh-tien', 'tin↑ teeyen↓'),
 ])
 def test_reviewed_southern_hint_tones_and_syllables(phrase_id, hint):
     rows = json.loads(files('better_speech').joinpath('data/curriculum.vi.json').read_text())['focusPhrases']
@@ -129,10 +129,11 @@ def test_hint_code_block_after_translation_and_never_spoken():
     plan = compile('Note.', profile(), ledger=EmptyLedger())
     sections, _ = present(replace(plan, executed=True))
     lines = next(s.text for s in sections if s.kind == 'lesson').splitlines()
-    assert 'eat' in lines[1]
-    assert lines[2:6] == ['', '```', 'ahng - thoy', '```']
-    assert lines[6].startswith('*') and '[just/let' in lines[6].replace('\\', '')
-    assert all('ahng - thoy' not in clip.text for clip in plan.clips)
+    assert 'eat' in lines[1] and lines[1].endswith('  ')
+    assert lines[2].startswith('   _') and lines[2].endswith('_') and '[just/let' in lines[2].replace('\\', '')
+    assert '—' not in lines[2]
+    assert lines[3:7] == ['', '```', 'ahng thoy', '```']
+    assert all('ahng thoy' not in clip.text for clip in plan.clips)
 
 
 def test_cli_hint_persists_and_renders(tmp_path, capsys):
@@ -155,10 +156,12 @@ def test_arrow_hints_and_piece_spacing():
         hint = row['hint']
         assert '[' not in hint, row['id']
         assert not re.search(r'(?<![a-z])[↑↓•⌄]', hint), row['id']
-        assert not re.search(r'(?<! )- | -(?! )', hint), row['id']
+        # Words split by single spaces; breath breaks are a spaced slash; no ' - ' separators.
+        assert not re.search(r'(?:^| )-(?: |$)', hint), row['id']
+        assert not re.search(r'(?<! )/|/(?! )', hint), row['id']
         assert '  ' not in hint, row['id']
     towel = next(row for row in rows if row['id'] == 'cho-minh-mot-cai-khan-a')
-    assert towel['hint'] == 'chaw - min↓ - mohk• - kye↑ - khahng tahm↑ - ah•'
+    assert towel['hint'] == 'chaw min↓ / mohk• kye↑ khahng tahm↑ ah•'
 
 
 def test_every_shipped_syllable_matches_alphabet_guide_fixture():
@@ -169,7 +172,7 @@ def test_every_shipped_syllable_matches_alphabet_guide_fixture():
     checked = set()
     for row in rows:
         words = re.findall(r'[^\W\d_]+', row['l2'].lower())
-        syllables = row['hint'].replace(' - ', ' ').split()
+        syllables = row['hint'].replace(' / ', ' ').split()
         for word, hint in zip(words, syllables, strict=True):
             assert hint == expected[word], (row['id'], word, hint)
             checked.add(word)
@@ -185,4 +188,26 @@ def test_cli_learn_literal_persists_and_renders(tmp_path, capsys):
     from better_speech.config import load_profile
     cfg = load_profile(config)
     plan = compile('Note.', cfg, ledger=Ledger.for_profile(cfg))
-    assert 'study — \\[softener\\]' in present(replace(plan, executed=True))[1]
+    assert '   _study \\[softener\\]_\n' in present(replace(plan, executed=True))[1]
+
+
+def test_format_hint_spaces_words_and_keeps_breath_slashes():
+    from better_speech.curriculum import format_hint
+
+    assert format_hint('kye↑ - nigh↓ - bow nyee-uh-oo - teeyen↓') == 'kye↑ nigh↓ bow nyee-uh-oo teeyen↓'
+    assert format_hint('chaw min↓  /  mohk•\nkye↑') == 'chaw min↓ / mohk• kye↑'
+    assert format_hint('daw-ee↑ wah↑') == 'daw-ee↑ wah↑'
+
+
+def test_cli_learn_stores_breath_hint_and_renders_it_exactly(tmp_path, capsys):
+    config = tmp_path / 'profile.toml'
+    config.write_text('model="none"\nstate_dir="state"\n[[voices]]\nvoice="native"\n')
+    assert main(['learn', 'Cho mình xin cái khăn giấy nha.', '--gloss', 'Can I have a napkin, please?',
+                 '--hint', 'chaw - min↓ - sin / kye↑ - khahng yuhy↑ - nya',
+                 '--profile', str(config)]) == 0
+    row = json.loads(capsys.readouterr().out)
+    assert row['hint'] == 'chaw min↓ sin / kye↑ khahng yuhy↑ nya'
+    from better_speech.config import load_profile
+    cfg = load_profile(config)
+    plan = compile('Note.', cfg, ledger=Ledger.for_profile(cfg))
+    assert '\n```\nchaw min↓ sin / kye↑ khahng yuhy↑ nya\n```' in present(replace(plan, executed=True))[1]

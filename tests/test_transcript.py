@@ -27,6 +27,7 @@ def test_source_html_cannot_close_collapsed_transcript():
 
 def test_public_render_numbers_lessons_in_first_audible_order(tmp_path):
     import json
+    import re
 
     from better_speech import render
     from tests.test_model_free_audio import ToneProvider
@@ -61,7 +62,8 @@ def test_public_render_numbers_lessons_in_first_audible_order(tmp_path):
         def snapshot(self, *args, **kwargs):
             return records
 
-    cfg = replace(cfg, intensity=2)
+    # Always close so the numbering check covers the closing item regardless of the seeded draw.
+    cfg = replace(cfg, intensity=2, closer_chance=1.0)
     plan = compile("# First paragraph.\n\nSecond paragraph.", cfg, ledger=KnownPhrases(), model_call=select)
     provider = ToneProvider()
     result = render(plan, {"google": provider, "elevenlabs": provider}, tmp_path / "cache")
@@ -73,7 +75,10 @@ def test_public_render_numbers_lessons_in_first_audible_order(tmp_path):
     lesson_block = next(section.text for section in result.sections if section.kind == "lesson")
     rows = [line for line in lesson_block.splitlines() if line[:1].isdigit()]
     assert len(rows) == 4  # the closing is numbered as the next item
-    for number, phrase, line in zip((1, 2, 3, 4), ("Không sao đâu", "Hiểu rồi", "Ăn thôi", "Đi thôi"), rows):
+    # Which closing is drawn depends on the curriculum-seeded draw; it must still be numbered 4.
+    closing = next(lesson for lesson in result.plan.lessons if lesson.record.get("category") in ("closing", "bookend"))
+    closing_phrase = " ".join(re.findall(r"\w+", closing.record["phrase"]))
+    for number, phrase, line in zip((1, 2, 3, 4), ("Không sao đâu", "Hiểu rồi", "Ăn thôi", closing_phrase), rows):
         assert line.startswith(f"{number}. **") and phrase in line
     assert result.markdown.index(rows[0]) < result.markdown.index(rows[1]) < result.markdown.index(rows[2]) < result.markdown.index(rows[3])
 
@@ -107,17 +112,19 @@ def test_hint_fences_stand_alone_between_numbered_items():
     fences = [token for token in tokens if token.type == 'fence']
     assert all(token.level == 0 for token in fences)
     assert [token.content for token in fences] == [
-        'ahng - thoy\n', 'hee-uh-oo⌄ - roy↓\n',
-        'chaw - min↓ - mohk• - kye↑ - khahng tahm↑ - ah•\n',
+        'ahng thoy\n', 'hee-uh-oo⌄ roy↓\n',
+        'chaw min↓ / mohk• kye↑ khahng tahm↑ ah•\n',
     ]
-    for number, item in enumerate(re.split(r'\n\n(?=\d+\. )', text.rstrip()), 1):
+    assert len([token for token in tokens if token.type == 'hr']) == 2
+    items = text.split('\n\n---\n\n')
+    assert len(items) == 3
+    for number, item in enumerate(items, 1):
         assert item.startswith(f'{number}. **')
-        before, rest = item.split('\n\n')
-        assert len(before.splitlines()) == 2  # phrase, translation
-        assert rest.startswith('```\n')
-        closing, literal = rest.rsplit('\n', 1)
-        assert closing.endswith('\n```')  # literal follows the closing fence directly, at column 0
-        assert literal.startswith('*') and literal.endswith('*')
+        before, fence = item.split('\n\n')
+        phrase, translation, literal = before.split('\n')  # phrase, translation, literal
+        assert phrase.endswith('**  ') and translation.endswith('  ') and not translation.endswith('   ')
+        assert literal.startswith('   _') and literal.endswith('_') and '—' not in literal
+        assert fence.startswith('```\n') and fence.endswith('\n```')
 
 
 def test_host_render_preserves_standalone_hint_fences_and_numbering():
@@ -142,7 +149,7 @@ def test_host_render_preserves_standalone_hint_fences_and_numbering():
     assert len(parts) == 1
     rich, plain = host.render(parts[0])
     lesson = parts[0]['sections'][0]['text']
-    assert '\n```  \nahng - thoy  \n```' in rich
+    assert '\n```  \nahng thoy  \n```' in rich
     assert lesson in plain
     # Parse the actual host output, including its two-space line joins and wrapper.
     tokens = MarkdownIt('commonmark', {'html': True}).parse(rich)
@@ -152,8 +159,8 @@ def test_host_render_preserves_standalone_hint_fences_and_numbering():
     fences = [token for token in tokens if token.type == 'fence']
     assert all(token.level == 0 for token in fences)
     assert [token.content.rstrip() for token in fences] == [
-        'ahng - thoy', 'hee-uh-oo⌄ - roy↓',
-        'chaw - min↓ - mohk• - kye↑ - khahng tahm↑ - ah•',
+        'ahng thoy', 'hee-uh-oo⌄ roy↓',
+        'chaw min↓ / mohk• kye↑ khahng tahm↑ ah•',
     ]
 
     row = plan.lessons[0].record
@@ -209,13 +216,66 @@ def test_item_layout_orders_translation_pronunciation_literal_without_stray_blan
 
     rows = (
         {"phrase": "Xin chào", "translation": "Hello", "hint": "sin chow", "literal": "ask — hello"},
-        {"phrase": "Cảm ơn", "translation": "Thanks"},
+        {"phrase": "Cảm ơn", "translation": "Thanks", "literal": None},
+        {"phrase": "Cảm ơn", "translation": "Thanks", "hint": "kahm⌄ uhng"},
         {"phrase": "Đi thôi", "translation": "Let us go", "category": "closing", "literal": "go — let's"},
     )
     sections, _ = present(P("Note.", True, tuple(L(r) for r in rows)))
     text = next(s.text for s in sections if s.kind == "lesson")
     assert text == (
-        "1. **Xin chào**\n   Hello\n\n```\nsin chow\n```\n*ask — hello*\n\n"
-        "2. **Cảm ơn**\n   Thanks\n\n"
-        "3. **Đi thôi**\n   Let us go\n   *go — let's*"
+        "1. **Xin chào**  \n   Hello  \n   _ask hello_\n\n```\nsin chow\n```\n\n---\n\n"
+        "2. **Cảm ơn**  \n   Thanks\n\n---\n\n"
+        "3. **Cảm ơn**  \n   Thanks\n\n```\nkahm⌄ uhng\n```\n\n---\n\n"
+        "4. **Đi thôi**  \n   Let us go  \n   _go let's_"
     )
+
+
+def test_item_layout_matches_liam_preview_exactly():
+    from better_speech.curriculum import runtime_curriculum
+    from better_speech.config import Profile
+
+    row = next(r for r in runtime_curriculum(Profile()) if r.get("id") == "minh-co-tin-nay")
+    plan = P2("Note.", True, (L2(dict(row, phrase=row["l2"], translation=row["l1"])),
+                              L2({"phrase": "Cái này bao nhiêu tiền?", "translation": "How much is this?",
+                                  "units": ["Cái này", "bao nhiêu", "tiền"],
+                                  "l1_literal": [["Cái", "[classifier]"], ["này", "this"],
+                                                 ["bao nhiêu", "how much"], ["tiền", "money"]],
+                                  "hint": "kye↑ - nigh↓ - bow nyee-uh-oo - teeyen↓"})))
+    text = next(s.text for s in present(plan)[0] if s.kind == "lesson")
+    assert text == (
+        "1. **Mình có tin này\\.**  \n"
+        "   I have some news\\.  \n"
+        "   _I have news this_\n"
+        "\n"
+        "```\n"
+        "min↓ kaw↑ tin nigh↓\n"
+        "```\n"
+        "\n"
+        "---\n"
+        "\n"
+        "2. **Cái này • bao nhiêu • tiền?**  \n"
+        "   How much is this?  \n"
+        "   _\\[classifier\\] this how much money_\n"
+        "\n"
+        "```\n"
+        "kye↑ nigh↓ bow nyee-uh-oo teeyen↓\n"
+        "```"
+    )
+    assert "—" not in text and not text.endswith("---")
+    # A stored legacy " - " separator renders as a space; the hyphens inside nyee-uh-oo stay.
+    assert " - " not in text
+
+
+from dataclasses import dataclass as _dc
+
+
+@_dc
+class L2:
+    record: dict
+
+
+@_dc
+class P2:
+    source: str
+    executed: bool
+    lessons: tuple

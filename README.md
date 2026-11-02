@@ -121,9 +121,13 @@ eligible echo voice, the lesson keeps its lead without an echo. Setting
 
 The Vietnamese phrase list is the **lexicon**, stored in `curriculum.vi.json`.
 Every shipped phrase includes a founder-editable English pronunciation `hint`.
-The lesson block shows it in a standalone, full-width fenced code block after the
-translation. The literal gloss follows the closing fence on the very next line at column zero (no blank line; with no hint it sits indented under the translation). Each item (closings included) is numbered. The fences and hint start at column zero, with
-blank lines around the block; the block contains only the hint. Add or edit your own with `speak learn PHRASE --gloss GLOSS --hint RESPELLING [--literal GLOSS]`. Hints are
+Each lesson item (closings included) is numbered: the bold phrase, the translation,
+then the literal gloss in italics on its own line, words separated by single spaces
+(no em dashes; bracketed glosses such as `[classifier]` stay). Lines end in two
+spaces so each renders on its own line. The hint follows in a standalone, full-width
+fenced code block at column zero, with blank lines around it; the block contains only
+the hint. Items are separated by a `---` rule; the last item has none. Items without a
+hint or literal omit that block or line. Add or edit your own with `speak learn PHRASE --gloss GLOSS --hint RESPELLING [--literal GLOSS]`. Hints are
 visual only.
 
 Accent: The shipped pronunciation hints use a southern Vietnamese target with broad English-speaker
@@ -131,7 +135,9 @@ approximations; regional differences remain in the central/southern lesson voice
 v use y, đ uses d, r keeps r, and tr stays tr without a strongly separate r. Vietnamese th uses
 plain t, like tea, never English th.
 
-Pieces are separated by ` - `; syllables within a multi-syllable word use a single space. Give each
+Words and syllables are separated by single spaces; ` / ` marks a natural breath point (two or three
+chunks for a full sentence, none for a short phrase). A stored hint that still uses ` - ` separators
+renders them as spaces; hyphens inside one syllable's spelling (nyee-uh-oo) stay. Give each
 syllable one beat, without English stress. Eh (also e
 in closed hints such as em/dep/sem) is the vowel of bet; ay for ê is the first part of say, held
 steady without an ee offglide. Lên/mệt use the southern central-vowel cues luhn/muht. Ee is see; gì
@@ -154,7 +160,7 @@ Every non-level syllable has a tone mark glued directly to it: no mark means nga
 `•` is nặng’s low heavy register, which may recover slightly on open/nasal-final syllables, without a
 compulsory glottal choke. Low syllables ending in p/t/k also have final-stop closure; clipping is
 a reading note, not a separate mark. These are broad directions, not fixed pitch tracks. For example,
-`chaw - min↓ - mohk• - kye↑ - khahng tahm↑ - ah•` retains the two syllables of khăn tắm together.
+`chaw min↓ / mohk• kye↑ khahng tahm↑ ah•` breathes once, after chaw min↓.
 
 Set one profile setting to choose the optional contextual placer:
 
