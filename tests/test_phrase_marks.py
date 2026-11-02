@@ -242,3 +242,30 @@ def test_marks_leave_plans_of_lanes_that_ignore_recall_unchanged(cfg, tmp_path):
     for row in runtime_curriculum(cfg):
         set_mode(row["id"], "learning", cfg, ledger=ledger(cfg))
     assert ledger(cfg).learner_state(cfg.learner_id)[1] == []
+
+
+def test_marks_follow_a_shipped_text_fix_that_keeps_the_id(tmp_path):
+    cfg = _curriculum(tmp_path)
+    retire("coffee", cfg, ledger=ledger(cfg))
+    set_mode("coffee", "recall", cfg, ledger=ledger(cfg))
+    cfg = _curriculum(tmp_path, l2="Cho mình ly cà phê.", units=["Cho mình", "ly cà phê"])
+    [row] = phrases(cfg, ledger=ledger(cfg))
+    assert (row["phrase"], row["retired"], row["mode"]) == ("Cho mình ly cà phê.", True, "recall")
+    restore("coffee", cfg, ledger=ledger(cfg))
+    retire("coffee", cfg, ledger=ledger(cfg))
+    [stored] = ledger(cfg).learner_state(cfg.learner_id)[1]
+    assert stored["l2"] == "Cho mình ly cà phê." and stored["retired"] is True
+    assert phrases(cfg, ledger=ledger(cfg))[0]["retired"] is True
+    assert not due(cfg, ledger=ledger(cfg), now=NOW + timedelta(days=60))
+
+
+def test_learn_after_a_text_fix_owns_the_marked_phrase_without_duplicates(tmp_path):
+    cfg = _curriculum(tmp_path)
+    set_mode("coffee", "recall", cfg, ledger=ledger(cfg))
+    cfg = _curriculum(tmp_path, l2="Cho mình ly cà phê.", units=["Cho mình", "ly cà phê"])
+    row = learn("Cho mình ly cà phê.", "A coffee, please.", cfg, now=NOW, ledger=ledger(cfg))
+    assert (row["id"], row["recall"], "learner_phrase" in row) == ("coffee", True, False)
+    [stored] = ledger(cfg).learner_state(cfg.learner_id)[1]
+    assert stored["l2"] == "Cho mình ly cà phê." and stored["units"] == ["Cho mình", "ly cà phê"]
+    [listed] = phrases(cfg, ledger=ledger(cfg))
+    assert (listed["learner_phrase"], listed["mode"], listed["translation"]) == (True, "recall", "A coffee, please.")

@@ -175,13 +175,16 @@ def runtime_curriculum(profile, *, additions=()) -> tuple[dict, ...]:
     validate_inventory(additions)
     # NFC l2 deduplicates shipped phrases; learner edits (including landed) win.
     by_key = {canonical_phrase(r["l2"]): r for r in rows}
+    shipped_ids = {r["id"]: key for key, r in by_key.items()}
     for row in additions:
         key = canonical_phrase(row["l2"])
         if row.get("learner_phrase") is False:
             # A mark-only row (mode/retire on a shipped phrase) keeps the shipped schedule tier.
-            # It contributes only its marks: the shipped id, l2 and l1 win so later fixes apply,
-            # and marks for a phrase that no longer ships are ignored.
-            if key not in by_key:
+            # It contributes only its marks: the shipped id, l2 and l1 win so later fixes apply.
+            # It follows its phrase by text or, after a text fix, by id; marks for a phrase
+            # that no longer ships are ignored.
+            key = key if key in by_key else shipped_ids.get(row["id"])
+            if key is None:
                 continue
             row = {k: v for k, v in row.items() if k not in ("id", "l2", "l1")}
         row.setdefault("learner_phrase", True)

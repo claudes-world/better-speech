@@ -53,7 +53,8 @@ def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, 
     def edit(rows):
         existing = next((r for r in runtime_curriculum(profile, additions=rows)
                          if canonical_phrase(r["l2"]) == phrase), None)
-        row = next((r for r in rows if canonical_phrase(r["l2"]) == phrase), None)
+        row = _stored(rows, existing) if existing else next(
+            (r for r in rows if canonical_phrase(r["l2"]) == phrase), None)
         template = existing or {
             "id": "learn-" + hashlib.sha256(phrase.encode()).hexdigest()[:16],
             "l2": phrase, "units": [phrase], "lesson_type": "learning_sentence",
@@ -128,6 +129,9 @@ def _mark(key, profile, ledger, change):
         if row is None:
             row = {"id": existing["id"], "l2": existing["l2"], "l1": existing["l1"], "learner_phrase": False}
             rows.append(row)
+        elif row.get("learner_phrase") is False:
+            # Re-point a stub at the current shipped phrase (edit_phrases drops a replaced id).
+            row.update(id=existing["id"], l2=existing["l2"], l1=existing["l1"])
         change(row)
         if row.get("learner_phrase") is False and set(row) <= {"id", "l2", "l1", "learner_phrase"}:
             # No marks left: drop the stub (edit_phrases deletes it) so the phrase is as never marked.
