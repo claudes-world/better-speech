@@ -10,12 +10,12 @@ from __future__ import annotations
 import json
 import math
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import asdict, dataclass, replace
 
 from .boundaries import paragraph_boundaries
 from .curriculum import canonical_phrase
 from .pacing import compile_lesson, resolve_profile
-from .types import Clip, Voice
+from .types import Clip, Voice, canonical_json
 
 DEFAULTS = {
     "repeat": True,
@@ -53,6 +53,9 @@ class LessonPlacement:
     echo: Voice | None
     level: int = 1
     mode: str = "open"
+    # Pool voices spoken instead of a cached-only lead/echo whose clip is not cached.
+    lead_substitute: Voice | None = None
+    echo_substitute: Voice | None = None
 
 
 def _tts(text: str, display: str, voice: Voice, **fields) -> Clip:
@@ -205,11 +208,22 @@ def sequence_clips(
                 return _tts(text, text, main, purpose=purpose, phrase_key=identity)
 
             def l2(occurrence):
-                voice = (
-                    placement.lead
-                    if occurrence == 1 or placement.level == 2 or not cfg["repeatSecondVoice"]
-                    else placement.echo
-                )
+                use_lead = occurrence == 1 or placement.level == 2 or not cfg["repeatSecondVoice"]
+                voice = placement.lead if use_lead else placement.echo
+                clips = voice_clips(voice, occurrence)
+                if not voice.cached_only:
+                    return clips
+                stand_in = placement.lead_substitute if use_lead else placement.echo_substitute
+                alternates = voice_clips(stand_in, occurrence) if stand_in is not None else [None] * len(clips)
+                return [
+                    clip if clip.purpose == "silence" else replace(
+                        clip, cached_only=True,
+                        substitute_json=canonical_json(asdict(alternate)) if alternate is not None else "",
+                    )
+                    for clip, alternate in zip(clips, alternates, strict=True)
+                ]
+
+            def voice_clips(voice, occurrence):
                 if occurrence == 2 and "echo_rate" in cfg:
                     voice = replace(voice, rate=cfg["echo_rate"])
                 profile = resolve_profile(

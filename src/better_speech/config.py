@@ -142,8 +142,14 @@ def load_profile(path: str | Path | None = None) -> Profile:
         try:
             pool = json.loads((path.parent / pool_file).read_text(encoding="utf-8"))
             excluded = pool.get("exclude", [])
+            cached_only = pool.get("cached_only", [])
+            if not isinstance(cached_only, list) or not all(isinstance(k, str) for k in cached_only):
+                # Only a list of voice ids marks voices cached-only. No diagnostic: hosts treat
+                # config diagnostics as failures, and a bad flag list must not stop rendering.
+                cached_only = []
             data["voices"] = [
-                dict(voice=key, weight=weight, region=pool.get("regions", {}).get(key))
+                dict(voice=key, weight=weight, region=pool.get("regions", {}).get(key),
+                     **({"cached_only": True} if key in cached_only else {}))
                 for key, weight in pool["weights"].items()
                 if key not in excluded
             ]

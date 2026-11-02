@@ -133,6 +133,18 @@ def compile(
                 repeat=True,
                 second_voice=profile.repeat_second_voice,
             )
+
+            def stand_in(voice, partner):
+                # Deterministic (no RNG draw): the heaviest voice that is not
+                # cached-only, preferring one that differs from the partner role.
+                if voice is None or not voice.cached_only:
+                    return None
+                spoken = sorted((v for v in eligible if not v.cached_only), key=lambda v: -v.weight)
+                partner_id = partner.voice if partner is not None else None
+                return next((v for v in spoken if v.voice != partner_id), spoken[0] if spoken else None)
+
+            lead_substitute = stand_in(voices.lead, voices.echo) if voices else None
+            echo_substitute = stand_in(voices.echo, voices.lead) if voices else None
             eligible_rows = _rank(rows, records, at, profile.boost_daily_cap)
             ranked = [r for r in eligible_rows if r.get("category") not in BOOKEND_CATEGORIES]
             previous_closing = max(
@@ -174,6 +186,8 @@ def compile(
                             voices.echo,
                             2 if row.get("landed") else 1,
                             mode,
+                            lead_substitute,
+                            echo_substitute,
                         )
                     )
                 return curated, sequence_clips(

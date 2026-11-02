@@ -147,15 +147,8 @@ class ClipCache:
         self.directory = Path(directory)
         self.lock_timeout = lock_timeout
 
-    def get_or_synthesize(self, clip, synthesize, *, deadline, diagnostics):
-        import os
-        import tempfile
-
-        from filelock import FileLock, Timeout
-
-        from .budget import remaining
+    def path(self, clip):
         from .pronunciation import speech_input
-        from .types import Diagnostic
 
         mode, _ = speech_input(clip)
         identity = clip_identity(
@@ -169,20 +162,38 @@ class ClipCache:
             input_mode=mode,
             pronunciations=clip.pronunciations if mode == "ssml" else (),
         )
-        path = self.directory / (identity.cache_key + ".clip")
+        return self.directory / (identity.cache_key + ".clip")
+
+    @staticmethod
+    def _read(path):
+        try:
+            data = path.read_bytes()
+            if data[:4] == b"BSC1" and len(data) > 36 and hashlib.sha256(data[36:]).digest() == data[4:36]:
+                return data[36:]
+        except FileNotFoundError:
+            pass
+        return None
+
+    def lookup(self, clip):
+        """Verified cached audio, or None. Never synthesizes; I/O errors are a miss."""
+        try:
+            return self._read(self.path(clip))
+        except (OSError, ValueError):
+            return None
+
+    def get_or_synthesize(self, clip, synthesize, *, deadline, diagnostics):
+        import os
+        import tempfile
+
+        from filelock import FileLock, Timeout
+
+        from .budget import remaining
+        from .types import Diagnostic
+
+        path = self.path(clip)
 
         def read():
-            try:
-                data = path.read_bytes()
-                if (
-                    data[:4] == b"BSC1"
-                    and len(data) > 36
-                    and hashlib.sha256(data[36:]).digest() == data[4:36]
-                ):
-                    return data[36:]
-            except FileNotFoundError:
-                pass
-            return None
+            return self._read(path)
 
         lock = None
 

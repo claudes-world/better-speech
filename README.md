@@ -118,6 +118,12 @@ speeds are applied before synthesis with a diagnostic.
 Random echo selection excludes voices with lead weights of 1 or lower; with no
 eligible echo voice, the lesson keeps its lead without an echo. Setting
 `repeat_second_voice=false` explicitly reuses the lead.
+A voice marked `cached_only` (`Voice(cached_only=True)`, or listed under
+`"cached_only"` in a `voices_file` pool) is never synthesized: its lesson clips play
+only from verified cache entries (pre-generate them). On a miss the renderer speaks
+the same slot with the heaviest non-cached-only pool voice (preferring one that
+differs from the other role) and records a `voice/cached_only_substituted`
+diagnostic. Unmarked voices keep the profile digest unchanged.
 
 The Vietnamese phrase list is the **lexicon**, stored in `curriculum.vi.json`.
 Every shipped phrase includes a founder-editable English pronunciation `hint`.
