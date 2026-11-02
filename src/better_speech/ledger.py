@@ -145,8 +145,14 @@ class Ledger:
         try:
             self._execute(connection, "BEGIN IMMEDIATE", deadline=deadline)
             rows = self._learner_rows(connection, learner_id, deadline=deadline)
+            before = {row["id"] for row in rows}
             result = edit(rows)
             validate_inventory(rows)
+            # A row the edit removed or re-identified (a cleared mark-only row, or one adopting a
+            # renamed shipped id) is deleted, so one phrase never keeps a stale stored row.
+            for stale in sorted(before - {row["id"] for row in rows}):
+                self._execute(connection, "DELETE FROM learner_phrases WHERE learner_id=? AND phrase_id=?",
+                              (learner_id, stale), deadline=deadline)
             for row in rows:
                 self._execute(
                     connection, "INSERT INTO learner_phrases VALUES(?,?,?) "

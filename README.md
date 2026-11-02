@@ -212,6 +212,11 @@ The cap resets at midnight in the profile's IANA `timezone` (default
 `Asia/Ho_Chi_Minh`); capped phrases step aside for ordinary rotation, including
 contextual placements. Plans and echoes do not add to the daily count. Neither
 learner command records a hearing. `due` lists eligible boosted/due phrases.
+`phrases [--retired|--active]` lists the lexicon with each phrase's mode and removal
+state. `mode <key> learning|recall` sets a phrase's audio order (stored as `recall: true`;
+lanes honour it only with the profile's `recall` switch, `Profile.recall` in 0.2.19). `retire <key>` hides a phrase
+from selection and from `due`; its exposure history stays, and `restore <key>` brings it
+back. Marking a shipped phrase keeps its schedule; `learn` on a retired phrase restores it.
 When shipped and learner entries share NFC-normalized Vietnamese text, they
 schedule once, with the learner entry's identity, edits and landed state taking precedence.
 `--learner` overrides the profile's default `liam` for every command.

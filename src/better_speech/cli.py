@@ -13,7 +13,7 @@ from pathlib import Path
 
 from .compiler import compile
 from .config import load_profile
-from .learning import due, learn, learned
+from .learning import MODES, due, learn, learned, phrases, restore, retire, set_mode
 from .ledger import Ledger
 from .rendering import render
 
@@ -21,10 +21,13 @@ from .rendering import render
 def parser():
     root = argparse.ArgumentParser(prog="speak", description="Vietnamese lexicon lessons inside English voice notes")
     commands = root.add_subparsers(dest="command", required=True)
-    for name in ("plan", "render", "learn", "learned", "due"):
+    for name in ("plan", "render", "learn", "learned", "due", "phrases", "mode", "retire", "restore"):
         command = commands.add_parser(name, help={
             "learn": "add or edit a lexicon entry", "due": "show due lexicon entries",
             "learned": "mark a lexicon entry learned",
+            "phrases": "list lexicon entries with their mode and removal state",
+            "mode": "set a lexicon entry to learning or recall order",
+            "retire": "hide a lexicon entry (history is kept)", "restore": "un-hide a retired lexicon entry",
         }.get(name))
         command.add_argument("--profile", type=Path)
         command.add_argument("--learner")
@@ -39,8 +42,14 @@ def parser():
             command.add_argument("--gloss", required=True)
             command.add_argument("--hint")
             command.add_argument("--literal")
-        if name == "learned":
+        if name in ("learned", "mode", "retire", "restore"):
             command.add_argument("key")
+        if name == "mode":
+            command.add_argument("mode", choices=MODES)
+        if name == "phrases":
+            shown = command.add_mutually_exclusive_group()
+            shown.add_argument("--retired", action="store_true", help="only retired entries")
+            shown.add_argument("--active", action="store_true", help="only active entries")
     return root
 
 
@@ -57,6 +66,13 @@ def main(argv=None):
             print(json.dumps(learned(args.key, profile, ledger=ledger), ensure_ascii=False, indent=2))
         elif args.command == "due":
             print(json.dumps(due(profile, ledger=ledger), ensure_ascii=False, indent=2))
+        elif args.command == "phrases":
+            shown = True if args.retired else False if args.active else None
+            print(json.dumps(phrases(profile, ledger=ledger, retired=shown), ensure_ascii=False, indent=2))
+        elif args.command in ("mode", "retire", "restore"):
+            row = (set_mode(args.key, args.mode, profile, ledger=ledger) if args.command == "mode"
+                   else (retire if args.command == "retire" else restore)(args.key, profile, ledger=ledger))
+            print(json.dumps(row, ensure_ascii=False, indent=2))
         else:
             plan = compile(args.input.read_text(encoding="utf-8"), profile, ledger=ledger, greeting=args.greeting)
             if args.command == "plan":

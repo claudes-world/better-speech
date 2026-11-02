@@ -20,6 +20,23 @@ def _writable(profile):
     return profile
 
 
+def _own(row, existing):
+    """Turn a mark-only row into a full learner row, exactly as an unmarked shipped phrase is
+    copied by `learn`/`learned`; its marks are kept."""
+    if row.get("learner_phrase") is False:
+        marks = {k: v for k, v in row.items() if k not in ("id", "l2", "l1", "learner_phrase")}
+        row.clear()
+        row.update({k: v for k, v in existing.items() if k != "learner_phrase"}, **marks)
+
+
+def _stored(rows, existing, runtime):
+    """The learner's stored row for a runtime phrase: by id, else by NFC l2 among rows whose id
+    belongs to no runtime phrase (a stub left under a renamed shipped id)."""
+    phrase, attached = canonical_phrase(existing["l2"]), {r["id"] for r in runtime}
+    return next((r for r in rows if r["id"] == existing["id"]), None) or next(
+        (r for r in rows if r["id"] not in attached and canonical_phrase(r["l2"]) == phrase), None)
+
+
 def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, now: datetime | None = None, hint: str | None = None, literal: str | None = None) -> dict:
     profile = _writable(profile)
     if not vietnamese.strip() or not gloss.strip():
@@ -36,16 +53,25 @@ def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, 
     phrase = canonical_phrase(vietnamese.strip())
 
     def edit(rows):
-        existing = next((r for r in runtime_curriculum(profile, additions=rows)
-                         if canonical_phrase(r["l2"]) == phrase), None)
-        row = next((r for r in rows if canonical_phrase(r["l2"]) == phrase), None)
+        runtime = runtime_curriculum(profile, additions=rows)
+        existing = next((r for r in runtime if canonical_phrase(r["l2"]) == phrase), None)
+        attached = {r["id"] for r in runtime}
+        # With no runtime phrase, adopt only an orphaned mark stub, never one whose marks
+        # still belong to a shipped phrase that was re-texted under the same id.
+        row = _stored(rows, existing, runtime) if existing else next(
+            (r for r in rows if canonical_phrase(r["l2"]) == phrase
+             and not (r.get("learner_phrase") is False and r["id"] in attached)), None)
+        template = existing or {
+            "id": "learn-" + hashlib.sha256(phrase.encode()).hexdigest()[:16],
+            "l2": phrase, "units": [phrase], "lesson_type": "learning_sentence",
+            "vocabulary": [], "structure_pauses": [],
+        }
         if row is None:
-            row = dict(existing) if existing else {
-                "id": "learn-" + hashlib.sha256(phrase.encode()).hexdigest()[:16],
-                "l2": phrase, "units": [phrase], "lesson_type": "learning_sentence",
-                "vocabulary": [], "structure_pauses": [],
-            }
+            row = dict(template)
             rows.append(row)
+        else:
+            # Includes a mark-only row whose shipped phrase no longer ships.
+            _own(row, template)
         row.update(
             l1=gloss.strip(), translation=gloss.strip(), pending_learning=True, landed=False,
             boost_until=timestamp(midnight.isoformat()), added_at=timestamp(instant.isoformat()),
@@ -55,6 +81,8 @@ def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, 
             row["hint"] = format_hint(hint)
         if literal is not None:
             row["literal"] = literal.strip()
+        # Adding or editing a phrase un-retires it.
+        row.pop("retired", None)
         # Validate the actual merged record, including existing unit/pacing metadata.
         paced = compile_lesson({**row, "phrase": phrase}, profile=DEFAULT)
         if len(paced.rendered.encode("utf-16-le")) // 2 > 4000:
@@ -68,18 +96,88 @@ def learned(key: str, profile: Profile = Profile(), *, ledger) -> dict:
     profile = _writable(profile)
 
     def edit(rows):
-        existing = next((r for r in runtime_curriculum(profile, additions=rows)
-                         if r["id"] == key or r["ledger_identity"] == key), None)
+        runtime = runtime_curriculum(profile, additions=rows)
+        existing = next((r for r in runtime if r["id"] == key or r["ledger_identity"] == key), None)
         if existing is None:
             raise ValueError("unknown phrase key")
-        row = next((r for r in rows if r["id"] == existing["id"]), None)
+        row = _stored(rows, existing, runtime)
         if row is None:
             row = dict(existing)
             rows.append(row)
+        _own(row, existing)
         row.update(landed=True, pending_learning=False, boost_until=None)
         return dict(row)
 
     return ledger.edit_phrases(profile.learner_id, edit)
+
+
+# Per-phrase audio order. "learning" (the default, no stored key) plays Vietnamese, English,
+# Vietnamese; "recall" plays the English cue then the Vietnamese on lanes that honour it.
+MODES = ("learning", "recall")
+
+
+def _mark(key, profile, ledger, change):
+    """Edit one phrase's marks; `events` history is never touched.
+
+    A shipped phrase gets a mark-only row (id, l2, l1, learner_phrase=false, the mark), so it
+    keeps its schedule and later shipped fixes to its hint, units or metadata still apply.
+    Clearing its last mark deletes the row.
+    """
+    profile = _writable(profile)
+
+    def edit(rows):
+        identity = canonical_phrase(key.strip())
+        runtime = runtime_curriculum(profile, additions=rows)
+        existing = next((r for r in runtime if r["id"] == key or r["ledger_identity"] == identity), None)
+        if existing is None:
+            raise ValueError("unknown phrase key")
+        row = _stored(rows, existing, runtime)
+        if row is None:
+            row = {"id": existing["id"], "l2": existing["l2"], "l1": existing["l1"], "learner_phrase": False}
+            rows.append(row)
+        elif row.get("learner_phrase") is False:
+            # Re-point a stub at the current shipped phrase (edit_phrases drops a replaced id).
+            row.update(id=existing["id"], l2=existing["l2"], l1=existing["l1"])
+        change(row)
+        if row.get("learner_phrase") is False and set(row) <= {"id", "l2", "l1", "learner_phrase"}:
+            # No marks left: drop the stub (edit_phrases deletes it) so the phrase is as never marked.
+            rows.remove(row)
+            return {k: v for k, v in existing.items() if k not in ("recall", "retired", "learner_phrase")}
+        return dict(row)
+
+    return ledger.edit_phrases(profile.learner_id, edit)
+
+
+def set_mode(key: str, mode: str, profile: Profile = Profile(), *, ledger) -> dict:
+    if mode not in MODES:
+        raise ValueError("mode must be learning or recall")
+    return _mark(key, profile, ledger,
+                 lambda row: row.update(recall=True) if mode == "recall" else row.pop("recall", None))
+
+
+def retire(key: str, profile: Profile = Profile(), *, ledger) -> dict:
+    """Hide a phrase from selection and from `due`; `restore` brings it back."""
+    return _mark(key, profile, ledger, lambda row: row.update(retired=True))
+
+
+def restore(key: str, profile: Profile = Profile(), *, ledger) -> dict:
+    return _mark(key, profile, ledger, lambda row: row.pop("retired", None))
+
+
+def phrases(profile: Profile = Profile(), *, ledger, retired: bool | None = None) -> list[dict]:
+    """The runtime lexicon with each phrase's mode and removal state, for a control page.
+
+    retired=None lists every phrase, True only removed ones, False only active ones.
+    """
+    _, additions = ledger.learner_state(profile.learner_id, timezone=profile.timezone)
+    return [
+        {"id": r["id"], "ledger_identity": r["ledger_identity"], "phrase": r["phrase"],
+         "translation": r["translation"], "category": r.get("category"),
+         "learner_phrase": r.get("learner_phrase") is True, "landed": r.get("landed") is True,
+         "mode": "recall" if r.get("recall") is True else "learning", "retired": r.get("retired") is True}
+        for r in runtime_curriculum(profile, additions=additions)
+        if retired is None or (r.get("retired") is True) == retired
+    ]
 
 
 def due(profile: Profile = Profile(), *, ledger, now: datetime | None = None) -> list[dict]:
