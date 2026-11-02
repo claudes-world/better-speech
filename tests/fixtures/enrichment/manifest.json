@@ -127,7 +127,7 @@
     },
     {
       "path": "voices.json",
-      "sha256": "854ad6f49ae30893a2613ff139f53438aa44daac1a54e3fc8432e3d15ab91e87",
+      "sha256": "77e00dc5a6591cfe855c3f86e4434c93384c404d6715b5280bcfb81d99afde39",
       "classification": "v1-original",
       "source_file": "polyglot-speak.test.ts",
       "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
@@ -142,7 +142,7 @@
     },
     {
       "path": "echo.json",
-      "sha256": "501c73b106213d393749b13004d6e833eeb48d6861ef0fbabecdaf9f561d90fe",
+      "sha256": "a55ffc6f5381336e38f462ae4b52329082c8180411c43eaa53117467fc3e7a2c",
       "classification": "v1-original",
       "source_file": "polyglot-speak.test.ts",
       "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
@@ -155,7 +155,7 @@
     },
     {
       "path": "sequences.json",
-      "sha256": "df8fdaa787c611566c13ed1dd83ff64b4ed8b0e1d5d0ce54586185d3d5268125",
+      "sha256": "914e90ffe8767b34791c094aca674b8217867bab753a12e9813a0a55bb0fc936",
       "classification": "source-derived-regression",
       "source_file": "polyglot-speak.ts",
       "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
@@ -215,13 +215,13 @@
     },
     {
       "path": "voices-owner.json",
-      "sha256": "00a28c11148cc4b206c9c5d2e92eafb21b8906f68b83422467957db912bc3044",
+      "sha256": "dda1fa77011376ac9af2d2cbd1c52b9a1352f3f31a3987644637e9b6871cb76f",
       "classification": "owner-extension",
       "source_file": "LESSON-PACING-SCHEMA-20260917.md",
       "source_commit": null,
       "source_sha256": "3d2d37fecc9868f7d77f1e3562f56a7952e2567efcbfbcb6c17a2ac6028ca7a9",
       "source_test_names": ["weighted-first", "weighted-last", "excluded-first", "level-two-no-new-accent", "zero-weight-first", "repeat-off"],
-      "expectation_delta": "Locked eleven-voice ElevenLabs-only pool and weights supersede baseline mixed-provider rotation. Owner vector names, not V1 tests; later CamHong weight three is retained."
+      "expectation_delta": "Locked ten-voice ElevenLabs-only pool and weights supersede baseline mixed-provider rotation. Owner vector names, not V1 tests; later CamHong weight three is retained."
     },
     {
       "path": "settings-owner.json",
@@ -365,7 +365,7 @@
       "id": "voices",
       "status": "partial",
       "evidence": "Original voice/RNG fixtures plus locked owner pool, configured-provider filtering and pinned actual clip identity",
-      "remaining": "Approved configured eleven-voice pool and audible weighted/exclusion acceptance"
+      "remaining": "Approved configured ten-voice pool and audible weighted/exclusion acceptance"
     },
     {
       "id": "echo",

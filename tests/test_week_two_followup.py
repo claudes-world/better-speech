@@ -25,7 +25,7 @@ def test_example_echo_pool_excludes_weight_one_and_keeps_variety():
         echoes.add(choice.echo.voice)
         leads.add(choice.lead.voice)
     assert echoes == {v.voice for v in cfg.voices if v.weight > 1}
-    assert len(echoes) == 7
+    assert len(echoes) == 6
     assert leads == {v.voice for v in cfg.voices}
 
 

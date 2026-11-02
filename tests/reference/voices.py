@@ -20,9 +20,8 @@ class VoiceRef:
     region: str | None = None
 
 
-# Exact V1 polyglot-speak.ts inventory/order, not current owner eligibility.
+# V1 polyglot-speak.ts inventory/order minus the removed near-silent ElevenLabs voice; not current owner eligibility.
 VOICE_POOL = (
-    VoiceRef("elevenlabs", "CE5BJM57m1rtrAFVXfCq", "central"),
     VoiceRef("elevenlabs", "uN2lv5lSgnxa1hcYRElP", "central"),
     VoiceRef("elevenlabs", "9FhIljxdGFirnCpAoUES", "central"),
     VoiceRef("elevenlabs", "2G3KT0n4xucedtpsBlU2", "southern"),
@@ -39,7 +38,6 @@ ROLE_DEFAULTS = {"tailL1Lead": True, "midL1Close": True, "midL1Lead": False, "l1
 LOCKED_LEAD_WEIGHTS = {
     "ZvBK3ITp9pAzXbi1yZZH": 1,
     "uN2lv5lSgnxa1hcYRElP": 2,
-    "CE5BJM57m1rtrAFVXfCq": 4,
     "L5c6tGA8OiORYKxez5Zu": 4,
     "9FhIljxdGFirnCpAoUES": 1,
     "a3AkyqGG4v8Pg7SWQ0Y3": 4,
@@ -50,7 +48,7 @@ LOCKED_LEAD_WEIGHTS = {
     "x4KAhuXs2G8TfK9Zr7Q4": 3,
 }
 LOCKED_POOL = tuple(
-    VoiceRef("elevenlabs", name, "southern" if i >= 9 else "central")
+    VoiceRef("elevenlabs", name, "southern" if i >= 8 else "central")
     for i, name in enumerate(LOCKED_LEAD_WEIGHTS)
 )
 

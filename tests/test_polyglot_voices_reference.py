@@ -121,9 +121,9 @@ def test_owner_locked_roster_and_weights():
         {key: row[key] for key in ("provider", "voice", "region")} for row in owner["voices"]
     ]
     assert LOCKED_LEAD_WEIGHTS == {row["voice"]: row["weight"] for row in owner["voices"]}
-    assert len(LOCKED_POOL) == 11
+    assert len(LOCKED_POOL) == 10
     assert all(v.provider == "elevenlabs" for v in LOCKED_POOL)
-    assert sum(LOCKED_LEAD_WEIGHTS.values()) == 26
+    assert sum(LOCKED_LEAD_WEIGHTS.values()) == 22
     assert LOCKED_POOL[0].voice == "ZvBK3ITp9pAzXbi1yZZH"
     assert LOCKED_LEAD_WEIGHTS["x4KAhuXs2G8TfK9Zr7Q4"] == 3
 
@@ -141,7 +141,7 @@ def test_portable_owner_selection_vectors(case):
     assert list(draws) == []
 
 
-@pytest.mark.parametrize("roll,index", [(0, 0), (1 / 26, 1), (3 / 26, 2), (7 / 26, 3), (0.9999, 10)])
+@pytest.mark.parametrize("roll,index", [(0, 0), (1 / 22, 1), (3 / 22, 2), (7 / 22, 3), (0.9999, 9)])
 def test_owner_weighted_interval_boundaries(roll, index):
     choice = choose_lesson_voices(main=LOCKED_POOL[0], random=lambda: roll, repeat=False)
     assert choice.lead == LOCKED_POOL[index]
