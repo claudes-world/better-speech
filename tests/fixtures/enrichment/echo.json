@@ -14,7 +14,7 @@
       "rng": 0,
       "primary": {
         "provider": "elevenlabs",
-        "voice": "CE5BJM57m1rtrAFVXfCq",
+        "voice": "uN2lv5lSgnxa1hcYRElP",
         "region": "central"
       },
       "echo": {
@@ -27,7 +27,7 @@
       "rng": 0.2,
       "primary": {
         "provider": "elevenlabs",
-        "voice": "uN2lv5lSgnxa1hcYRElP",
+        "voice": "9FhIljxdGFirnCpAoUES",
         "region": "central"
       },
       "echo": {
@@ -44,16 +44,16 @@
         "region": "southern"
       },
       "echo": {
-        "provider": "elevenlabs",
-        "voice": "9FhIljxdGFirnCpAoUES",
-        "region": "central"
+        "provider": "google",
+        "voice": "vi-VN-Chirp3-HD-Puck",
+        "region": "northern"
       }
     },
     {
       "rng": 0.6,
       "primary": {
         "provider": "google",
-        "voice": "vi-VN-Chirp3-HD-Puck",
+        "voice": "vi-VN-Chirp3-HD-Enceladus",
         "region": "northern"
       },
       "echo": {

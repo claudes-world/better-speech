@@ -127,7 +127,7 @@
     },
     {
       "path": "voices.json",
-      "sha256": "854ad6f49ae30893a2613ff139f53438aa44daac1a54e3fc8432e3d15ab91e87",
+      "sha256": "77e00dc5a6591cfe855c3f86e4434c93384c404d6715b5280bcfb81d99afde39",
       "classification": "v1-original",
       "source_file": "polyglot-speak.test.ts",
       "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
@@ -142,7 +142,7 @@
     },
     {
       "path": "echo.json",
-      "sha256": "501c73b106213d393749b13004d6e833eeb48d6861ef0fbabecdaf9f561d90fe",
+      "sha256": "a55ffc6f5381336e38f462ae4b52329082c8180411c43eaa53117467fc3e7a2c",
       "classification": "v1-original",
       "source_file": "polyglot-speak.test.ts",
       "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
@@ -155,7 +155,7 @@
     },
     {
       "path": "sequences.json",
-      "sha256": "df8fdaa787c611566c13ed1dd83ff64b4ed8b0e1d5d0ce54586185d3d5268125",
+      "sha256": "914e90ffe8767b34791c094aca674b8217867bab753a12e9813a0a55bb0fc936",
       "classification": "source-derived-regression",
       "source_file": "polyglot-speak.ts",
       "source_commit": "5b61b0f9bf0cf648eb7b810cd34c0faf95d761fc",
@@ -215,7 +215,7 @@
     },
     {
       "path": "voices-owner.json",
-      "sha256": "00a28c11148cc4b206c9c5d2e92eafb21b8906f68b83422467957db912bc3044",
+      "sha256": "e9f899ad2bbb7c3eafbc2baa4887bab50c6c119ad99f9d5724276220e1c3c552",
       "classification": "owner-extension",
       "source_file": "LESSON-PACING-SCHEMA-20260917.md",
       "source_commit": null,

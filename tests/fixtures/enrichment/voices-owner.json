@@ -5,11 +5,11 @@
   "authority": "Liam10376, lockedvoicepool/weights",
   "expectation_delta": "ElevenLabs-only eleven-voice lead pool replaces legacy eight-voice mixed-provider rotation. Later locked CamHongweight3 supersedes earlier exclusion. Exclusions/weights supplied as lane settings; main narrator is lane-owned. No provider registration removed.",
   "cases": [
-    {"name":"weighted-first","draws":[0,0],"settings":{},"lead_index":0,"echo_index":9},
-    {"name":"weighted-last","draws":[0.99,0],"settings":{},"lead_index":10,"echo_index":0},
-    {"name":"excluded-first","draws":[0,0],"settings":{"excluded":["ZvBK3ITp9pAzXbi1yZZH"]},"lead_index":1,"echo_index":9},
+    {"name":"weighted-first","draws":[0,0],"settings":{},"lead_index":0,"echo_index":8},
+    {"name":"weighted-last","draws":[0.99,0],"settings":{},"lead_index":9,"echo_index":0},
+    {"name":"excluded-first","draws":[0,0],"settings":{"excluded":["ZvBK3ITp9pAzXbi1yZZH"]},"lead_index":1,"echo_index":8},
     {"name":"level-two-no-new-accent","draws":[0],"settings":{"level":2},"lead_index":0,"echo_index":0},
-    {"name":"zero-weight-first","draws":[0,0],"settings":{"weights":{"ZvBK3ITp9pAzXbi1yZZH":0}},"lead_index":1,"echo_index":9},
+    {"name":"zero-weight-first","draws":[0,0],"settings":{"weights":{"ZvBK3ITp9pAzXbi1yZZH":0}},"lead_index":1,"echo_index":8},
     {"name":"repeat-off","draws":[0],"settings":{"repeat":false},"lead_index":0,"echo_index":0}
   ],
   "voices": [
@@ -26,13 +26,6 @@
       "voice": "uN2lv5lSgnxa1hcYRElP",
       "region": "central",
       "weight": 2
-    },
-    {
-      "name": "VânCa",
-      "provider": "elevenlabs",
-      "voice": "CE5BJM57m1rtrAFVXfCq",
-      "region": "central",
-      "weight": 4
     },
     {
       "name": "Linh",
