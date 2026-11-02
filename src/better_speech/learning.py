@@ -29,10 +29,12 @@ def _own(row, existing):
         row.update({k: v for k, v in existing.items() if k != "learner_phrase"}, **marks)
 
 
-def _stored(rows, existing):
-    """The learner's stored row for a runtime phrase, matched by id or NFC l2."""
-    phrase = canonical_phrase(existing["l2"])
-    return next((r for r in rows if r["id"] == existing["id"] or canonical_phrase(r["l2"]) == phrase), None)
+def _stored(rows, existing, runtime):
+    """The learner's stored row for a runtime phrase: by id, else by NFC l2 among rows whose id
+    belongs to no runtime phrase (a stub left under a renamed shipped id)."""
+    phrase, attached = canonical_phrase(existing["l2"]), {r["id"] for r in runtime}
+    return next((r for r in rows if r["id"] == existing["id"]), None) or next(
+        (r for r in rows if r["id"] not in attached and canonical_phrase(r["l2"]) == phrase), None)
 
 
 def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, now: datetime | None = None, hint: str | None = None, literal: str | None = None) -> dict:
@@ -51,10 +53,14 @@ def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, 
     phrase = canonical_phrase(vietnamese.strip())
 
     def edit(rows):
-        existing = next((r for r in runtime_curriculum(profile, additions=rows)
-                         if canonical_phrase(r["l2"]) == phrase), None)
-        row = _stored(rows, existing) if existing else next(
-            (r for r in rows if canonical_phrase(r["l2"]) == phrase), None)
+        runtime = runtime_curriculum(profile, additions=rows)
+        existing = next((r for r in runtime if canonical_phrase(r["l2"]) == phrase), None)
+        attached = {r["id"] for r in runtime}
+        # With no runtime phrase, adopt only an orphaned mark stub, never one whose marks
+        # still belong to a shipped phrase that was re-texted under the same id.
+        row = _stored(rows, existing, runtime) if existing else next(
+            (r for r in rows if canonical_phrase(r["l2"]) == phrase
+             and not (r.get("learner_phrase") is False and r["id"] in attached)), None)
         template = existing or {
             "id": "learn-" + hashlib.sha256(phrase.encode()).hexdigest()[:16],
             "l2": phrase, "units": [phrase], "lesson_type": "learning_sentence",
@@ -90,11 +96,11 @@ def learned(key: str, profile: Profile = Profile(), *, ledger) -> dict:
     profile = _writable(profile)
 
     def edit(rows):
-        existing = next((r for r in runtime_curriculum(profile, additions=rows)
-                         if r["id"] == key or r["ledger_identity"] == key), None)
+        runtime = runtime_curriculum(profile, additions=rows)
+        existing = next((r for r in runtime if r["id"] == key or r["ledger_identity"] == key), None)
         if existing is None:
             raise ValueError("unknown phrase key")
-        row = _stored(rows, existing)
+        row = _stored(rows, existing, runtime)
         if row is None:
             row = dict(existing)
             rows.append(row)
@@ -121,11 +127,11 @@ def _mark(key, profile, ledger, change):
 
     def edit(rows):
         identity = canonical_phrase(key.strip())
-        existing = next((r for r in runtime_curriculum(profile, additions=rows)
-                         if r["id"] == key or r["ledger_identity"] == identity), None)
+        runtime = runtime_curriculum(profile, additions=rows)
+        existing = next((r for r in runtime if r["id"] == key or r["ledger_identity"] == identity), None)
         if existing is None:
             raise ValueError("unknown phrase key")
-        row = _stored(rows, existing)
+        row = _stored(rows, existing, runtime)
         if row is None:
             row = {"id": existing["id"], "l2": existing["l2"], "l1": existing["l1"], "learner_phrase": False}
             rows.append(row)

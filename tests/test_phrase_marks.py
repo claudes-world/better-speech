@@ -269,3 +269,19 @@ def test_learn_after_a_text_fix_owns_the_marked_phrase_without_duplicates(tmp_pa
     assert stored["l2"] == "Cho mình ly cà phê." and stored["units"] == ["Cho mình", "ly cà phê"]
     [listed] = phrases(cfg, ledger=ledger(cfg))
     assert (listed["learner_phrase"], listed["mode"], listed["translation"]) == (True, "recall", "A coffee, please.")
+
+
+def test_learning_the_old_text_of_a_retexted_marked_phrase_keeps_its_marks(tmp_path):
+    cfg = _curriculum(tmp_path)
+    retire("coffee", cfg, ledger=ledger(cfg))
+    cfg = _curriculum(tmp_path, l2="Cho mình ly cà phê.", units=["Cho mình", "ly cà phê"])
+    added = learn("Cho mình cà phê.", "Coffee.", cfg, now=NOW, ledger=ledger(cfg))
+    assert added["id"].startswith("learn-")
+    listed = {p["id"]: p for p in phrases(cfg, ledger=ledger(cfg))}
+    assert listed["coffee"]["retired"] is True and listed[added["id"]]["retired"] is False
+    assert sorted(r["id"] for r in ledger(cfg).learner_state(cfg.learner_id)[1]) == sorted(["coffee", added["id"]])
+    # Marks on the new learner phrase go to its own row, never to the shipped phrase's stub.
+    set_mode(added["id"], "recall", cfg, ledger=ledger(cfg))
+    listed = {p["id"]: p for p in phrases(cfg, ledger=ledger(cfg))}
+    assert (listed[added["id"]]["mode"], listed["coffee"]["mode"], listed["coffee"]["retired"]) == (
+        "recall", "learning", True)
