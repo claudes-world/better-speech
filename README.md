@@ -111,6 +111,12 @@ fields stay out of the profile digest, so plan identities do not change.
 `opener_chance` (default 1.0, 0 to 1) is the chance that a requested greeting
 (`greeting=True` / `--greeting`) is placed; at 1.0 no extra random draw is made and it
 stays out of the digest too.
+`cue` (default unset) is an English cue voice: when set it reads every lesson's English
+line, and the narrator keeps the prose. An unusable cue voice is dropped with an
+`invalid_cue_voice` diagnostic. `recall` (default false) lets this lane honour per-phrase
+recall marks (`recall: true` on a learner row): a recall item plays the English cue, a
+`recall_pause_s` thinking pause (default 1.5 s), then the Vietnamese once. At their
+defaults these three fields stay out of the digest, so unset lanes keep today's plans.
 `anchor_floor_days` (default 7) caps anchor entries' effective due dates after the
 last hearing. `echo_rate` (default 0.75) slows the second Vietnamese occurrence;
 the lead rate and random voice selection stay as configured. Provider minimum

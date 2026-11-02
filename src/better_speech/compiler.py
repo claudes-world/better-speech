@@ -18,7 +18,7 @@ from .exposure import anchor_floor, timestamp
 from .markdown import markdown_to_speech_structure
 from .planner import LessonPlacement, sequence_clips
 from .rewriter import parse_placements
-from .types import Diagnostic, Lesson, Plan, Profile, canonical_json, digest
+from .types import RECALL_PAUSE_S, Diagnostic, Lesson, Plan, Profile, canonical_json, digest
 from .voices import choose_lesson_voices
 
 
@@ -42,6 +42,10 @@ _LANE_CONTROL_DEFAULTS = {
     "paragraph_start_lessons": True,
     "paragraph_end_lessons": True,
     "end_lesson": True,
+    # 0.2.19 polyglot cue voice and recall mode.
+    "cue": None,
+    "recall": False,
+    "recall_pause_s": RECALL_PAUSE_S,
 }
 
 
@@ -167,6 +171,8 @@ def compile(
                 "pauseS": profile.pause_s,
                 "chunkPauseS": profile.chunk_pause_s,
                 "repeatPauseS": profile.repeat_pause_s,
+                "recall": profile.recall,
+                "recallPauseS": profile.recall_pause_s,
                 "longBreakSeconds": profile.long_break_seconds,
                 "pacing": json.loads(canonical_json(profile.pacing)),
             }
@@ -192,7 +198,7 @@ def compile(
                     )
                 return curated, sequence_clips(
                     speech, inventory=curated, placements=placements, main=main, settings=settings,
-                    opener_offsets=openers
+                    cue=profile.cue, opener_offsets=openers
                 )
 
             reserved_rows, reserved_plan = build(chosen)

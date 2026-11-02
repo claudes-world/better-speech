@@ -43,6 +43,21 @@ def resolve_profile(profile: Profile) -> Profile:
     except Exception:
         profile = replace(profile, english=Profile().english)
         diagnostics.append("invalid_english_voice")
+    if profile.cue is not None:
+        try:
+            cue = profile.cue if isinstance(profile.cue, Voice) else Voice(**profile.cue)
+            cue.validate()
+            from .providers.elevenlabs import ElevenLabsProvider
+            from .providers.google import GoogleProvider
+
+            builtin = {"google": GoogleProvider, "elevenlabs": ElevenLabsProvider}.get(cue.provider)
+            if builtin and ("en" not in builtin.languages or cue.output_format not in builtin.formats):
+                raise ValueError("unsupported cue language/format")
+            profile = replace(profile, cue=cue)
+        except Exception:
+            # An unusable cue voice is optional: the narrator keeps reading the English.
+            profile = replace(profile, cue=None,
+                              config_diagnostics=tuple(profile.config_diagnostics) + ("invalid_cue_voice",))
     try:
         if profile.heteronyms is None:
             profile = replace(profile, heteronyms=profile.model != "none")
@@ -56,6 +71,7 @@ def resolve_profile(profile: Profile) -> Profile:
             "pause_s",
             "chunk_pause_s",
             "repeat_pause_s",
+            "recall_pause_s",
             "long_break_seconds",
             "echo_rate",
             "anchor_floor_days",
@@ -64,7 +80,8 @@ def resolve_profile(profile: Profile) -> Profile:
             minimum = (
                 0
                 if key
-                in {"fallback_reserve_s", "pause_s", "chunk_pause_s", "repeat_pause_s", "long_break_seconds"}
+                in {"fallback_reserve_s", "pause_s", "chunk_pause_s", "repeat_pause_s", "recall_pause_s",
+                    "long_break_seconds"}
                 else 1e-9
             )
             if type(value) not in (int, float) or not math.isfinite(value) or value < minimum:
@@ -74,7 +91,7 @@ def resolve_profile(profile: Profile) -> Profile:
         if any(
             type(getattr(profile, key)) is not bool for key in (
                 "enabled", "repeat", "repeat_second_voice", "heteronyms",
-                "paragraph_start_lessons", "paragraph_end_lessons", "end_lesson",
+                "paragraph_start_lessons", "paragraph_end_lessons", "end_lesson", "recall",
             )
         ):
             raise ValueError("invalid boolean profile field")

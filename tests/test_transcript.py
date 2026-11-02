@@ -1,4 +1,4 @@
-from dataclasses import replace
+from dataclasses import dataclass, replace
 
 from better_speech import compile
 from better_speech.transcript import present
@@ -99,8 +99,6 @@ def _three_lesson_plan():
 
 
 def test_hint_fences_stand_alone_between_numbered_items():
-    import re
-
     from markdown_it import MarkdownIt
 
     sections, _ = present(_three_lesson_plan())
@@ -231,8 +229,8 @@ def test_item_layout_orders_translation_pronunciation_literal_without_stray_blan
 
 
 def test_item_layout_matches_liam_preview_exactly():
-    from better_speech.curriculum import runtime_curriculum
     from better_speech.config import Profile
+    from better_speech.curriculum import runtime_curriculum
 
     row = next(r for r in runtime_curriculum(Profile()) if r.get("id") == "minh-co-tin-nay")
     plan = P2("Note.", True, (L2(dict(row, phrase=row["l2"], translation=row["l1"])),
@@ -266,15 +264,13 @@ def test_item_layout_matches_liam_preview_exactly():
     assert " - " not in text
 
 
-from dataclasses import dataclass as _dc
 
-
-@_dc
+@dataclass
 class L2:
     record: dict
 
 
-@_dc
+@dataclass
 class P2:
     source: str
     executed: bool
