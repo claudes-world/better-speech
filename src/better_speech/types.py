@@ -85,6 +85,12 @@ class Profile:
     paragraph_start_lessons: bool = True
     paragraph_end_lessons: bool = True
     end_lesson: bool = True
+    # 0.2.18 polyglot: English cue voice (None = the narrator reads the English),
+    # recall marks honoured on this lane, and the thinking pause before a recall item's
+    # Vietnamese. At these defaults they stay out of the profile digest.
+    cue: Voice | None = None
+    recall: bool = False
+    recall_pause_s: float = 1.5
     pacing: dict = field(default_factory=dict)
     curriculum_path: str | None = None
     state_dir: str | None = None
@@ -108,6 +114,8 @@ class Profile:
         data = dict(value)
         if "english" in data:
             data["english"] = Voice(**data["english"])
+        if data.get("cue") is not None:
+            data["cue"] = Voice(**data["cue"])
         if "voices" in data:
             data["voices"] = tuple(Voice(**row) for row in data["voices"])
         if "config_diagnostics" in data:

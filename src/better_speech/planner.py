@@ -23,15 +23,31 @@ DEFAULTS = {
     "pauseS": 0.6,
     "chunkPauseS": 0.4,
     "repeatPauseS": 1.0,
+    # Recall items honoured only when the lane opts in (Profile.recall).
+    "recall": False,
+    "recallPauseS": 1.5,
 }
+# The cue voice also reads the English of Learning items; False limits it to Recall items.
+CUE_IN_LEARNING = True
+# Recall items play the Vietnamese once; True adds the slow echo after it.
+RECALL_ECHO = False
 
 
 def _sequence(segment: Mapping, config: Mapping, l1: Callable, l2: Callable, silence: Callable) -> list:
-    """Speak Vietnamese, its translation, then the optional Vietnamese echo."""
+    """Learning: Vietnamese, translation, optional echo. Recall: English cue, pause, Vietnamese."""
     result = []
     has_l2 = bool(segment.get("l2"))
     repeat = config["repeat"]
-    if has_l2:
+    if has_l2 and segment.get("recall"):
+        if segment.get("l1"):
+            result += [l1(segment["l1"], "translation"), silence(config["recallPauseS"])]
+        result += l2(1)
+        repeat = repeat and RECALL_ECHO
+        if repeat:
+            result += [silence(config["repeatPauseS"])]
+            result += l2(2)
+        result += [silence(0.25 if repeat else config["pauseS"])]
+    elif has_l2:
         result += l2(1)
         if segment.get("l1"):
             result += [silence(0.25), l1(segment["l1"], "translation")]
@@ -84,6 +100,7 @@ def sequence_clips(
     placements: Sequence[LessonPlacement],
     main: Voice,
     settings: Mapping,
+    cue: Voice | None = None,
     protected_ranges: Sequence[tuple[int, int]] = (),
     opener_offsets: Sequence[int] = (0,),
 ) -> tuple[tuple[Clip, ...], str | None]:
@@ -107,7 +124,7 @@ def sequence_clips(
         frozen = "{}"
         invalid_settings = True
     cfg = {**DEFAULTS, **json.loads(frozen)}
-    for key in ("repeat", "repeatSecondVoice"):
+    for key in ("repeat", "repeatSecondVoice", "recall"):
         if type(cfg[key]) is not bool:
             cfg[key] = DEFAULTS[key]
     _, ends = paragraph_boundaries(source)
@@ -125,7 +142,7 @@ def sequence_clips(
     if not placements:
         return plain(None)
     try:
-        for key in ("pauseS", "repeatPauseS", "chunkPauseS"):
+        for key in ("pauseS", "repeatPauseS", "chunkPauseS", "recallPauseS"):
             if type(cfg[key]) not in (int, float) or not math.isfinite(cfg[key]) or cfg[key] < 0:
                 raise ValueError("invalid silence setting")
         entries = {entry["id"]: entry for entry in inventory}
@@ -196,7 +213,9 @@ def sequence_clips(
             seen.add(identity)
             steps.extend(source_steps(cursor, offset))
             cursor = offset
-            segment = {"l2": phrase, "l1": record["translation"], "mode": placement.mode}
+            # "mode" is the open/close slot; "recall" is the per-phrase audio order.
+            segment = {"l2": phrase, "l1": record["translation"], "mode": placement.mode,
+                       "recall": cfg["recall"] and record.get("recall") is True}
             literal = record.get("literal")
             if literal:
                 segment["literal"] = " — ".join(literal) if isinstance(literal, list) else literal
@@ -205,7 +224,8 @@ def sequence_clips(
                 return replace(_tts("", "", main, purpose="silence"), pause_after_s=seconds)
 
             def l1(text, purpose):
-                return _tts(text, text, main, purpose=purpose, phrase_key=identity)
+                voice = cue if cue is not None and (segment["recall"] or CUE_IN_LEARNING) else main
+                return _tts(text, text, voice, purpose=purpose, phrase_key=identity)
 
             def l2(occurrence):
                 use_lead = occurrence == 1 or placement.level == 2 or not cfg["repeatSecondVoice"]

@@ -42,6 +42,10 @@ _LANE_CONTROL_DEFAULTS = {
     "paragraph_start_lessons": True,
     "paragraph_end_lessons": True,
     "end_lesson": True,
+    # 0.2.18 polyglot cue voice and recall mode.
+    "cue": None,
+    "recall": False,
+    "recall_pause_s": 1.5,
 }
 
 
@@ -167,6 +171,8 @@ def compile(
                 "pauseS": profile.pause_s,
                 "chunkPauseS": profile.chunk_pause_s,
                 "repeatPauseS": profile.repeat_pause_s,
+                "recall": profile.recall,
+                "recallPauseS": profile.recall_pause_s,
                 "longBreakSeconds": profile.long_break_seconds,
                 "pacing": json.loads(canonical_json(profile.pacing)),
             }
@@ -192,7 +198,7 @@ def compile(
                     )
                 return curated, sequence_clips(
                     speech, inventory=curated, placements=placements, main=main, settings=settings,
-                    opener_offsets=openers
+                    cue=profile.cue, opener_offsets=openers
                 )
 
             reserved_rows, reserved_plan = build(chosen)
