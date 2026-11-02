@@ -14,6 +14,7 @@ import re
 from .curriculum import canonical_phrase, grouped_literal
 
 _LINK = re.compile(r"\[([^\]\n]+)\]\((https?://(?:[^()<>\s]|\([^()<>\s]*\))+)\)")
+_DASH = re.compile(r"\s*[—•]\s*")
 _BARE = re.compile(r"\bhttps?://(?:[^\s<>()\[\]]|\([^\s<>()\[\]]*\))+")
 
 
@@ -86,8 +87,22 @@ def present(plan):
         items = []
         for number, lesson in enumerate(plan.lessons, 1):
             row = lesson.record
-            item = [f"{number}. **{_label(_grouped_phrase(row['phrase'], row.get('units')))}**",
-                    "   " + _label(row["translation"])]
+            # Two trailing spaces force a hard break; a bare newline in a list item renders as a space.
+            item = [f"{number}. **{_label(_grouped_phrase(row['phrase'], row.get('units')))}**"]
+            try:
+                aligned = grouped_literal(row)
+            except Exception:
+                aligned = None
+            literal = aligned if aligned else row.get("literal", "")
+            if isinstance(literal, (list, tuple)):
+                literal = " ".join(literal)
+            # Literal glosses read as plain words: no em-dash or unit separators.
+            literal = " ".join(_DASH.sub(" ", literal).split())
+            item[0] += "  "
+            item.append("   " + _label(row["translation"]))
+            if literal:
+                item[-1] += "  "
+                item.append("   _" + _label(literal) + "_")
             if row.get("hint"):
                 # Keep a single hint line, including for founder-authored multiline hints.
                 hint = " ".join(row["hint"].splitlines())
@@ -95,18 +110,8 @@ def present(plan):
                 # A longer fence keeps founder-authored backticks inside the block.
                 fence = "`" * max(3, max((len(run) + 1 for run in re.findall(r"`+", hint)), default=0))
                 item.extend(("", fence, hint, fence))
-            try:
-                aligned = grouped_literal(row)
-            except Exception:
-                aligned = None
-            literal = " • ".join(aligned) if aligned else row.get("literal", "")
-            if isinstance(literal, list):
-                literal = " • ".join(literal)
-            if literal:
-                # After a fence the list item has ended, so the literal sits at column 0 on the next line.
-                item.append(("" if row.get("hint") else "   ") + "*" + _label(literal) + "*")
             items.append("\n".join(item))
-        sections.append(Section("lesson", "\n\n".join(items), True))
+        sections.append(Section("lesson", "\n\n---\n\n".join(items), True))
     sections.append(Section("transcript", plan.source, True))
     links = extract_links(plan.source)
     if links:

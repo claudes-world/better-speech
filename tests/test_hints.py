@@ -129,9 +129,10 @@ def test_hint_code_block_after_translation_and_never_spoken():
     plan = compile('Note.', profile(), ledger=EmptyLedger())
     sections, _ = present(replace(plan, executed=True))
     lines = next(s.text for s in sections if s.kind == 'lesson').splitlines()
-    assert 'eat' in lines[1]
-    assert lines[2:6] == ['', '```', 'ahng - thoy', '```']
-    assert lines[6].startswith('*') and '[just/let' in lines[6].replace('\\', '')
+    assert 'eat' in lines[1] and lines[1].endswith('  ')
+    assert lines[2].startswith('   _') and lines[2].endswith('_') and '[just/let' in lines[2].replace('\\', '')
+    assert '—' not in lines[2]
+    assert lines[3:7] == ['', '```', 'ahng - thoy', '```']
     assert all('ahng - thoy' not in clip.text for clip in plan.clips)
 
 
@@ -185,4 +186,4 @@ def test_cli_learn_literal_persists_and_renders(tmp_path, capsys):
     from better_speech.config import load_profile
     cfg = load_profile(config)
     plan = compile('Note.', cfg, ledger=Ledger.for_profile(cfg))
-    assert 'study — \\[softener\\]' in present(replace(plan, executed=True))[1]
+    assert '   _study \\[softener\\]_\n' in present(replace(plan, executed=True))[1]

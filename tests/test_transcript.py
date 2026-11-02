@@ -110,14 +110,16 @@ def test_hint_fences_stand_alone_between_numbered_items():
         'ahng - thoy\n', 'hee-uh-oo⌄ - roy↓\n',
         'chaw - min↓ - mohk• - kye↑ - khahng tahm↑ - ah•\n',
     ]
-    for number, item in enumerate(re.split(r'\n\n(?=\d+\. )', text.rstrip()), 1):
+    assert len([token for token in tokens if token.type == 'hr']) == 2
+    items = text.split('\n\n---\n\n')
+    assert len(items) == 3
+    for number, item in enumerate(items, 1):
         assert item.startswith(f'{number}. **')
-        before, rest = item.split('\n\n')
-        assert len(before.splitlines()) == 2  # phrase, translation
-        assert rest.startswith('```\n')
-        closing, literal = rest.rsplit('\n', 1)
-        assert closing.endswith('\n```')  # literal follows the closing fence directly, at column 0
-        assert literal.startswith('*') and literal.endswith('*')
+        before, fence = item.split('\n\n')
+        phrase, translation, literal = before.split('\n')  # phrase, translation, literal
+        assert phrase.endswith('**  ') and translation.endswith('  ') and not translation.endswith('   ')
+        assert literal.startswith('   _') and literal.endswith('_') and '—' not in literal
+        assert fence.startswith('```\n') and fence.endswith('\n```')
 
 
 def test_host_render_preserves_standalone_hint_fences_and_numbering():
@@ -210,12 +212,63 @@ def test_item_layout_orders_translation_pronunciation_literal_without_stray_blan
     rows = (
         {"phrase": "Xin chào", "translation": "Hello", "hint": "sin chow", "literal": "ask — hello"},
         {"phrase": "Cảm ơn", "translation": "Thanks"},
+        {"phrase": "Cảm ơn", "translation": "Thanks", "hint": "kahm⌄ uhng"},
         {"phrase": "Đi thôi", "translation": "Let us go", "category": "closing", "literal": "go — let's"},
     )
     sections, _ = present(P("Note.", True, tuple(L(r) for r in rows)))
     text = next(s.text for s in sections if s.kind == "lesson")
     assert text == (
-        "1. **Xin chào**\n   Hello\n\n```\nsin chow\n```\n*ask — hello*\n\n"
-        "2. **Cảm ơn**\n   Thanks\n\n"
-        "3. **Đi thôi**\n   Let us go\n   *go — let's*"
+        "1. **Xin chào**  \n   Hello  \n   _ask hello_\n\n```\nsin chow\n```\n\n---\n\n"
+        "2. **Cảm ơn**  \n   Thanks\n\n---\n\n"
+        "3. **Cảm ơn**  \n   Thanks\n\n```\nkahm⌄ uhng\n```\n\n---\n\n"
+        "4. **Đi thôi**  \n   Let us go  \n   _go let's_"
     )
+
+
+def test_item_layout_matches_liam_preview_exactly():
+    from better_speech.curriculum import runtime_curriculum
+    from better_speech.config import Profile
+
+    row = next(r for r in runtime_curriculum(Profile()) if r.get("id") == "minh-co-tin-nay")
+    plan = P2("Note.", True, (L2(dict(row, phrase=row["l2"], translation=row["l1"])),
+                              L2({"phrase": "Cái này bao nhiêu tiền?", "translation": "How much is this?",
+                                  "units": ["Cái này", "bao nhiêu", "tiền"],
+                                  "l1_literal": [["Cái", "[classifier]"], ["này", "this"],
+                                                 ["bao nhiêu", "how much"], ["tiền", "money"]],
+                                  "hint": "kye↑ - nigh↓ - bow nyee-uh-oo - teeyen↓"})))
+    text = next(s.text for s in present(plan)[0] if s.kind == "lesson")
+    assert text == (
+        "1. **Mình có tin này\\.**  \n"
+        "   I have some news\\.  \n"
+        "   _I have news this_\n"
+        "\n"
+        "```\n"
+        "min↓ - kaw↑ - tin - nigh↓\n"
+        "```\n"
+        "\n"
+        "---\n"
+        "\n"
+        "2. **Cái này • bao nhiêu • tiền?**  \n"
+        "   How much is this?  \n"
+        "   _\\[classifier\\] this how much money_\n"
+        "\n"
+        "```\n"
+        "kye↑ - nigh↓ - bow nyee-uh-oo - teeyen↓\n"
+        "```"
+    )
+    assert "—" not in text and not text.endswith("---")
+
+
+from dataclasses import dataclass as _dc
+
+
+@_dc
+class L2:
+    record: dict
+
+
+@_dc
+class P2:
+    source: str
+    executed: bool
+    lessons: tuple
