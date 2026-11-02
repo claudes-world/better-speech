@@ -188,6 +188,8 @@ def test_pre_week_two_plan_keeps_execution_identity():
     for row in old['clips'] + old['fallback_clips']:
         row.pop('pronunciations')
         row.pop('echo')
+        row.pop('cached_only')
+        row.pop('substitute_json')
     previous_digest = digest([old['clips'], old['lessons']])
     old['executed_digest'] = previous_digest
     assert Plan.from_dict(old).executed_digest == previous_digest

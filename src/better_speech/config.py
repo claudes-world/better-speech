@@ -142,8 +142,10 @@ def load_profile(path: str | Path | None = None) -> Profile:
         try:
             pool = json.loads((path.parent / pool_file).read_text(encoding="utf-8"))
             excluded = pool.get("exclude", [])
+            cached_only = pool.get("cached_only", [])
             data["voices"] = [
-                dict(voice=key, weight=weight, region=pool.get("regions", {}).get(key))
+                dict(voice=key, weight=weight, region=pool.get("regions", {}).get(key),
+                     **({"cached_only": True} if key in cached_only else {}))
                 for key, weight in pool["weights"].items()
                 if key not in excluded
             ]

@@ -35,6 +35,8 @@ class Voice:
     region: str | None = None
     weight: float = 1
     settings_json: str = "{}"
+    # Speak this voice only from pre-verified cached clips; a miss substitutes.
+    cached_only: bool = False
 
     def __post_init__(self):
         if not self.output_format:
@@ -45,6 +47,8 @@ class Voice:
             raise ValueError("voice requires provider/model/voice/format")
         if type(self.rate) not in (int, float) or not math.isfinite(self.rate) or self.rate <= 0:
             raise ValueError("voice rate must be positive and finite")
+        if type(self.cached_only) is not bool:
+            raise ValueError("voice cached_only must be a boolean")
         settings = json.loads(self.settings_json)
         if not isinstance(settings, dict):
             raise ValueError("voice settings must be an object")
@@ -92,7 +96,12 @@ class Profile:
     config_diagnostics: tuple[str, ...] = ()
 
     def to_dict(self) -> dict:
-        return json.loads(canonical_json(asdict(self)))
+        data = json.loads(canonical_json(asdict(self)))
+        # Omit the default so profile digests (and plan identities) stay stable.
+        for voice in (data["english"], *data["voices"]):
+            if not voice["cached_only"]:
+                del voice["cached_only"]
+        return data
 
     @classmethod
     def from_dict(cls, value: dict) -> Profile:
@@ -124,6 +133,10 @@ class Clip:
     source_end: int | None = None
     pronunciations: list[dict] = field(default_factory=list)
     echo: bool = False
+    # Cached-only voice: never synthesized. On a cache miss the renderer speaks
+    # substitute_json (a serialized Clip from another pool voice) instead.
+    cached_only: bool = False
+    substitute_json: str = ""
 
 
 @dataclass(frozen=True)
@@ -160,7 +173,7 @@ class Plan:
         object.__setattr__(
             self,
             "executed_digest",
-            digest([[{k: v for k, v in asdict(clip).items() if k not in {"pronunciations", "echo"} or v}
+            digest([[{k: v for k, v in asdict(clip).items() if k not in {"pronunciations", "echo", "cached_only", "substitute_json"} or v}
                      for clip in self.clips], [asdict(lesson) for lesson in self.lessons]])
             if self.executed
             else None,

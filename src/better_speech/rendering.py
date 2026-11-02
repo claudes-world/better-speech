@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import math
 import tempfile
 import time
@@ -19,7 +20,7 @@ from .executor import AudioPart
 from .pronunciation import speech_input
 from .providers.elevenlabs import ElevenLabsProvider
 from .transcript import present
-from .types import Diagnostic, Rendering, Section, digest
+from .types import Clip, Diagnostic, Rendering, Section, digest
 
 
 def render(
@@ -75,9 +76,8 @@ def render(
         nonlocal hits, artifact_dir, pronunciation_failure
         pronunciation_failure = False
         remaining(budget)
-        # Present before purchasing clips: a corrupt optional manifest is not audible authority.
-        lowered = []
-        for clip in requested.clips:
+
+        def lower(clip):
             normalized = unicodedata.normalize("NFC", clip.text)
             if clip.pronunciations:
                 try:
@@ -89,8 +89,7 @@ def render(
                     clip = replace(clip, pronunciations=[])
             clip = replace(clip, text=normalized)
             if not clip.text.strip():
-                lowered.append(replace(clip, pause_after_s=clip.pause_after_s + (0 if requested.executed else 0.25)))
-                continue
+                return (replace(clip, pause_after_s=clip.pause_after_s + (0 if requested.executed else 0.25)),)
             provider = providers[clip.provider]
             if clip.language not in provider.languages or clip.output_format not in provider.formats:
                 raise ValueError("provider does not support clip language/format")
@@ -103,6 +102,21 @@ def render(
             if sum(len(c.pronunciations) for c in parts) != len(clip.pronunciations):
                 diagnostics.append(Diagnostic('heteronym', 'provider_limit_plain_fallback'))
                 parts = tuple(lower_clip(replace(clip, pronunciations=[]), provider.max_request_bytes))
+            return parts
+
+        # Present before purchasing clips: a corrupt optional manifest is not audible authority.
+        lowered = []
+        for clip in requested.clips:
+            parts = lower(clip)
+            # Cached-only voices are never purchased: a miss speaks the planned substitute.
+            if clip.cached_only and not (
+                cache is not None and len(parts) == 1 and cache.lookup(parts[0]) is not None
+            ):
+                if not clip.substitute_json:
+                    raise ValueError("cached-only clip unavailable")
+                diagnostics.append(Diagnostic("voice", "cached_only_substituted"))
+                substitute = Clip(**json.loads(clip.substitute_json))
+                parts = lower(replace(substitute, pause_after_s=clip.pause_after_s))
             lowered.extend(parts)
         actual = replace(requested, clips=tuple(lowered), executed=True)
         sections, markdown = present(actual)
@@ -130,11 +144,16 @@ def render(
                     return audio
 
                 pronunciation_failure = bool(clip.pronunciations)
-                audio, hit = (
-                    cache.get_or_synthesize(clip, synthesize, deadline=budget, diagnostics=diagnostics)
-                    if cache is not None
-                    else (synthesize(), False)
-                )
+                if clip.cached_only:
+                    audio, hit = cache.lookup(clip), True
+                    if audio is None:  # Evicted after the check: still never purchase.
+                        raise ValueError("cached-only clip unavailable")
+                else:
+                    audio, hit = (
+                        cache.get_or_synthesize(clip, synthesize, deadline=budget, diagnostics=diagnostics)
+                        if cache is not None
+                        else (synthesize(), False)
+                    )
                 pronunciation_failure = False
                 hits += hit
                 remaining(budget)
