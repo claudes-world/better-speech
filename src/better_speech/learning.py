@@ -55,6 +55,10 @@ def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, 
             row["hint"] = format_hint(hint)
         if literal is not None:
             row["literal"] = literal.strip()
+        # Adding or editing a phrase makes it the learner's own again and un-retires it.
+        row.pop("retired", None)
+        if row.get("learner_phrase") is False:
+            del row["learner_phrase"]
         # Validate the actual merged record, including existing unit/pacing metadata.
         paced = compile_lesson({**row, "phrase": phrase}, profile=DEFAULT)
         if len(paced.rendered.encode("utf-16-le")) // 2 > 4000:
@@ -80,6 +84,63 @@ def learned(key: str, profile: Profile = Profile(), *, ledger) -> dict:
         return dict(row)
 
     return ledger.edit_phrases(profile.learner_id, edit)
+
+
+# Per-phrase audio order. "learning" (the default, no stored key) plays Vietnamese, English,
+# Vietnamese; "recall" plays the English cue then the Vietnamese on lanes that honour it.
+MODES = ("learning", "recall")
+
+
+def _mark(key, profile, ledger, change):
+    """Edit one phrase's marks. A shipped phrase is copied into the learner's rows (as `learned`
+    does) with learner_phrase=false so its schedule is unchanged; `events` history is never touched."""
+    profile = _writable(profile)
+
+    def edit(rows):
+        existing = next((r for r in runtime_curriculum(profile, additions=rows)
+                         if r["id"] == key or r["ledger_identity"] == key), None)
+        if existing is None:
+            raise ValueError("unknown phrase key")
+        row = next((r for r in rows if r["id"] == existing["id"]), None)
+        if row is None:
+            row = {**existing, "learner_phrase": False}
+            rows.append(row)
+        change(row)
+        return dict(row)
+
+    return ledger.edit_phrases(profile.learner_id, edit)
+
+
+def set_mode(key: str, mode: str, profile: Profile = Profile(), *, ledger) -> dict:
+    if mode not in MODES:
+        raise ValueError("mode must be learning or recall")
+    return _mark(key, profile, ledger,
+                 lambda row: row.update(recall=True) if mode == "recall" else row.pop("recall", None))
+
+
+def retire(key: str, profile: Profile = Profile(), *, ledger) -> dict:
+    """Hide a phrase from selection and from `due`; `restore` brings it back."""
+    return _mark(key, profile, ledger, lambda row: row.update(retired=True))
+
+
+def restore(key: str, profile: Profile = Profile(), *, ledger) -> dict:
+    return _mark(key, profile, ledger, lambda row: row.pop("retired", None))
+
+
+def phrases(profile: Profile = Profile(), *, ledger, retired: bool | None = None) -> list[dict]:
+    """The runtime lexicon with each phrase's mode and removal state, for a control page.
+
+    retired=None lists every phrase, True only removed ones, False only active ones.
+    """
+    _, additions = ledger.learner_state(profile.learner_id, timezone=profile.timezone)
+    return [
+        {"id": r["id"], "ledger_identity": r["ledger_identity"], "phrase": r["phrase"],
+         "translation": r["translation"], "category": r.get("category"),
+         "learner_phrase": r.get("learner_phrase") is True,
+         "mode": "recall" if r.get("recall") is True else "learning", "retired": r.get("retired") is True}
+        for r in runtime_curriculum(profile, additions=additions)
+        if retired is None or (r.get("retired") is True) == retired
+    ]
 
 
 def due(profile: Profile = Profile(), *, ledger, now: datetime | None = None) -> list[dict]:

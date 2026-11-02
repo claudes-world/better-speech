@@ -177,7 +177,8 @@ def runtime_curriculum(profile, *, additions=()) -> tuple[dict, ...]:
     by_key = {canonical_phrase(r["l2"]): r for r in rows}
     for row in additions:
         key = canonical_phrase(row["l2"])
-        row["learner_phrase"] = True
+        # Mode/retire marks on a shipped phrase store learner_phrase=false to keep its schedule.
+        row.setdefault("learner_phrase", True)
         by_key[key] = {**by_key.get(key, {}), **row}
     result = []
     for original in by_key.values():

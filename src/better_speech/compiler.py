@@ -61,8 +61,9 @@ def _rank(rows, records, now, boost_daily_cap=3):
             row.get("added_at", ""),
         )
 
-    return sorted((row for row in rows if not _boost_pending(row, now)
-                   or _boosted(row, records, now, boost_daily_cap)), key=priority)
+    # Retired (removed) phrases are hidden from selection and from `due`; their history stays.
+    return sorted((row for row in rows if row.get("retired") is not True and (
+        not _boost_pending(row, now) or _boosted(row, records, now, boost_daily_cap))), key=priority)
 
 
 def compile(
