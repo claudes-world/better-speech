@@ -11,7 +11,7 @@ from __future__ import annotations
 import html
 import re
 
-from .curriculum import canonical_phrase, grouped_literal
+from .curriculum import canonical_phrase, format_hint, grouped_literal
 
 _LINK = re.compile(r"\[([^\]\n]+)\]\((https?://(?:[^()<>\s]|\([^()<>\s]*\))+)\)")
 _DASH = re.compile(r"\s*[—•]\s*")
@@ -105,9 +105,9 @@ def present(plan):
             if literal:
                 item[-1] += "  "
                 item.append("   _" + _label(literal) + "_")
-            if row.get("hint"):
-                # Keep a single hint line, including for founder-authored multiline hints.
-                hint = " ".join(row["hint"].splitlines())
+            hint = format_hint(row["hint"]) if isinstance(row.get("hint"), str) else ""
+            if hint:
+                # One line, words split by spaces, breath breaks as " / "; legacy " - " separators become spaces.
                 # Code content is literal; the Markdown renderer escapes its HTML.
                 # A longer fence keeps founder-authored backticks inside the block.
                 fence = "`" * max(3, max((len(run) + 1 for run in re.findall(r"`+", hint)), default=0))

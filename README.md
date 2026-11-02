@@ -135,7 +135,9 @@ approximations; regional differences remain in the central/southern lesson voice
 v use y, đ uses d, r keeps r, and tr stays tr without a strongly separate r. Vietnamese th uses
 plain t, like tea, never English th.
 
-Pieces are separated by ` - `; syllables within a multi-syllable word use a single space. Give each
+Words and syllables are separated by single spaces; ` / ` marks a natural breath point (two or three
+chunks for a full sentence, none for a short phrase). A stored hint that still uses ` - ` separators
+renders them as spaces; hyphens inside one syllable's spelling (nyee-uh-oo) stay. Give each
 syllable one beat, without English stress. Eh (also e
 in closed hints such as em/dep/sem) is the vowel of bet; ay for ê is the first part of say, held
 steady without an ee offglide. Lên/mệt use the southern central-vowel cues luhn/muht. Ee is see; gì
@@ -158,7 +160,7 @@ Every non-level syllable has a tone mark glued directly to it: no mark means nga
 `•` is nặng’s low heavy register, which may recover slightly on open/nasal-final syllables, without a
 compulsory glottal choke. Low syllables ending in p/t/k also have final-stop closure; clipping is
 a reading note, not a separate mark. These are broad directions, not fixed pitch tracks. For example,
-`chaw - min↓ - mohk• - kye↑ - khahng tahm↑ - ah•` retains the two syllables of khăn tắm together.
+`chaw min↓ / mohk• kye↑ khahng tahm↑ ah•` breathes once, after chaw min↓.
 
 Set one profile setting to choose the optional contextual placer:
 

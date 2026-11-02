@@ -27,6 +27,7 @@ def test_source_html_cannot_close_collapsed_transcript():
 
 def test_public_render_numbers_lessons_in_first_audible_order(tmp_path):
     import json
+    import re
 
     from better_speech import render
     from tests.test_model_free_audio import ToneProvider
@@ -61,7 +62,8 @@ def test_public_render_numbers_lessons_in_first_audible_order(tmp_path):
         def snapshot(self, *args, **kwargs):
             return records
 
-    cfg = replace(cfg, intensity=2)
+    # Always close so the numbering check covers the closing item regardless of the seeded draw.
+    cfg = replace(cfg, intensity=2, closer_chance=1.0)
     plan = compile("# First paragraph.\n\nSecond paragraph.", cfg, ledger=KnownPhrases(), model_call=select)
     provider = ToneProvider()
     result = render(plan, {"google": provider, "elevenlabs": provider}, tmp_path / "cache")
@@ -73,7 +75,10 @@ def test_public_render_numbers_lessons_in_first_audible_order(tmp_path):
     lesson_block = next(section.text for section in result.sections if section.kind == "lesson")
     rows = [line for line in lesson_block.splitlines() if line[:1].isdigit()]
     assert len(rows) == 4  # the closing is numbered as the next item
-    for number, phrase, line in zip((1, 2, 3, 4), ("Không sao đâu", "Hiểu rồi", "Ăn thôi", "Đi thôi"), rows):
+    # Which closing is drawn depends on the curriculum-seeded draw; it must still be numbered 4.
+    closing = next(lesson for lesson in result.plan.lessons if lesson.record.get("category") in ("closing", "bookend"))
+    closing_phrase = " ".join(re.findall(r"\w+", closing.record["phrase"]))
+    for number, phrase, line in zip((1, 2, 3, 4), ("Không sao đâu", "Hiểu rồi", "Ăn thôi", closing_phrase), rows):
         assert line.startswith(f"{number}. **") and phrase in line
     assert result.markdown.index(rows[0]) < result.markdown.index(rows[1]) < result.markdown.index(rows[2]) < result.markdown.index(rows[3])
 
@@ -107,8 +112,8 @@ def test_hint_fences_stand_alone_between_numbered_items():
     fences = [token for token in tokens if token.type == 'fence']
     assert all(token.level == 0 for token in fences)
     assert [token.content for token in fences] == [
-        'ahng - thoy\n', 'hee-uh-oo⌄ - roy↓\n',
-        'chaw - min↓ - mohk• - kye↑ - khahng tahm↑ - ah•\n',
+        'ahng thoy\n', 'hee-uh-oo⌄ roy↓\n',
+        'chaw min↓ / mohk• kye↑ khahng tahm↑ ah•\n',
     ]
     assert len([token for token in tokens if token.type == 'hr']) == 2
     items = text.split('\n\n---\n\n')
@@ -144,7 +149,7 @@ def test_host_render_preserves_standalone_hint_fences_and_numbering():
     assert len(parts) == 1
     rich, plain = host.render(parts[0])
     lesson = parts[0]['sections'][0]['text']
-    assert '\n```  \nahng - thoy  \n```' in rich
+    assert '\n```  \nahng thoy  \n```' in rich
     assert lesson in plain
     # Parse the actual host output, including its two-space line joins and wrapper.
     tokens = MarkdownIt('commonmark', {'html': True}).parse(rich)
@@ -154,8 +159,8 @@ def test_host_render_preserves_standalone_hint_fences_and_numbering():
     fences = [token for token in tokens if token.type == 'fence']
     assert all(token.level == 0 for token in fences)
     assert [token.content.rstrip() for token in fences] == [
-        'ahng - thoy', 'hee-uh-oo⌄ - roy↓',
-        'chaw - min↓ - mohk• - kye↑ - khahng tahm↑ - ah•',
+        'ahng thoy', 'hee-uh-oo⌄ roy↓',
+        'chaw min↓ / mohk• kye↑ khahng tahm↑ ah•',
     ]
 
     row = plan.lessons[0].record
@@ -243,7 +248,7 @@ def test_item_layout_matches_liam_preview_exactly():
         "   _I have news this_\n"
         "\n"
         "```\n"
-        "min↓ - kaw↑ - tin - nigh↓\n"
+        "min↓ kaw↑ tin nigh↓\n"
         "```\n"
         "\n"
         "---\n"
@@ -253,10 +258,12 @@ def test_item_layout_matches_liam_preview_exactly():
         "   _\\[classifier\\] this how much money_\n"
         "\n"
         "```\n"
-        "kye↑ - nigh↓ - bow nyee-uh-oo - teeyen↓\n"
+        "kye↑ nigh↓ bow nyee-uh-oo teeyen↓\n"
         "```"
     )
     assert "—" not in text and not text.endswith("---")
+    # A stored legacy " - " separator renders as a space; the hyphens inside nyee-uh-oo stay.
+    assert " - " not in text
 
 
 from dataclasses import dataclass as _dc

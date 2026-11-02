@@ -27,6 +27,15 @@ def canonical_phrase(text: str) -> str:
     return unicodedata.normalize("NFC", text)
 
 
+def format_hint(text: str) -> str:
+    """One hint line: words split by single spaces, breath breaks as " / ".
+
+    A legacy spaced " - " word separator becomes a space; hyphens inside a
+    syllable spelling (nyee-uh-oo) stay.
+    """
+    return " ".join(token for token in text.split() if token != "-")
+
+
 def strip_tiers(text: str) -> str:
     text = re.sub(r"⟨[0-9]⟩|⟨[0-9]|[0-9]⟩", " ", text)
     return js_collapse_whitespace(re.sub("[⟨⟩]", "", text))
