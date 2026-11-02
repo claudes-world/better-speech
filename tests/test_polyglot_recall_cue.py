@@ -103,3 +103,70 @@ def test_invalid_cue_voice_falls_back_to_narrator_and_keeps_lessons():
 def test_profile_round_trip_keeps_cue_voice():
     cfg = replace(profile(), cue=CUE, recall=True, recall_pause_s=2.0)
     assert Profile.from_dict(json.loads(canonical_json(cfg.to_dict()))) == cfg
+
+
+def test_recall_pause_setting_reaches_the_cue_clip():
+    rows = []
+
+    class MarkedLedger(EmptyLedger):
+        def learner_state(self, learner_id, **kwargs):
+            return {}, rows
+
+    from better_speech.curriculum import runtime_curriculum
+
+    rows.extend({k: v for k, v in r.items() if k != "ledger_identity"} | {"recall": True}
+                for r in runtime_curriculum(Profile()))
+    cfg = replace(profile(), recall=True, recall_pause_s=2.0, closer_chance=0.0)
+    plan = compile("Source.", cfg, ledger=MarkedLedger(), now=NOW, seed=1)
+    cue = next(c for c in plan.clips if c.purpose == "translation")
+    assert cue.pause_after_s == 2.0 and cue.voice == profile().english.voice
+
+
+def test_recall_stays_echo_free_when_learning_would_force_an_echo():
+    pending = dict(RECORD, recall=True, pending_learning=True)
+    assert sequence(pending, recall=True, repeat=False, recallPauseS=1.5) == [
+        ("translation", "Coffee, please.", "narrator", 1.5),
+        ("lesson", "Cho mình, cà phê.", "lead", 0.7),
+    ]
+    # Without a translation a recall item is just the Vietnamese.
+    assert sequence(dict(RECORD, recall=True, translation=""), recall=True) == [
+        ("lesson", "Cho mình, cà phê.", "lead", 0.7),
+    ]
+
+
+def test_invalid_recall_pause_setting_falls_back_to_plain_source():
+    for bad in (-1, float("nan"), "1"):
+        clips, reason = sequence_clips(
+            "Done.", inventory=[dict(RECORD, recall=True)], main=MAIN, settings={"recall": True, "recallPauseS": bad},
+            placements=[LessonPlacement("coffee", 5, "end", LEAD, ECHO, 1, "open")],
+        )
+        assert reason.startswith("invalid optional") and [c.purpose for c in clips] == ["source"]
+
+
+def test_switch_constants_cover_the_open_questions(monkeypatch):
+    import better_speech.planner as planner
+
+    monkeypatch.setattr(planner, "CUE_IN_LEARNING", False)
+    assert sequence(RECORD, cue=CUE)[1][2] == "narrator"
+    assert sequence(dict(RECORD, recall=True), recall=True, cue=CUE)[0][2] == CUE.voice
+    monkeypatch.setattr(planner, "RECALL_ECHO", True)
+    assert sequence(dict(RECORD, recall=True), recall=True, recallPauseS=1.5) == [
+        ("translation", "Coffee, please.", "narrator", 1.5),
+        ("lesson", "Cho mình, cà phê.", "lead", 1.3),
+        ("lesson", "Cho mình, cà phê.", "echo", 0.25),
+    ]
+
+
+def test_single_recall_pause_constant():
+    from better_speech import compiler, planner
+    from better_speech.types import RECALL_PAUSE_S
+
+    assert Profile().recall_pause_s == planner.DEFAULTS["recallPauseS"] == RECALL_PAUSE_S
+    assert compiler._LANE_CONTROL_DEFAULTS["recall_pause_s"] == RECALL_PAUSE_S
+
+
+def test_malformed_cue_object_drops_only_the_cue():
+    from better_speech.config import resolve_profile
+
+    loaded = resolve_profile(Profile.from_dict({**profile().to_dict(), "cue": {"voice": "x", "bogus": 1}}))
+    assert loaded.enabled and loaded.cue is None and "invalid_cue_voice" in loaded.config_diagnostics

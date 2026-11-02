@@ -18,7 +18,7 @@ from .exposure import anchor_floor, timestamp
 from .markdown import markdown_to_speech_structure
 from .planner import LessonPlacement, sequence_clips
 from .rewriter import parse_placements
-from .types import Diagnostic, Lesson, Plan, Profile, canonical_json, digest
+from .types import RECALL_PAUSE_S, Diagnostic, Lesson, Plan, Profile, canonical_json, digest
 from .voices import choose_lesson_voices
 
 
@@ -45,7 +45,7 @@ _LANE_CONTROL_DEFAULTS = {
     # 0.2.18 polyglot cue voice and recall mode.
     "cue": None,
     "recall": False,
-    "recall_pause_s": 1.5,
+    "recall_pause_s": RECALL_PAUSE_S,
 }
 
 

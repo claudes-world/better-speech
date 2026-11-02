@@ -15,7 +15,7 @@ from dataclasses import asdict, dataclass, replace
 from .boundaries import paragraph_boundaries
 from .curriculum import canonical_phrase
 from .pacing import compile_lesson, resolve_profile
-from .types import Clip, Voice, canonical_json
+from .types import RECALL_PAUSE_S, Clip, Voice, canonical_json
 
 DEFAULTS = {
     "repeat": True,
@@ -25,7 +25,7 @@ DEFAULTS = {
     "repeatPauseS": 1.0,
     # Recall items honoured only when the lane opts in (Profile.recall).
     "recall": False,
-    "recallPauseS": 1.5,
+    "recallPauseS": RECALL_PAUSE_S,
 }
 # The cue voice also reads the English of Learning items; False limits it to Recall items.
 CUE_IN_LEARNING = True

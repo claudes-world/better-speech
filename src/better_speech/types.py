@@ -56,6 +56,11 @@ class Voice:
 
 
 
+# Thinking pause between a recall item's English cue and its Vietnamese (seconds). The single
+# source for the Profile default, the planner default and the digest default.
+RECALL_PAUSE_S = 1.5
+
+
 @dataclass(frozen=True)
 class Profile:
     english: Voice = field(default_factory=lambda: Voice("en-US-Neural2-J", "google", "neural2", 1.05, "mp3"))
@@ -85,12 +90,12 @@ class Profile:
     paragraph_start_lessons: bool = True
     paragraph_end_lessons: bool = True
     end_lesson: bool = True
-    # 0.2.18 polyglot: English cue voice (None = the narrator reads the English),
-    # recall marks honoured on this lane, and the thinking pause before a recall item's
-    # Vietnamese. At these defaults they stay out of the profile digest.
+    # 0.2.18 polyglot: English cue voice (None = the narrator reads the English); recall
+    # marks honoured on this lane (PLAN §6 audio.polyglot_recall, off until rollout); the
+    # thinking pause before a recall item's Vietnamese. At defaults they stay out of the digest.
     cue: Voice | None = None
     recall: bool = False
-    recall_pause_s: float = 1.5
+    recall_pause_s: float = RECALL_PAUSE_S
     pacing: dict = field(default_factory=dict)
     curriculum_path: str | None = None
     state_dir: str | None = None
@@ -114,8 +119,11 @@ class Profile:
         data = dict(value)
         if "english" in data:
             data["english"] = Voice(**data["english"])
-        if data.get("cue") is not None:
-            data["cue"] = Voice(**data["cue"])
+        if isinstance(data.get("cue"), dict):
+            try:
+                data["cue"] = Voice(**data["cue"])
+            except (TypeError, ValueError):
+                pass  # optional: resolve_profile drops it with invalid_cue_voice
         if "voices" in data:
             data["voices"] = tuple(Voice(**row) for row in data["voices"])
         if "config_diagnostics" in data:
