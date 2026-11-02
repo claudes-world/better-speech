@@ -23,7 +23,7 @@ def _writable(profile):
 def _own(row, existing):
     """Turn a mark-only row into a full learner row, exactly as an unmarked shipped phrase is
     copied by `learn`/`learned`; its marks are kept."""
-    if row.get("learner_phrase") is False and existing:
+    if row.get("learner_phrase") is False:
         marks = {k: v for k, v in row.items() if k not in ("id", "l2", "l1", "learner_phrase")}
         row.clear()
         row.update({k: v for k, v in existing.items() if k != "learner_phrase"}, **marks)
@@ -54,15 +54,17 @@ def learn(vietnamese: str, gloss: str, profile: Profile = Profile(), *, ledger, 
         existing = next((r for r in runtime_curriculum(profile, additions=rows)
                          if canonical_phrase(r["l2"]) == phrase), None)
         row = next((r for r in rows if canonical_phrase(r["l2"]) == phrase), None)
-        if row is not None:
-            _own(row, existing)
+        template = existing or {
+            "id": "learn-" + hashlib.sha256(phrase.encode()).hexdigest()[:16],
+            "l2": phrase, "units": [phrase], "lesson_type": "learning_sentence",
+            "vocabulary": [], "structure_pauses": [],
+        }
         if row is None:
-            row = dict(existing) if existing else {
-                "id": "learn-" + hashlib.sha256(phrase.encode()).hexdigest()[:16],
-                "l2": phrase, "units": [phrase], "lesson_type": "learning_sentence",
-                "vocabulary": [], "structure_pauses": [],
-            }
+            row = dict(template)
             rows.append(row)
+        else:
+            # Includes a mark-only row whose shipped phrase no longer ships.
+            _own(row, template)
         row.update(
             l1=gloss.strip(), translation=gloss.strip(), pending_learning=True, landed=False,
             boost_until=timestamp(midnight.isoformat()), added_at=timestamp(instant.isoformat()),

@@ -187,3 +187,37 @@ def test_cli_phrases_mode_retire_restore(tmp_path, capsys):
     assert main(["phrases", "--active", *args]) == 0
     assert len(json.loads(capsys.readouterr().out)) == len(listed)
     assert main(["retire", "missing", *args]) == 2
+
+
+def _curriculum(tmp_path, **changes):
+    base = {"id": "coffee", "l2": "Cho mình cà phê.", "l1": "Coffee, please.", "units": ["Cho mình", "cà phê"],
+            "lesson_type": "connector"}
+    path = tmp_path / "curriculum.json"
+    path.write_text(json.dumps({"focusPhrases": [dict(base, **changes)] if changes.get("id") != "gone" else []}))
+    return profile(state_dir=str(tmp_path), curriculum_path=str(path))
+
+
+def test_rename_then_learned_keeps_one_stored_row_and_marks_stay_editable(tmp_path):
+    cfg = _curriculum(tmp_path)
+    set_mode("coffee", "recall", cfg, ledger=ledger(cfg))
+    cfg = _curriculum(tmp_path, id="coffee-v2")
+    learned("coffee-v2", cfg, ledger=ledger(cfg))
+    assert [r["id"] for r in ledger(cfg).learner_state(cfg.learner_id)[1]] == ["coffee-v2"]
+    set_mode("coffee-v2", "learning", cfg, ledger=ledger(cfg))
+    retire("coffee-v2", cfg, ledger=ledger(cfg))
+    [row] = phrases(cfg, ledger=ledger(cfg))
+    assert (row["id"], row["mode"], row["retired"], row["landed"]) == ("coffee-v2", "learning", True, True)
+    restore("coffee-v2", cfg, ledger=ledger(cfg))
+    assert phrases(cfg, ledger=ledger(cfg))[0]["retired"] is False
+
+
+def test_learn_re_adds_a_marked_phrase_that_stopped_shipping(tmp_path):
+    cfg = _curriculum(tmp_path)
+    retire("coffee", cfg, ledger=ledger(cfg))
+    cfg = _curriculum(tmp_path, id="gone")
+    assert phrases(cfg, ledger=ledger(cfg)) == []
+    row = learn("Cho mình cà phê.", "Coffee again.", cfg, now=NOW, ledger=ledger(cfg))
+    assert row["id"].startswith("learn-") and row["units"] == ["Cho mình cà phê."] and "retired" not in row
+    [listed] = phrases(cfg, ledger=ledger(cfg))
+    assert (listed["translation"], listed["learner_phrase"]) == ("Coffee again.", True)
+    assert [r["id"] for r in ledger(cfg).learner_state(cfg.learner_id)[1]] == [row["id"]]
