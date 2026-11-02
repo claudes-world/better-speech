@@ -129,9 +129,9 @@ def test_hint_code_block_after_translation_and_never_spoken():
     plan = compile('Note.', profile(), ledger=EmptyLedger())
     sections, _ = present(replace(plan, executed=True))
     lines = next(s.text for s in sections if s.kind == 'lesson').splitlines()
-    assert 'eat' in lines[1] and '[just/let' in lines[1].replace('\\', '')
-    assert 'eat' in lines[2]
-    assert lines[3:7] == ['', '```', 'ahng - thoy', '```']
+    assert 'eat' in lines[1]
+    assert lines[2:6] == ['', '```', 'ahng - thoy', '```']
+    assert lines[6].startswith('*') and '[just/let' in lines[6].replace('\\', '')
     assert all('ahng - thoy' not in clip.text for clip in plan.clips)
 
 
@@ -174,3 +174,15 @@ def test_every_shipped_syllable_matches_alphabet_guide_fixture():
             assert hint == expected[word], (row['id'], word, hint)
             checked.add(word)
     assert checked == expected.keys()
+
+
+def test_cli_learn_literal_persists_and_renders(tmp_path, capsys):
+    config = tmp_path / 'profile.toml'
+    config.write_text('model="none"\nstate_dir="state"\n[[voices]]\nvoice="native"\n')
+    assert main(['learn', 'Học nhé.', '--gloss', 'Let us learn.', '--literal', 'study — [softener]',
+                 '--profile', str(config)]) == 0
+    assert json.loads(capsys.readouterr().out)['literal'] == 'study — [softener]'
+    from better_speech.config import load_profile
+    cfg = load_profile(config)
+    plan = compile('Note.', cfg, ledger=Ledger.for_profile(cfg))
+    assert 'study — \\[softener\\]' in present(replace(plan, executed=True))[1]

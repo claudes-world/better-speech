@@ -83,13 +83,18 @@ def present(plan):
 
     sections = [Section("title", derive_title(plan.source))]
     if plan.executed and plan.lessons:
-        lines = []
-        number = 0
-        for lesson in plan.lessons:
+        items = []
+        for number, lesson in enumerate(plan.lessons, 1):
             row = lesson.record
-            number += row.get("category") not in ("closing", "bookend")
-            label = "" if row.get("category") in ("closing", "bookend") else f"{number}. "
-            lines.append(f"{label}**{_label(_grouped_phrase(row['phrase'], row.get('units')))}**")
+            item = [f"{number}. **{_label(_grouped_phrase(row['phrase'], row.get('units')))}**",
+                    "   " + _label(row["translation"])]
+            if row.get("hint"):
+                # Keep a single hint line, including for founder-authored multiline hints.
+                hint = " ".join(row["hint"].splitlines())
+                # Code content is literal; the Markdown renderer escapes its HTML.
+                # A longer fence keeps founder-authored backticks inside the block.
+                fence = "`" * max(3, max((len(run) + 1 for run in re.findall(r"`+", hint)), default=0))
+                item.extend(("", fence, hint, fence))
             try:
                 aligned = grouped_literal(row)
             except Exception:
@@ -98,17 +103,10 @@ def present(plan):
             if isinstance(literal, list):
                 literal = " • ".join(literal)
             if literal:
-                lines.append("   *" + _label(literal) + "*")
-            lines.append("   " + _label(row["translation"]))
-            if row.get("hint"):
-                # Keep a single hint line, including for founder-authored multiline hints.
-                hint = " ".join(row["hint"].splitlines())
-                # Code content is literal; the Markdown renderer escapes its HTML.
-                # A longer fence keeps founder-authored backticks inside the block.
-                fence = "`" * max(3, max((len(run) + 1 for run in re.findall(r"`+", hint)), default=0))
-                lines.extend(("", fence, hint, fence))
-            lines.append("")
-        sections.append(Section("lesson", "\n".join(lines), True))
+                # After a fence the list item has ended, so the literal sits at column 0 on the next line.
+                item.append(("" if row.get("hint") else "   ") + "*" + _label(literal) + "*")
+            items.append("\n".join(item))
+        sections.append(Section("lesson", "\n\n".join(items), True))
     sections.append(Section("transcript", plan.source, True))
     links = extract_links(plan.source)
     if links:

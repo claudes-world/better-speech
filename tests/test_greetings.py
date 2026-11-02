@@ -150,8 +150,8 @@ def test_closing_only_after_complete_source(tmp_path, text, greeting):
     assert min(closing_indices) > max(source_indices)
     sections, _ = present(replace(plan, executed=True))
     lines = next(s.text for s in sections if s.kind == 'lesson').splitlines()
-    assert any(line.startswith('**') for line in lines)
-    assert not any(line[:1].isdigit() and closings(plan)[0].record['phrase'].rstrip('!.?') in line for line in lines)
+    assert any(line[:1].isdigit() and '**' in line for line in lines)
+    assert any(line[:1].isdigit() and closings(plan)[0].record['phrase'].rstrip('!.?') in line for line in lines)
 
 
 def test_closing_rotation_is_confirmed_and_per_learner(tmp_path):
@@ -255,7 +255,7 @@ def test_bookend_only_at_message_boundaries(tmp_path):
             assert max(clips) < min(source) or min(clips) > max(source)
             seen.add('open' if max(clips) < min(source) else 'close')
             block = next(s.text for s in present(replace(plan, executed=True))[0] if s.kind == 'lesson')
-            assert not any(line[:1].isdigit() and 'Đi thôi' in line for line in block.splitlines())
+            assert any(line[:1].isdigit() and 'Đi thôi' in line for line in block.splitlines())
     assert seen == {'open', 'close'}
 
 

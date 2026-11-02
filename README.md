@@ -122,8 +122,8 @@ eligible echo voice, the lesson keeps its lead without an echo. Setting
 The Vietnamese phrase list is the **lexicon**, stored in `curriculum.vi.json`.
 Every shipped phrase includes a founder-editable English pronunciation `hint`.
 The lesson block shows it in a standalone, full-width fenced code block after the
-literal gloss and translation. The fences and hint start at column zero, with
-blank lines around the block; the block contains only the hint. Add or edit your own with `speak learn PHRASE --gloss GLOSS --hint RESPELLING`. Hints are
+translation. The literal gloss follows the closing fence on the very next line at column zero (no blank line; with no hint it sits indented under the translation). Each item (closings included) is numbered. The fences and hint start at column zero, with
+blank lines around the block; the block contains only the hint. Add or edit your own with `speak learn PHRASE --gloss GLOSS --hint RESPELLING [--literal GLOSS]`. Hints are
 visual only.
 
 Accent: The shipped pronunciation hints use a southern Vietnamese target with broad English-speaker

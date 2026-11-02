@@ -7,7 +7,7 @@ from tests.test_model_free_audio import EmptyLedger, profile
 
 def test_only_executed_lesson_has_numbered_collapsible_block_and_links():
     plan = compile("Hello.\n\n[Docs](https://example.org/docs).", profile(), ledger=EmptyLedger())
-    assert "Vietnamese lexicon" not in present(plan)[1]
+    assert "Vietnamese lesson" not in present(plan)[1]
     sections, markdown = present(replace(plan, executed=True))
     assert [s.kind for s in sections] == ["title", "lesson", "transcript", "links"]
     assert sections[1].collapsible
@@ -72,10 +72,10 @@ def test_public_render_numbers_lessons_in_first_audible_order(tmp_path):
     assert [lesson.phrase_key for lesson in result.plan.lessons] == audible_keys
     lesson_block = next(section.text for section in result.sections if section.kind == "lesson")
     rows = [line for line in lesson_block.splitlines() if line[:1].isdigit()]
-    assert len(rows) == 3
-    for number, phrase, line in zip((1, 2, 3), ("Không sao đâu", "Hiểu rồi", "Ăn thôi"), rows):
+    assert len(rows) == 4  # the closing is numbered as the next item
+    for number, phrase, line in zip((1, 2, 3, 4), ("Không sao đâu", "Hiểu rồi", "Ăn thôi", "Đi thôi"), rows):
         assert line.startswith(f"{number}. **") and phrase in line
-    assert result.markdown.index(rows[0]) < result.markdown.index(rows[1]) < result.markdown.index(rows[2])
+    assert result.markdown.index(rows[0]) < result.markdown.index(rows[1]) < result.markdown.index(rows[2]) < result.markdown.index(rows[3])
 
 
 def _three_lesson_plan():
@@ -112,10 +112,12 @@ def test_hint_fences_stand_alone_between_numbered_items():
     ]
     for number, item in enumerate(re.split(r'\n\n(?=\d+\. )', text.rstrip()), 1):
         assert item.startswith(f'{number}. **')
-        before, code = item.split('\n\n', 1)
-        assert len(before.splitlines()) == 3  # phrase, literal, translation
-        assert code.startswith('```\n')
-        assert code.endswith('\n```')
+        before, rest = item.split('\n\n')
+        assert len(before.splitlines()) == 2  # phrase, translation
+        assert rest.startswith('```\n')
+        closing, literal = rest.rsplit('\n', 1)
+        assert closing.endswith('\n```')  # literal follows the closing fence directly, at column 0
+        assert literal.startswith('*') and literal.endswith('*')
 
 
 def test_host_render_preserves_standalone_hint_fences_and_numbering():
@@ -190,3 +192,30 @@ def test_custom_hint_newlines_backticks_and_html_stay_in_one_code_line():
     assert 'dee toy ``` &lt;soft&gt; &amp; &lt;/details&gt;' in rendered
     assert '&amp;lt;' not in rendered
     assert '<summary>Transcript</summary>' in rendered
+
+
+def test_item_layout_orders_translation_pronunciation_literal_without_stray_blanks():
+    from dataclasses import dataclass
+
+    @dataclass
+    class L:
+        record: dict
+
+    @dataclass
+    class P:
+        source: str
+        executed: bool
+        lessons: tuple
+
+    rows = (
+        {"phrase": "Xin chào", "translation": "Hello", "hint": "sin chow", "literal": "ask — hello"},
+        {"phrase": "Cảm ơn", "translation": "Thanks"},
+        {"phrase": "Đi thôi", "translation": "Let us go", "category": "closing", "literal": "go — let's"},
+    )
+    sections, _ = present(P("Note.", True, tuple(L(r) for r in rows)))
+    text = next(s.text for s in sections if s.kind == "lesson")
+    assert text == (
+        "1. **Xin chào**\n   Hello\n\n```\nsin chow\n```\n*ask — hello*\n\n"
+        "2. **Cảm ơn**\n   Thanks\n\n"
+        "3. **Đi thôi**\n   Let us go\n   *go — let's*"
+    )

@@ -78,5 +78,5 @@ def test_missing_native_provider_yields_complete_english(tmp_path):
     result = render(plan, {"google": ToneProvider()}, tmp_path / "cache")
     assert result.audio_path and result.plan.status == "english"
     assert not result.plan.lessons
-    assert "Vietnamese lexicon" not in result.markdown
+    assert "Vietnamese lesson" not in result.markdown
     assert "".join(c.text for c in result.plan.clips) == plan.speech_text

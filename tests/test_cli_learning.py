@@ -161,6 +161,6 @@ def test_cli_text_degradation_removes_previous_successful_output(config, tmp_pat
     assert main(args) == 0
     printed = capsys.readouterr()
     assert "A different complete note." in printed.out
-    assert "Vietnamese lexicon" not in printed.out
+    assert "Vietnamese lesson" not in printed.out
     assert "english_render" in printed.err
     assert not output.exists()
