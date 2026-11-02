@@ -103,7 +103,8 @@ def present(plan):
             if isinstance(literal, list):
                 literal = " • ".join(literal)
             if literal:
-                item.extend(("", "   *" + _label(literal) + "*"))
+                # After a fence the list item has ended, so the literal sits at column 0 on the next line.
+                item.append(("" if row.get("hint") else "   ") + "*" + _label(literal) + "*")
             items.append("\n".join(item))
         sections.append(Section("lesson", "\n\n".join(items), True))
     sections.append(Section("transcript", plan.source, True))

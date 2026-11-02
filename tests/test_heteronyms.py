@@ -210,10 +210,10 @@ def test_ssml_failure_retains_teaching_and_plain_failure_still_fails_open(tmp_pa
     if failure == 'ssml_only':
         assert result.audio_path and result.status == 'bilingual', result.diagnostics
         assert result.plan.lessons == plan.lessons
-        assert 'Vietnamese lexicon' in result.markdown
+        assert 'Vietnamese lesson' in result.markdown
     elif failure == 'native_after_ssml':
         assert result.audio_path and result.status == 'english', result.diagnostics
-        assert not result.plan.lessons and 'Vietnamese lexicon' not in result.markdown
+        assert not result.plan.lessons and 'Vietnamese lesson' not in result.markdown
     else:
         assert not result.audio_path and result.status == 'text'
         assert not result.plan.lessons

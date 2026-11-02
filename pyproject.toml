@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "better-speech"
-version = "0.2.15"
+version = "0.2.16"
 description = "Vietnamese lessons inside agent voice notes"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -20,6 +20,8 @@ elevenlabs = ["httpx>=0.27"]
 
 [dependency-groups]
 dev = [
+    "google-cloud-texttospeech>=2.21",
+    "httpx>=0.27",
     "markdown-it-py>=4.2.0",
     "pytest>=8.3",
     "ruff>=0.9",

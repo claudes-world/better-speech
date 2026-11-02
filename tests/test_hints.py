@@ -131,7 +131,7 @@ def test_hint_code_block_after_translation_and_never_spoken():
     lines = next(s.text for s in sections if s.kind == 'lesson').splitlines()
     assert 'eat' in lines[1]
     assert lines[2:6] == ['', '```', 'ahng - thoy', '```']
-    assert lines[6] == '' and '[just/let' in lines[7].replace('\\', '')
+    assert lines[6].startswith('*') and '[just/let' in lines[6].replace('\\', '')
     assert all('ahng - thoy' not in clip.text for clip in plan.clips)
 
 

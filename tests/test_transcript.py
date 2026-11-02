@@ -7,7 +7,7 @@ from tests.test_model_free_audio import EmptyLedger, profile
 
 def test_only_executed_lesson_has_numbered_collapsible_block_and_links():
     plan = compile("Hello.\n\n[Docs](https://example.org/docs).", profile(), ledger=EmptyLedger())
-    assert "Vietnamese lexicon" not in present(plan)[1]
+    assert "Vietnamese lesson" not in present(plan)[1]
     sections, markdown = present(replace(plan, executed=True))
     assert [s.kind for s in sections] == ["title", "lesson", "transcript", "links"]
     assert sections[1].collapsible
@@ -112,10 +112,12 @@ def test_hint_fences_stand_alone_between_numbered_items():
     ]
     for number, item in enumerate(re.split(r'\n\n(?=\d+\. )', text.rstrip()), 1):
         assert item.startswith(f'{number}. **')
-        before, code, literal = item.split('\n\n')
+        before, rest = item.split('\n\n')
         assert len(before.splitlines()) == 2  # phrase, translation
-        assert code.startswith('```\n') and code.endswith('\n```')
-        assert literal.startswith('   *') and literal.endswith('*')
+        assert rest.startswith('```\n')
+        closing, literal = rest.rsplit('\n', 1)
+        assert closing.endswith('\n```')  # literal follows the closing fence directly, at column 0
+        assert literal.startswith('*') and literal.endswith('*')
 
 
 def test_host_render_preserves_standalone_hint_fences_and_numbering():
@@ -213,7 +215,7 @@ def test_item_layout_orders_translation_pronunciation_literal_without_stray_blan
     sections, _ = present(P("Note.", True, tuple(L(r) for r in rows)))
     text = next(s.text for s in sections if s.kind == "lesson")
     assert text == (
-        "1. **Xin chào**\n   Hello\n\n```\nsin chow\n```\n\n   *ask — hello*\n\n"
+        "1. **Xin chào**\n   Hello\n\n```\nsin chow\n```\n*ask — hello*\n\n"
         "2. **Cảm ơn**\n   Thanks\n\n"
-        "3. **Đi thôi**\n   Let us go\n\n   *go — let's*"
+        "3. **Đi thôi**\n   Let us go\n   *go — let's*"
     )
